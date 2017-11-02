@@ -56,3 +56,6 @@ client-setup:
   skin: "confort"
   menu: true
   lang: es
+  labels:
+    agrupacion-principal: Autonomía
+

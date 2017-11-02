@@ -609,7 +609,7 @@ class AppSIGBA extends backend.AppBackend{
                                 html.thead([
                                     html.tr([
                                         html.th(""),
-                                        html.th({class:'head-inicio',style:"text-align:left" },"Agrupacion Principal"),
+                                        html.th({class:'head-inicio',style:"text-align:left" },be.config['client-setup'].labels['agrupacion-principal']),
                                         html.th({class:'head-inicio',style:"text-align:left" },"Dimensión"),
                                         html.th({class:'head-inicio',style:"text-align:left" },"Indicador"),
                                         html.th({class:'head-inicio',style:"text-align:right"},"año"),
@@ -798,17 +798,18 @@ class AppSIGBA extends backend.AppBackend{
         ]);
     }
     getMenu(context){
+        be = this;
         return {menu:[
-            {menuType:'menu', name:'Variables de Indicadores', menuContent:[
+            {menuType:'menu', name:'Indicadores', menuContent:[
+                {menuType:'table', name:'agrupacion_principal', label:be.config['client-setup'].labels['agrupacion-principal'], },
+                {menuType:'table', name:'dimension'       , label:'Dimensión'                             },
+                {menuType:'table', name:'indicadores'     , label:'Indicadores'                           },
                 {menuType:'table', name:'fte'             , label:'Fuente de datos '                      },
                 {menuType:'table', name:'um'              , label:'Unidad de medida'                      },
                 {menuType:'table', name:'cv'              , label:'Coeficientes de variación'             },
-                {menuType:'table'    , name:'Cortes'                  , table:'cortes'               },
+                {menuType:'table', name:'cortes'          , label:'Cortes'                                },
+                {menuType:'table', name:'indicador_annio' , label:'Cobertura'                             },
             ]},
-            {menuType:'table'    , name:'Cobertura de indicadores', table:'indicador_annio'      },
-            {menuType:'table'    , name:'Agrupacion Principal'                 , table:'agrupacion_principal'              },
-            {menuType:'table'    , name:'Dimensión'               , table:'dimension'            },
-            {menuType:'table'    , name:'Indicadores'             , table:'indicadores'          },
             {menuType:'table'    , name:'Variables'               , table:'variables'            },
             {menuType:'table'    , name:'Indicadores-Variables'   , table:'indicadores_variables'},
             {menuType:'table'    , name:'Valores'                 , table:'valores'              },
@@ -819,7 +820,10 @@ class AppSIGBA extends backend.AppBackend{
                 {menuType:'calculaTotales' , name:'Calcular totales'},
                 {menuType:'table'          , name:'Discrepancias'         , table:'diferencia_totales'},
             ]},
-            {menuType:'table'    ,name:'Signos convencionales'   , table:'signos_convencionales'}
+            {menuType:'menu'     , name:'configuración'                 , menuContent:[
+                {menuType:'table'    , name:'signos_convencionales', label:'signos convencionales'},
+                {menuType:'table'    , name:'usuarios'},
+            ]},
         ]}
     }
     getTables(){
