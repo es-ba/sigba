@@ -108,6 +108,14 @@ window.addEventListener('load',function(){
             }
         }
     });
+    var foot=document.getElementById('foot-texto');
+    var footOtroRenglon=document.getElementById('foot-texto-2');
+    if(foot){
+        foot.textContent='Dirección General de Estadística y Censos';
+    }
+    if(footOtroRenglon){
+        footOtroRenglon.textContent='Gobierno de la Ciudad de Buenos Aires';
+    }
     var volverAHomeElements=document.querySelectorAll('[volver-a-home]');
     volverAHomeElements.forEach(function(elemento){
         elemento.addEventListener('click',function(){

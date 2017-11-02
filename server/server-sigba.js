@@ -533,7 +533,8 @@ class AppSIGBA extends backend.AppBackend{
                                 ]),
                                 html.div({class:'div-pantallas',id:'div-pantalla-izquierda'},[
                                     html.h2('Tabulados'),
-                                    html.table({id:'tabla-izquierda'},trCortantes)]),
+                                    html.table({id:'tabla-izquierda'},trCortantes)
+                                ]),
                                 html.div({class:'div-pantallas',id:'div-pantalla-derecha'},[
                                     html.h2({class:'tabulado-descripcion'},annio),
                                     fila.habilitado?html.div({id:'tabulado-html','para-graficador':JSON.stringify(tabuladoHtmlYDescripcion.matrix)},[tabuladoHtmlYDescripcion.tabuladoHtml]):null,                                    
@@ -557,7 +558,7 @@ class AppSIGBA extends backend.AppBackend{
                             ]);
                             var pagina=html.html([
                                 be.headSigba(false,req,descripcionTabulado.indicador),
-                                html.body([pantalla])
+                                html.body([pantalla,be.foot(skinUrl)])
                             ]);
                             res.send(pagina.toHtmlText({pretty:true}));
                             res.end();
@@ -601,11 +602,14 @@ class AppSIGBA extends backend.AppBackend{
                     html.body([
                         html.div({id:'total-layout', 'menu-type':'hidden'},[
                             be.encabezado(skinUrl,true,req),
-                            html.div({id:'div-encabezado-titutlo-tabulado',class:'titulo-tabulados'},[
-                                html.div({id:'indicadores-titulo',class:'titulo-tabulados'},'Indicadores'),
-                                html.div({id:'titulo-signos_convencionales',class:'titulo-tabulados'},[html.a({id:'signos_convencionales-link',href:'/sigba/principal-signos_convencionales'},'Signos convencionales')])
+                            html.div({id:'div-encabezado-titulo-tabulado',class:'titulo-tabulados'},[
+                                html.div({class:'encabezado-interno'},[
+                                    html.div({id:'indicadores-titulo',class:'titulo-tabulados'},'Indicadores'),
+                                    html.div({id:'titulo-signos_convencionales',class:'titulo-tabulados'},[html.a({id:'signos_convencionales-link',href:'/sigba/principal-signos_convencionales'},'Signos convencionales')]),
+                                    html.div({class:'float-clear'},"")
+                                ]),
                             ]),
-                            html.table({class:'tabla-inicio'},[
+                            html.table({class:'tabla-inicio', id:'tabla-inicio'},[
                                 html.thead([
                                     html.tr([
                                         html.th(""),
@@ -620,7 +624,8 @@ class AppSIGBA extends backend.AppBackend{
                                     ))
                                 ]),
                                 html.tbody(listaDeTr)
-                            ])
+                            ]),
+                            be.foot(skinUrl)
                         ])
                     ])
                 ]);
@@ -705,7 +710,8 @@ class AppSIGBA extends backend.AppBackend{
                             html.div({id:'total-layout', 'menu-type':'hidden'},[
                                 be.encabezado(skinUrl,false,req),
                                 tablaFicha
-                            ])
+                            ]),
+                            be.foot(skinUrl)
                         ])
                     ]);
                     res.send(paginaInfoIndicador.toHtmlText({pretty:true}));
@@ -732,7 +738,8 @@ class AppSIGBA extends backend.AppBackend{
                                     arregloLeyes.map(function(ley){
                                         return html.div({class:'leyes'},ley);
                                     })
-                                )
+                                ),
+                                be.foot(skinUrl)
                             ])
                         ])
                     ]);
@@ -769,7 +776,8 @@ class AppSIGBA extends backend.AppBackend{
                                             ])
                                         })
                                     )
-                                ])
+                                ]),
+                                be.foot(skinUrl)
                             ])
                         ])
                     ])
@@ -780,22 +788,33 @@ class AppSIGBA extends backend.AppBackend{
         })
     }
     encabezado(skinUrl,esPrincipal,req){
-        var paraIdOClase=esPrincipal?'':'-chico';
-        return html.div({id:'id-encabezado'+paraIdOClase,'volver-a-home':true},[
-            html.div({class:'encabezado'+paraIdOClase,id:'div-logo'+paraIdOClase,'volver-a-home':true},[
-                html.div({class:'encabezado'+paraIdOClase,id:'div-img-logo'+paraIdOClase,'volver-a-home':true},[
-                    html.img({class:'encabezado'+paraIdOClase,id:'img-logo'+paraIdOClase, src:skinUrl+'img/img-logo.png','volver-a-home':true})
+        var be = this;
+        return html.div({id:'id-encabezado','volver-a-home':true},[
+            html.div({class:'encabezado',id:'barra-superior','volver-a-home':true},[
+                html.div({class:'encabezado-interno'},[
+                    html.img({class:'encabezado',id:'bs-izq',src:skinUrl+'img/logo-ciudad.png','volver-a-home':true}),
+                    html.img({class:'encabezado',id:'bs-der',src:skinUrl+'img/logo-BA.png','volver-a-home':true})
                 ]),
-                html.div({id:'textos'+paraIdOClase,'volver-a-home':true},[
-                    esPrincipal?html.div({id:'texto-encabezado-grande','volver-a-home':true}):null,
-                    html.div({class:'encabezado',id:'estadistica-consejo'+paraIdOClase},[
-                        html.img({class:'encabezado'+paraIdOClase,id:'logo-consejo'+paraIdOClase, src:skinUrl+'img/img-logo-consejo.png','volver-a-home':true}),
-                        html.img({id:'logo-estadistica'+paraIdOClase,class:'encabezado', src:skinUrl+'img/img-logo-estadistica.png','volver-a-home':true}),
-                    ]),
-                    !esPrincipal?html.div({id:'texto-encabezado-chico','volver-a-home':true}):null,
-                ])
+            ]),
+            html.div({class:'encabezado',id:'barra-inferior','volver-a-home':true},[
+                html.div({class:'encabezado-interno'},[
+                    html.img({class:'encabezado',id:'img-logo',src:skinUrl+'img/img-logo.png','volver-a-home':true}),
+                ].concat(be.config['client-setup'].logos.map(function(logoName){
+                    return html.img({class:'encabezado',id:'logo-'+logoName,src:skinUrl+'img/img-logo-'+logoName+'.png','volver-a-home':true});
+                })).concat([
+                    be.config['client-setup'].conTextoPrincipal?html.div({class:'encabezado',id:'texto','volver-a-home':true}):null
+                ]))
             ])
         ]);
+    }
+    foot(skinUrl){
+        return html.div({class:'footer',id:'foot'},[
+            html.div({class:'footer',id:'foot-div-img'},[html.img({class:'footer',id:'foot-img',src:skinUrl+'img/foot-logo-BA.png'})]),
+            html.div({class:'footer',id:'contiene-textos-foot'},[
+                html.div({class:'footer',id:'foot-texto'}),
+                html.div({class:'footer',id:'foot-texto-2'})
+            ])
+        ])
     }
     getMenu(context){
         var be = this;

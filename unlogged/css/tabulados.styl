@@ -7,6 +7,9 @@ body
   margin 0px
   padding 0px
 
+#total-layout
+  min-width 960px
+    
 .tabla inicio
   background-color #fff
 
@@ -62,18 +65,21 @@ body
   -webkit-transition .2s ease-in-out
   transition .3s ease-in-out
   
-#div-encabezado-titutlo-tabulado
+.encabezado-interno
+  width 100%
+ 
+#div-encabezado-titulo-tabulado
   font-family helvetica
   font-size 100%
   background-color #878787
   padding 8px
   color #fff
   border-bottom solid 2px #fdb84b
-  width 137%
   line-height 30px
   padding 4px
   font-weight bold
-  display inline-block
+  width 100%
+  z-index 1
   
 #indicadores-titulo
   float left
@@ -81,15 +87,18 @@ body
   color #FFF
   font-size 120%
   margin-left 10px
+  z-index -1
+  
+.float-clear
+  float clear
+  height 32px
   
 #titulo-signos_convencionales
-  position relative
-  top 0
-  right 15%
   line-height 30px  
   color #FFF
   font-size 95%
-  z-index 1
+  margin-right 40px
+  float right
   text-decoration underline
 
 #valor-cv
@@ -141,7 +150,7 @@ thead th, #caption-signos_convencionales
   white-space nowrap
   color #FFF
   position sticky
-  top 100 /* required */
+  top 0 /* required */
   
 .campo_denominacion
   width 250px
@@ -391,7 +400,6 @@ h2
   line-height 30px  
   color #FFF
   font-size 100%
-  margin-right 350px
   z-index -1
   
 #tabulado-descripcion-um 
@@ -416,222 +424,122 @@ h2
 #div-pantalla-derecha
   margin-left 10px  
   display table
-  
-#id-encabezado
-  width 138%
+
+#barra-superior
+  background-image -webkit-gradient(linear left top left bottom from(#ffd300) to(#ffbc00))
+  background-image -webkit-linear-gradient(top, #ffd300 0%, #ffbc00 100%)
+  background-image linear-gradient(to bottom, #ffd300 0%, #ffbc00 100%)
+  background-color #ffbc00
+  border-color #d7a721
+  color #5f4600
+  height 48px
+  overflow:hidden
+    
+#barra-inferior
+  width 100%
   background-color #fff
   box-shadow 0 1.5em 9px -20px #687178
   padding 0
   z-index 2
   top 0
-  position sticky
   margin 0 auto
-
-#id-encabezado-chico
-  width 100%
-  background-color #fff
-  box-shadow 0 1.5em 9px -20px #687178
-  padding 0
-  z-index 1
-  top 0
-  position sticky
-  margin 0 auto
+  min-height 125px
+  overflow:hidden
   
-#div-logo-chico
-  height 100px
-  -webkit-animation animatediv 0.7s
-  animation animatediv 0.7s
-  animation-fill-mode forwards
-  transform-origin top left
-  box-shadow 0 1.5em 9px -30px #414549
-  z-index 1
-  position sticky
-
-#div-img-logo-chico
-  height 100px
-  float left
-  z-index 1
-  cursor pointer
-
-#img-logo-chico
-  padding 10px
-  -webkit-animation animatezoomout 0.7s
-  animation animatezoomout 0.7s
-  animation-fill-mode forwards
-  transform-origin top left
-  z-index 1
+#bs-izq
+  margin-left 50px
+  padding 8px
+  width 170px
   
-#textos
-  margin 20px
-  position absolute
-  margin-left 450
-  float left
-  -webkit-animation fade 1.5s forwards
-  -moz-animation fade 1.5s forwards
-  -o-animation fade 1.5s forwards
-  animation fade 1.5s forwards
-
-#textos-chico
-  margin 20px
-  position absolute
-  margin-left 450
-  float left
-  -webkit-animation fade 1.5s forwards
-  -moz-animation fade 1.5s forwards
-  -o-animation fade 1.5s forwards
-  animation fade 1.5s forwards
-
-#texto-encabezado-grande
+#bs-der
+  float right
+  padding 5px
+  padding-right 50px
+  
+#texto
+  box-sizing border-box
+  width calc(100% - 680px)
+  height 85px
   margin-left 10px
-  max-width 1050
-  height 120
   font-family helvetica
   font-size 82%
   color #7b7b7b
   text-align justify
   text-justify inter-word
-  margin-top 10px
+  margin-top 18px
   line-height 17px
-  overflow hidden
-  -webkit-animation typing 0.7s
-  animation typing 0.7s
-  animation-fill-mode forwards
-  transform-origin top left
-
-.al-reducir #texto-encabezado-grande
-  -webkit-animation typing-backwards 0.7s
-  animation typing-backwards 0.7s
-  animation-fill-mode forwards
-  transform-origin top left
-  margin-top 0px
-
-#texto-encabezado-chico
-  margin-left 10px
-  max-width 1050
-  height 0
-  font-family helvetica
-  font-size 82%
-  color #7b7b7b
-  margin-top 10px
-  line-height 20px
-  overflow hidden
-  -webkit-animation typing 0.7s
-  animation typing 0.7s
-  animation-fill-mode forwards
-  transform-origin top left
-  
-.al-reducir #texto-encabezado-chico
-  -webkit-animation typing-backwards 0.7s
-  animation typing-backwards 0.7s
-  animation-fill-mode forwards
-  transform-origin top left
-  margin-top 0px
-  
-#div-logo
-  -webkit-animation animatedivin 0.7s
-  animation animatedivin 0.7s
-  animation-fill-mode forwards
-  transform-origin top left
-  z-index 1
-  position sticky
-  position -webkit-sticky
-  top 0 /* required */
-  
-.al-reducir #div-logo
-  height 100px
-  -webkit-animation animatediv 0.7s
-  animation animatediv 0.7s
-  animation-fill-mode forwards
-  transform-origin top left
-  box-shadow 0 1.5em 9px -30px #414549
-  z-index 1
-  position sticky
-  
-#div-img-logo
-  height 100px
   float left
-  z-index 1
-  cursor pointer
+  position relative
+  overflow-y hidden
+  padding-right 16px
+  background-image url('../confort/img/continua.png')
+  background-position right bottom
+  background-repeat no-repeat
+  background-size 12px
 
-.al-reducir #div-img-logo
-  height 100px
-  z-index 1
+#texto:hover
+  overflow-y scroll
+  padding-right 0px
 
+#logo-estadistica
+  margin-top 5px
+  margin-left 15px
+  padding 10px
+  float right
+  position relative
+  width 220px
+
+#logo-consejo
+  margin-top 5px
+  margin-left 15px
+  padding 10px
+  float right
+  width 80px
+    
 #img-logo
   margin-top 5px
+  margin-left 15px
+  width 250px
   padding 10px
-  -webkit-animation animatezoom 0.7s
-  animation animatezoom 0.7s
-  animation-fill-mode forwards
-  transform-origin top left
+  float left
+  position relative 
 
-.al-reducir #img-logo
-  padding 10px
-  -webkit-animation animatezoomout 0.7s
-  animation animatezoomout 0.7s
-  animation-fill-mode forwards
-  transform-origin top left
-  z-index 1
-
-#estadistica-consejo
-  position fixed
-  top 0
-  right 0 
-  text-align right
-  height 90px
-  z-index 1
-  -webkit-animation fadeout 0.2s forwards
-  -moz-animation fadeout 0.2s forwards
-  -o-animation fadeout 0.2s forwards
-  animation fadeout 0.2s forwards
-  animation-fill-mode forwards
-  transform-origin top right
+#foot
+  height 177px
+  background-color #111111
+  width 143%
+  right 0
+  bottom 0
+  left 0
+  margin-bottom 0
+  clear both
+  margin-top 138px
   
-.al-reducir #estadistica-consejo
-  position fixed
-  top 0
-  right 0 
-  height 90px
-  z-index 1
-  -webkit-animation animatezoom 1.3s
-  animation animatezoom 1.3s
-  animation-fill-mode forwards
-  transform-origin top right
-
-#estadistica-consejo-chico
-  position fixed
-  top 0
-  right 0 
-  height 90px
-  -webkit-animation animatezoom 1.3s
-  animation animatezoom 1.3s
-  animation-fill-mode forwards
-  transform-origin top right
-
-#logo-estadistica-chico
-  -webkit-animation animatezoom 1.5s
-  animation animatezoom 1.5s
-  animation-fill-mode forwards
-  transform-origin top right
-  float right
-
+#foot-texto
+  font-family Open Sans,Arial, Helvetica, sans-serif
+  font-weight 400
+  font-style normal
+  font-size 13px
+  line-height 18px
+  color #ffffff
   
-#logo-estadistica
-  -webkit-animation fadeout 0.3s forwards
-  -moz-animation fadeout 0.3s forwards
-  -o-animation fadeout 0.3s forwards
-  animation fadeout 0.3s forwards
-  animation-fill-mode forwards
-  transform-origin top right
-  margin-left 30px
+#foot-texto-2  
+  font-family Open Sans,Arial, Helvetica, sans-serif
+  font-weight 400
+  font-style normal
+  font-size 13px
+  line-height 18px
+  color #999999
+  
+#foot-img
+  margin-top 60px
+  margin-left 222px
 
-.al-reducir #logo-estadistica
-  -webkit-animation animatezoom 1.5s
-  animation animatezoom 1.5s
-  animation-fill-mode forwards
-  transform-origin top right
+#contiene-textos-foot
   float right
-
+  margin-top -45px
+  margin-right 800px
+  
 [nivel-titulo="3"]
   font-size 110%
   background-color #808080
@@ -1048,6 +956,16 @@ h2
   
 @media print {
    #div-pantalla-izquierda{
+       display:none;}
+  }
+
+@media print {
+   #contiene-textos-foot{
+       display:none;}
+  }
+
+@media print {
+   #foot{
        display:none;}
   }
   

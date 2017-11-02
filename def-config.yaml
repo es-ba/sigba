@@ -58,4 +58,6 @@ client-setup:
   lang: es
   labels:
     agrupacion-principal: Autonomía
+  logos:
+  - estadistica
 
