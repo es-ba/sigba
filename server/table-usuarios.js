@@ -10,7 +10,7 @@ module.exports = function(context){
         fields:[
             {name:'usu_usu'              , typeName:'text'   , nullable:false   },
             {name:'usu_rol'              , typeName:'text'                    },
-            {name:'usu_clave'            , typeName:'text'    , allow:{select:context.user.usu_rol=='forDump'} },
+            {name:'usu_clave'            , typeName:'text'    , allow:{select:context.forDump} },
             {name:'usu_activo'           , typeName:'boolean' , nullable:false   ,defaultValue:false},
             {name:'usu_nombre'           , typeName:'text'                    },
             {name:'usu_apellido'         , typeName:'text'                    },
@@ -19,7 +19,7 @@ module.exports = function(context){
             {name:'usu_mail'             , typeName:'text'                    },
             {name:'usu_mail_alternativo' , typeName:'text'                    },
             {name:'usu_rol_secundario'   , typeName:'text'                    },
-            {name:'usu_tlg'              , typeName:'integer' , allow:{select:context.user.usu_rol=='forDump'}, nullable:false, defaultValue:1}
+            {name:'usu_tlg'              , typeName:'integer' , allow:{select:context.forDump}, nullable:false, defaultValue:1}
         ],
         primaryKey:['usu_usu']
     },context);
