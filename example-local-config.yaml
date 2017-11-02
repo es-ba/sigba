@@ -1,0 +1,5 @@
+db:
+  password: 44php55
+  port: 5432
+  database: sigba_produc_db
+  host: 10.32.72.10
