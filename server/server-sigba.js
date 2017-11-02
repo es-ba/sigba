@@ -8,6 +8,8 @@
 
 var Path = require('path');
 
+var absolutePath = '';
+
 function inlineLog(whatEver){
     console.log(whatEver);
     return whatEver;
@@ -115,7 +117,7 @@ class AppSIGBA extends backend.AppBackend{
                                         attributes.title=registro.def_con;
                                     }
                                     var informacionIndicador=html.span({id:'ficha_'+registro.indicador,class:'info-indicador','ficha-indicador':JSON.stringify(registro.ficha)},[
-                                        html.a({class:'link-info-indicador',href:'/sigba/'+urlYClasesTabulados+'-info-indicador?indicador='+registro.indicador,title:'Ficha técnica'},[
+                                        html.a({class:'link-info-indicador',href:''+absolutePath+''+urlYClasesTabulados+'-info-indicador?indicador='+registro.indicador,title:'Ficha técnica'},[
                                             html.img({class:'img-info-indicador', src:skinUrl+'img/img-info-indicador.png'})
                                         ]),
                                     ])
@@ -127,7 +129,7 @@ class AppSIGBA extends backend.AppBackend{
                                     var ley=registro.leyes;
                                     if(ley){
                                         var informacionAgrupacionPrincipal=html.span({id:'ley_'+registro.agrupacion_principal,class:'ley-agrupacion_principal'},[
-                                            html.a({class:'link-ley-agrupacion_principal',href:'/sigba/'+urlYClasesTabulados+'-ley-agrupacion_principal?agrupacion_principal='+registro.agrupacion_principal,title:'Leyes'},[
+                                            html.a({class:'link-ley-agrupacion_principal',href:''+absolutePath+''+urlYClasesTabulados+'-ley-agrupacion_principal?agrupacion_principal='+registro.agrupacion_principal,title:'Leyes'},[
                                                 html.img({class:'img-ley-agrupacion_principal', src:skinUrl+'img/img-ley-agrupacion_principal.png'})
                                             ])
                                         ]);
@@ -135,7 +137,7 @@ class AppSIGBA extends backend.AppBackend{
                                 }
                                 var htmlA=(
                                     defTables[0].mostrarIndicadoresYLinks && result.row.cant_cortantes!=1
-                                )?{href:'/sigba/'+urlYClasesTabulados+'-indicador?indicador='+(registro.indicador||''),class:'es-link'}:{class:'no-es-link'};
+                                )?{href:''+absolutePath+''+urlYClasesTabulados+'-indicador?indicador='+(registro.indicador||''),class:'es-link'}:{class:'no-es-link'};
                                 return html.td(attributes,[
                                     html.a(htmlA,registro[nombreCampo]),
                                     registro.indicador?informacionIndicador:null,
@@ -181,7 +183,7 @@ class AppSIGBA extends backend.AppBackend{
                                     var indicadorAnnio=rowValor.indicador;
                                     var despliegueEspecial=rowValor.despliegue_especial;
                                     var valorFormateado=be.decimalesYComa(valorRow,decimales,',');
-                                    var aAtribute={class:'link-cortantes',href:'/sigba/'+urlYClasesTabulados+'-indicador?annio='+annioRow+'&indicador='+(registro.indicador||'')};
+                                    var aAtribute={class:'link-cortantes',href:''+absolutePath+''+urlYClasesTabulados+'-indicador?annio='+annioRow+'&indicador='+(registro.indicador||'')};
                                     var divAttribute={class:'cortante-no-dato'};
                                     var tdAttribute={class:'td-valores'};
                                     var divDespliegueEspecial=null;
@@ -221,7 +223,7 @@ class AppSIGBA extends backend.AppBackend{
                                     }).then(function(){
                                         var valorReporteBonito;
                                         valorReporteBonito=(valorRow==null)?(!indicadorAnnio?'///':'...'):be.puntosEnMiles(valorFormateado);
-                                        var aAttributes={class:'link-cortantes',href:'/sigba/'+urlYClasesTabulados+'-indicador?annio='+annioRow+'&indicador='+(registro.indicador||'')}
+                                        var aAttributes={class:'link-cortantes',href:''+absolutePath+''+urlYClasesTabulados+'-indicador?annio='+annioRow+'&indicador='+(registro.indicador||'')}
                                         var divAttributes={class:'cortante-no-dato'};
                                         if(despliegueEspecial){
                                             aAttributes['a-despliegue-especial']=true;
@@ -495,7 +497,7 @@ class AppSIGBA extends backend.AppBackend{
                         var trCortantes=cortantesPosibles.map(function(cortanteAElegir){
                             var denominaciones=cortanteAElegir.denominacion.split('|');
                             annio?denominaciones.splice(cortanteAElegir.variable.split(',').indexOf('annio'),1):true;
-                            var href='/sigba/'+urlYClasesTabulados+'-indicador?'+(annio?'annio='+annio+'&':'')+'indicador='+indicador+'&cortante='+cortanteAElegir.variable;
+                            var href=''+absolutePath+''+urlYClasesTabulados+'-indicador?'+(annio?'annio='+annio+'&':'')+'indicador='+indicador+'&cortante='+cortanteAElegir.variable;
                             return html.tr({class:'tr-cortante-posible'},[
                                 html.td({class:'td-cortante-posible', 'menu-item-selected':cortanteAElegir.variable==cortante},[
                                     html.a({class:'a-cortante-posible',href:href},denominaciones.join('-'))
@@ -512,14 +514,14 @@ class AppSIGBA extends backend.AppBackend{
                         var habilitationButton=html.button({id:'habilitacion-tabulado',type:'button','more-info':JSON.stringify(tabuladoHtmlYDescripcion.descripcionTabulado.info)}/*,bb*/);
                         be.anniosCortantes(client,annios,anniosA,indicador).then(function(){
                             anniosLinks=anniosA.map(function(annioAElegir){
-                                var href='/sigba/'+urlYClasesTabulados+'-indicador?annio='+annioAElegir+'&indicador='+indicador+
+                                var href=''+absolutePath+''+urlYClasesTabulados+'-indicador?annio='+annioAElegir+'&indicador='+indicador+
                                 '&cortante='+cortante;
                                 return html.span([
                                     html.a({class:'annio-cortante-posible',href:href,'menu-item-selected':annioAElegir==annio},annioAElegir),
                                 ]);
                             }).concat(
                                 html.span([
-                                    html.a({class:'annio-cortante-posible',href:'/sigba/'+urlYClasesTabulados+'-indicador?indicador='+indicador,'menu-item-selected':annio?false:true},'Serie')
+                                    html.a({class:'annio-cortante-posible',href:''+absolutePath+''+urlYClasesTabulados+'-indicador?indicador='+indicador,'menu-item-selected':annio?false:true},'Serie')
                                 ])
                             );
                         }).then(function(){
@@ -529,7 +531,7 @@ class AppSIGBA extends backend.AppBackend{
                                 be.encabezado(skinUrl,false,req),
                                 html.div({class:'annios-links-container',id:'annios-links'},[
                                     html.div({id:'barra-annios'},anniosLinks),
-                                    html.div({id:'link-signos-convencionales'},[html.a({id:'signos_convencionales-link',href:'/sigba/principal-signos_convencionales'},'Signos convencionales')])
+                                    html.div({id:'link-signos-convencionales'},[html.a({id:'signos_convencionales-link',href:''+absolutePath+'principal-signos_convencionales'},'Signos convencionales')])
                                 ]),
                                 html.div({class:'div-pantallas',id:'div-pantalla-izquierda'},[
                                     html.h2('Tabulados'),
@@ -605,7 +607,7 @@ class AppSIGBA extends backend.AppBackend{
                             html.div({id:'div-encabezado-titulo-tabulado',class:'titulo-tabulados'},[
                                 html.div({class:'encabezado-interno'},[
                                     html.div({id:'indicadores-titulo',class:'titulo-tabulados'},'Indicadores'),
-                                    html.div({id:'titulo-signos_convencionales',class:'titulo-tabulados'},[html.a({id:'signos_convencionales-link',href:'/sigba/principal-signos_convencionales'},'Signos convencionales')]),
+                                    html.div({id:'titulo-signos_convencionales',class:'titulo-tabulados'},[html.a({id:'signos_convencionales-link',href:''+absolutePath+'principal-signos_convencionales'},'Signos convencionales')]),
                                     html.div({class:'float-clear'},"")
                                 ]),
                             ]),
@@ -857,8 +859,8 @@ class AppSIGBA extends backend.AppBackend{
             'indicadores',
             'variables',
             'indicadores_variables',
-            'valores',
             'cortes',
+            'valores',
             'celdas',
             'cortes_celdas',
             'diferencia_totales',
