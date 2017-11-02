@@ -798,7 +798,7 @@ class AppSIGBA extends backend.AppBackend{
         ]);
     }
     getMenu(context){
-        be = this;
+        var be = this;
         return {menu:[
             {menuType:'menu', name:'Indicadores', menuContent:[
                 {menuType:'table', name:'agrupacion_principal', label:be.config['client-setup'].labels['agrupacion-principal'], },
