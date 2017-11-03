@@ -1,9 +1,10 @@
 "use strict";
 
 module.exports = function(context){
+    var puedeEditar = context.user.usu_rol === 'ingresador'  || context.user.usu_rol ==='admin'  || context.user.usu_rol ==='programador';    
     return context.be.tableDefAdapt({
         name:'cortes_celdas',
-        editable: false,
+        editable: puedeEditar,
         fields: [
             {name:'indicador'     ,               label:'Código indicador'         , typeName:'text' ,nullable:false},
             {name:'cortes'        ,isSlicer:true, label:'Cortes'                   , typeName:'jsonb', allow:{select: true,insert:false, update:false}},

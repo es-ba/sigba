@@ -13,11 +13,11 @@ module.exports = function(context){
             {name: 'variable'       ,typeName:'text'   ,nullable:false},
             {name: 'denominacion'   ,typeName:'text'   },
             {name: 'corte'          ,typeName:'boolean'},
-            // {name: 'tabla'          ,typeName:'text'   },
             {name: 'orden'          ,typeName:'integer'},
-            //{name: 'orden_menu'     ,typeName:'integer'},
-            //{name: 'grupo_menu'     ,typeName:'text'},
         ],
         primaryKey:['variable'],
+        detailTables:[
+            {table:'cortes', fields:['variable'], abr:'C', label:'cortes'},
+        ],
     },context);
 }
