@@ -1,6 +1,5 @@
 "use strict";
 
-
 function tableCreate(info,data) {
     var rows=JSON.parse(data);
     var tablaId=rows[0].indicador;
@@ -36,33 +35,122 @@ function tableCreate(info,data) {
     return tabla;
 }
 
-window.addEventListener('load',function(){
-    try {
-        var tabuladoId = 'tabulado-html';
-        var tabulado = document.getElementById(tabuladoId);
-        if (tabulado){
-            var tabulatorMatrix = JSON.parse(tabulado.getAttribute('para-graficador'));
-            if (tabulatorMatrix.columns.length > 1 && tabulatorMatrix.lineVariables.length == 1){
-
-                tabulatorMatrix.dataVariables = [tabulatorMatrix.dataVariables[0]]; //descarto coeficiente de variación
-                
-                var chartNewElement = document.createElement('div');
-                chartNewElement.setAttribute('id', 'newChartElement');
-
-                var chartTitle = document.createElement('h3');
-                chartTitle.innerText = tabulatorMatrix.caption;
-                
-                tabulado.parentNode.appendChild(chartTitle);
-                tabulado.parentNode.appendChild(chartNewElement);
-                
-                var graficador=new LineChartGraphicator('newChartElement', tabulatorMatrix);
-                graficador.renderTabulation();
-            }
-        }
-    } catch (error) {
-        console.error('No es posible graficar el tabulado en pantalla');
+function showChart() {
+    var tabulatorMatrix = JSON.parse(tabuladoElement().getAttribute('para-graficador'));
+    if (!(tabulatorMatrix.columns.length > 1 && tabulatorMatrix.lineVariables.length == tabulatorMatrix.columnVariables.length == 1)) {
+        throw 'no cumple las condiciones requeridas';
     }
-    
+    tabulatorMatrix.dataVariables = [tabulatorMatrix.dataVariables[0]]; //descarto coeficiente de variación
+
+    //TODO: pasar esto a un template por favor!
+    var chartElement = document.createElement('div');
+    chartElement.setAttribute('id', 'chartElement');
+
+    var chartTitle = document.createElement('h3');
+    chartTitle.innerText = tabulatorMatrix.caption;
+    chartTitle.style.textAlign='center';
+
+    var chartContainer = document.createElement('div');
+    chartContainer.setAttribute('id', 'chartContainer');
+    chartContainer.appendChild(chartTitle);
+    chartContainer.appendChild(chartElement);
+    chartContainer.style.display = 'none';
+
+    var tabuladoParentElem = tabuladoElement().parentNode;
+    var tabuladoHtml = document.getElementById("tabulado-html");
+    tabuladoParentElem.insertBefore(chartContainer, tabuladoHtml);
+
+    var graficador = new LineChartGraphicator('chartElement', tabulatorMatrix);
+    graficador.renderTabulation();
+}
+
+function chartElement(){ 
+    return document.getElementById('chartContainer');
+}
+function tabuladoElement(){ 
+    return document.getElementById('tabulado-html');
+}
+
+function toggleChartTabuladoDisplay(){
+    //changing url accordingly without reolading page
+    var newUrl = window.location.search.includes(displayChartParamName)? location.href.replace(displayChartParamName, ''): location.href+displayChartParamName;  
+    window.history.pushState("Cambiar visualización entre gráfico y tabulado", "Visualización", newUrl);
+
+    updateVisualization();
+}
+
+window.onpopstate = function (event) {
+    updateVisualization();
+};
+
+function updateVisualization(){
+    if (window.location.search.includes(displayChartParamName)) {
+        chartElement().style.display='block';
+        tabuladoElement().style.display='none';
+    } else {
+        chartElement().style.display='none';
+        tabuladoElement().style.display='block';
+    }
+}
+
+window.displayChartParamName = '&type=grafico';
+
+function buildToggleButton(){
+    var toggleButton = document.createElement('button');
+    toggleButton.innerText='Cambiar visualización de datos (grafico/tabulado)';
+    toggleButton.onclick= function(){
+        toggleChartTabuladoDisplay();
+    }
+    return toggleButton;
+}
+
+function copyInputToClipboard(inputToCopy) {
+    inputToCopy.value = window.location.href;
+    inputToCopy.focus();
+    inputToCopy.select();
+    document.execCommand("Copy");
+}
+
+function buildCopyUrlButton(){
+    var copyUrlButton = document.createElement('button');
+    copyUrlButton.innerText='Copiar dirección para compartir';
+    copyUrlButton.onclick= copyUrlFunc;
+    return copyUrlButton;
+}
+
+function copyUrlFunc() {
+    var inputUrl = document.getElementById("pasteBox");
+    inputUrl.hidden = false;
+    copyInputToClipboard(inputUrl);
+    inputUrl.hidden = true;
+}
+
+function buildInputUrl() {
+    var inputUrl = document.createElement('input');
+    inputUrl.type = 'text';
+    inputUrl.id = 'pasteBox';
+    inputUrl.hidden = true;
+    return inputUrl;
+}
+
+function insertNewButton(newButton){
+    var tabuladoHtml = document.getElementById("tabulado-html");
+    tabuladoElement().parentNode.insertBefore(newButton, tabuladoHtml.nextElementSibling);
+}
+
+window.addEventListener('load', function () {
+    if (tabuladoElement()){       
+        try {
+            showChart();
+            updateVisualization();                       
+            insertNewButton(buildToggleButton());
+        } catch (error) {
+            console.error('No es posible graficar el tabulado en pantalla');
+        }                      
+        insertNewButton(buildCopyUrlButton());
+        insertNewButton(buildInputUrl());
+    }
+
     var encabezadoChico =document.getElementById('id-encabezado-chico');
     var encabezado =document.getElementById('id-encabezado');
     var textoGrande=document.getElementById('texto-encabezado-grande');

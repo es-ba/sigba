@@ -23,6 +23,13 @@ myOwn.wScreens.calculaTotales=function(addrParams){
         return alertPromise(msg);
     });
 };
+
+myOwn.wScreens.borraValores=function(addrParams){
+    my.ajax.borrar.valores().then(function(result){
+        var msg='Se borraron tolos los valores.'
+        return alertPromise(msg);
+    });
+};
  
 window.addEventListener('load', function(){
     my.autoSetup().then(prepareTableButtons);

@@ -1,12 +1,11 @@
 "use strict";
 
 module.exports = function(context){
-    var puedeEditar = context.user.usu_rol === 'ingresador'  || context.user.usu_rol ==='admin'  || context.user.usu_rol ==='programador';    
     return context.be.tableDefAdapt({
         name:'celdas',
-        editable: puedeEditar,
+        editable: false,
         fields: [
-            /* CUIDADO CON EL ORDEN, DEBE SER EL MISMO QUE ESTÁ EN EL INSERT DE ...\yeah\fuentes\node\sigba\install\valores_cortes.sql */
+            /* CUIDADO CON EL ORDEN, DEBE SER EL MISMO QUE ESTÁ EN EL INSERT DE TRIGGER valores_cortes ...\yeah\fuentes\node\sigba\install\para-install.sql */
             {name:'indicador'      ,               label:'Código indicador'                      , typeName:'text' ,nullable:false},
             {name:'cortes'         ,isSlicer:true, label:'Cortes'                                , typeName:'jsonb', allow:{select: true,insert:false, update:false}},
             {name:'valor'          ,               label:'Valor'                                 , typeName:'text'},
@@ -23,6 +22,7 @@ module.exports = function(context){
         primaryKey:['indicador','cortes'], // poner acá el autonumérico
         foreignKeys:[
             {references:'indicadores', fields:['indicador']},
+            {references:'valores', fields:['indicador', 'cortes'], onDelete:'cascade'},
         ]
     },context);
 }

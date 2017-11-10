@@ -42,10 +42,10 @@ begin
     loop
       v_new_value=v_new_values -> v_column;
       select corte  into es_corte
-           from sigba.variables
-           where variable=v_column::text;  
+          from sigba.variables
+          where variable=v_column::text;  
       if not( jsonb_typeof(v_new_value)= 'null') and v_new_value is distinct from '"tcaba"'::jsonb 
-         and es_corte 
+        and es_corte 
       then  
           v_cortantes= jsonb_set(v_cortantes,array[v_column],to_jsonb(true),false);
       else  
@@ -53,16 +53,9 @@ begin
           v_cortantes= v_cortantes - v_column;
       end if;
     end loop;
-  
-  if TG_OP = 'DELETE' then 
-    DELETE 
-      FROM celdas
-      WHERE indicador=old.indicador 
-        AND cortes=old.cortes;
-    return old;
-  else 
-    new.cortes=v_cortes;
-    new.cortantes= v_cortantes;
+  new.cortes=v_cortes;
+  new.cortantes= v_cortantes;
+  IF TG_WHEN = 'AFTER' then 
     if TG_OP = 'INSERT' then 
       INSERT INTO celdas 
         VALUES (
@@ -109,12 +102,12 @@ begin
           FROM (select jsonb_object_keys(new.cortantes) as var_name INTERSECT select jsonb_object_keys(old.cortantes) as var_name) as modificados
         WHERE indicador = old.indicador AND cortes = old.cortes AND variable = modificados.var_name ; /* los cortes con valor_corte modificado */
     end if;
-    return new;
-  end if;  
+  end if;
+  return new; 
 end;
 $BODY$
   LANGUAGE plpgsql VOLATILE
-  COST 100;
+  security definer;
 
 -- Function: sigba.valores_validar_trg()
 
@@ -352,11 +345,18 @@ CREATE TRIGGER indicadores_variables_sincro_delete_trg
   FOR EACH ROW
   EXECUTE PROCEDURE sigba.indicadores_variables_sincro_delete_trg();
 
-CREATE TRIGGER valores_cortes_trg
-  BEFORE INSERT OR UPDATE OR DELETE
+CREATE TRIGGER valores_cortes_before_trg
+  BEFORE INSERT OR UPDATE
   ON sigba.valores
   FOR EACH ROW
   EXECUTE PROCEDURE sigba.valores_cortes_trg();
+
+CREATE TRIGGER valores_cortes_after_trg
+  AFTER INSERT OR UPDATE
+  ON sigba.valores
+  FOR EACH ROW
+  EXECUTE PROCEDURE sigba.valores_cortes_trg();
+
 
 -- Trigger: valores_validar_trg on sigba.valores
 

@@ -62,7 +62,7 @@ class AppSIGBA extends backend.AppBackend{
     puntosEnMiles(value){
         var str=value;
         if(typeof value!='string'){
-            str = typedValue.toString();
+            str = value===null?'':value.toString();
         }
        return str.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
     }
@@ -109,10 +109,14 @@ class AppSIGBA extends backend.AppBackend{
                         listaTd=[html.td({class:'td-'+urlYClasesTabulados+'-renglones',colspan:4-defTables.length},[html.div({class:'espacio-reserva'},'-')])].concat(
                             defTables[0].camposAMostrar.map(function(nombreCampo,i){
                                 var id=registro.indicador?registro.indicador:registro[nombreCampo];
-                                var attributes={colspan:i?1:defTables.length+1,class:'campo_'+nombreCampo,id:id};
+                                //var attributes={colspan:i?1:defTables.length+1,class:'campo_'+nombreCampo,id:id}; genera id de texto hasta con acentos
+                                var attributes={colspan:i?1:defTables.length+1,class:'campo_'+nombreCampo};
                                 var skin=be.config['client-setup'].skin;
                                 var skinUrl=(skin?skin+'/':'');
                                 if(registro.indicador ){
+                                    attributes.id=id;
+                                    var htmlIcono= html.span({class:'span-img-icono'},
+                                        registro.icono?html.img({class:'img-icono-indicador',src:skinUrl+'img/'+registro.icono}):null);
                                     if(registro.def_con){
                                         attributes.title=registro.def_con;
                                     }
@@ -136,9 +140,10 @@ class AppSIGBA extends backend.AppBackend{
                                     }
                                 }
                                 var htmlA=(
-                                    defTables[0].mostrarIndicadoresYLinks && result.row.cant_cortantes!=1
-                                )?{href:''+absolutePath+''+urlYClasesTabulados+'-indicador?indicador='+(registro.indicador||''),class:'es-link'}:{class:'no-es-link'};
-                                return html.td(attributes,[
+                                    defTables[0].mostrarIndicadoresYLinks && result.row.cant_cortantes>1
+                                )?{href:''+absolutePath+''+urlYClasesTabulados+'-indicador?indicador='+(registro.indicador||''),class:'es-link' ,'cant-cortantes':result.row.cant_cortantes}:{class:'no-es-link'};
+                            return html.td(attributes,[
+                                    htmlIcono,
                                     html.a(htmlA,registro[nombreCampo]),
                                     registro.indicador?informacionIndicador:null,
                                     registro.agrupacion_principal?informacionAgrupacionPrincipal:null
@@ -330,6 +335,9 @@ class AppSIGBA extends backend.AppBackend{
                         row.desagr=null;
                     }
                 })
+                //falta testear! sacar annio si viene como parametro
+                //datum.vars=annio?datum.vars.filter(function(variable){if(variable.name !=='annio'){return variable}}):datum.vars;
+                //console.log('------------'+ stringify(datum.vars));
                 tabulator.defaultShowAttribute='valor';
                 //fs.writeFile('C:/compartida/datum/'+indicador+'_'+Date.now()+'_datum.json',JSON.stringify(datum),{encoding:'utf8'})
                 var matrix=tabulator.toMatrix(datum);
@@ -835,7 +843,10 @@ class AppSIGBA extends backend.AppBackend{
                 {menuType:'table', name:'cortes'          , label:'Cortes'                                },
             ]},
             {menuType:'table'    , name:'Indicadores-Variables'   , table:'indicadores_variables'},
-            {menuType:'table'    , name:'Valores'                 , table:'valores'              },
+            {menuType:'menu'     , name:'Valores'                 , menuContent:[
+                {menuType:'borraValores'    , name:'Borrar datos valores'},
+                {menuType:'table'    , name:'Valores'                 , table:'valores'              },
+            ]},
             // {menuType:'table'    , name:'Celdas'                  , table:'celdas'               },
             // {menuType:'table'    , name:'Cortes-Celdas'           , table:'cortes_celdas'        },
             {menuType:'path'     , name:'Tabulados'               , path:'/principal'            },

@@ -101,6 +101,15 @@ ProceduresExamples = [
             });
         }
     },
+    {
+        action:'borrar/valores',
+        parameters:[],
+        coreFunction:function(context, parameters){
+            return context.client.query(`delete from valores`).fetchOneRowIfExists().then(function(result){
+                return result;
+            });
+        }
+    },
 ];
 
 module.exports = ProceduresExamples;

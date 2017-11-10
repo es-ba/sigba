@@ -1,16 +1,16 @@
 {
   "name": "sigba",
-  "version": "1.0.0", 
+  "version": "1.0.0",
   "scripts": {
     "start": "node server/server-sigba.js",
     "dump-db": "node server/server-sigba.js --dump-db"
   },
   "dependencies": {
-    "backend-plus": "~0.18.20",
-    "backend-skins": "~0.1.0",
+    "backend-plus": "~0.18.24",
+    "backend-skins": "~0.1.1",
     "type-store": "~0.2.11",
     "tabulator": "~0.1.22",
     "pg-triggers": "~0.2.1",
-    "graphicator": "~0.24.0"
+    "graphicator": "~0.25.0"
   }
 }
