@@ -103,10 +103,13 @@ ProceduresExamples = [
     },
     {
         action:'borrar/valores',
-        parameters:[],
+        parameters:[{name: 'confirmacion', label: 'Escriba para confirmar "BORRAR TODO"'}],
         coreFunction:function(context, parameters){
+            if (parameters.confirmacion != 'BORRAR TODO'){
+                throw new Error('Enserio tiene que escribir "BORRAR TODO" (sin las comillas y en mayúsculas');
+            }
             return context.client.query(`delete from valores`).fetchOneRowIfExists().then(function(result){
-                return result;
+                return result.rowCount||' registros borrados';
             });
         }
     },

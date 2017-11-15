@@ -13,6 +13,7 @@ module.exports = function(context){
             {name: 'leyes'           ,typeName:'text'          ,label:'Leyes asociadas'},
             {name: 'ocultar'         ,typeName:'boolean'                               },
             {name: 'color'           ,typeName:'text'                                  },
+            {name: 'icono'           ,typeName:'text'                                  },
         ],
         primaryKey:['agrupacion_principal'],
         detailTables:[

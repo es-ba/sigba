@@ -36,7 +36,7 @@ function tableCreate(info,data) {
 }
 
 function showChart() {
-    var tabulatorMatrix = JSON.parse(tabuladoElement().getAttribute('para-graficador'));
+    var tabulatorMatrix = getMatrix();
     if (!(tabulatorMatrix.columns.length > 1 && tabulatorMatrix.lineVariables.length == tabulatorMatrix.columnVariables.length == 1)) {
         throw 'no cumple las condiciones requeridas';
     }
@@ -56,12 +56,15 @@ function showChart() {
     chartContainer.appendChild(chartElement);
     chartContainer.style.display = 'none';
 
-    var tabuladoParentElem = tabuladoElement().parentNode;
-    var tabuladoHtml = document.getElementById("tabulado-html");
-    tabuladoParentElem.insertBefore(chartContainer, tabuladoHtml);
+    var tabuladoHtml = tabuladoElement();
+    tabuladoHtml.parentNode.insertBefore(chartContainer, tabuladoHtml);
 
     var graficador = new LineChartGraphicator('chartElement', tabulatorMatrix);
     graficador.renderTabulation();
+}
+
+function getMatrix() {
+    return JSON.parse(tabuladoElement().getAttribute('para-graficador'));
 }
 
 function chartElement(){ 
@@ -125,7 +128,7 @@ function copyUrlFunc() {
     inputUrl.hidden = true;
 }
 
-function buildInputUrl() {
+function buildHiddenInputUrl() {
     var inputUrl = document.createElement('input');
     inputUrl.type = 'text';
     inputUrl.id = 'pasteBox';
@@ -134,8 +137,26 @@ function buildInputUrl() {
 }
 
 function insertNewButton(newButton){
-    var tabuladoHtml = document.getElementById("tabulado-html");
-    tabuladoElement().parentNode.insertBefore(newButton, tabuladoHtml.nextElementSibling);
+    tabuladoElement().parentNode.insertBefore(newButton, tabuladoElement().nextElementSibling);
+}
+
+function buildExportExcelButton(){
+    var exportButton = document.createElement('input');
+    exportButton.type='button';
+    exportButton.value='Exportar a excel';
+    exportButton.onclick = function(){
+        var t = new Tabulator();
+        t.toExcel(tabuladoElement(), {
+            filename:getMatrix().caption, 
+            username: (window.my)?window.my.config.username: 'anónimo'
+        });
+    };
+    return exportButton
+}
+
+function insertCopyUrlButton(){
+    insertNewButton(buildHiddenInputUrl());
+    insertNewButton(buildCopyUrlButton());
 }
 
 window.addEventListener('load', function () {
@@ -147,8 +168,8 @@ window.addEventListener('load', function () {
         } catch (error) {
             console.error('No es posible graficar el tabulado en pantalla');
         }                      
-        insertNewButton(buildCopyUrlButton());
-        insertNewButton(buildInputUrl());
+        insertNewButton(buildExportExcelButton());
+        insertCopyUrlButton();
     }
 
     var encabezadoChico =document.getElementById('id-encabezado-chico');
@@ -156,14 +177,9 @@ window.addEventListener('load', function () {
     var textoGrande=document.getElementById('texto-encabezado-grande');
     if(textoGrande){
         textoGrande.innerHTML=
-        'El Sistema Integrado de Indicadores de Derechos de Niñas, Niños y Adolescentes, Ley Nº5.463/15, tiene por objetivo proveer información válida, '+
-        'relevante, mensurable y confiable, acorde con los nuevos estándares definidos en la Convención sobre los Derechos del Niño (CDN), la Ley '+
-        'Nacional Nº 26.061 y la Ley CABA Nº 114; así como la perspectiva de género y el respeto de los principios de intersectorialidad, '+
-        'transversalidad, integralidad, accesibilidad, transparencia y objetividad de la información. El Sistema presenta un conjunto de indicadores que '+
-        'establecen correspondencia con los derechos consagrados por la CDN, que permiten medir y cuantificar el acceso de dicha población a sus '+
-        'derechos. La información se presenta en series con cortes anuales en incluye, para su consulta, las fichas técnicas de cada indicador. En tal '+
-        'sentido, constituye una herramienta eficaz que permite el monitoreo del cumplimiento de los derechos reconocidos a la población de 0 a 17 años, '+
-        'residente en la Ciudad Autónoma de Buenos Aires, a través de la disponibilización sistemática y actualización continua.'
+        'En esta página se presenta la totalidad de los indicadores agrupados por dimensión y autonomía, junto con su serie histórica.'+
+        ' Los números indican los valores totales para cada indicador. Haciendo clic en el mismo puede verse la desagregación por sexo.';
+        textoGrande.style.paddingTop='40px';
     }
     var textoChico =document.getElementById('texto-encabezado-chico');
     var logoEstadistica=document.getElementById('logo-estadistica');

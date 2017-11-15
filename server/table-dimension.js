@@ -11,6 +11,7 @@ module.exports = function(context){
             {name: 'denominacion' ,typeName:'text'      },
             {name: 'orden'        ,typeName:'integer'   },
             {name: 'ocultar'      ,typeName:'boolean'   },
+            {name: 'icono'        ,typeName:'text'      },
         ],
         primaryKey:['dimension'],
         foreignKeys:[{references:'agrupacion_principal', fields:['agrupacion_principal']}],

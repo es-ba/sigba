@@ -26,6 +26,7 @@ module.exports = function(context){
             {name:'var_despliegue_especial'  , label:'var de despliegue esp'                 , typeName:'text'},
             {name:'icono'                    , label:'Archivo contenedor del Icono ODS'      , typeName:'text'},
             {name:'metas'                    , label:'Metas'                                 , typeName:'text'},
+            {name:'ods'                      , label:'ODS'                                   , typeName:'text'},
         ],
         primaryKey:['indicador'],
         foreignKeys:[{references:'dimension', fields:['dimension']} ],
