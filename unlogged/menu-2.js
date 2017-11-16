@@ -83,7 +83,7 @@ function showChart() {
                 },
                 y:{ 
                     label: {position:'outer-middle', text:(document.getElementById('tabulado-um-descripcion')||{}).textContent||''},
-                    min: min<0?min:(max-2*min>0?max-2*min:0) // acomoda el 0 automáticamente, si los datos útiles ocupan menos de la mitad cambio el 0
+                    min: min<0?min:(2*min-max>0?2*min-max:0) // acomoda el 0 automáticamente, si los datos útiles ocupan menos de la mitad cambio el 0
                 },
             }
         });
