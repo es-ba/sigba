@@ -99,7 +99,7 @@ class AppSIGBA extends backend.AppBackend{
                     ).fetchOneRowIfExists().then(function(resultCortantes){
                         result=resultCortantes;
                         return client.query(`
-                        SELECT i.dimension,i.indicador,i.denominacion,i.def_con,i.def_ope,i.cob,i.desagregaciones,i.uso_alc_lim,i.universo,f.denominacion fte,u.denominacion um
+                        SELECT i.dimension,i.indicador,i.denominacion,i.def_con,i.def_ope,i.cob,i.desagregaciones,i.uso_alc_lim,i.universo,i.metas,f.denominacion fte,u.denominacion um
                             FROM indicadores i LEFT JOIN fte f ON i.fte=f.fte LEFT JOIN um u ON u.um=i.um
                             WHERE i.indicador=$1
                             ORDER BY i.indicador,i.dimension
@@ -667,7 +667,7 @@ class AppSIGBA extends backend.AppBackend{
                 var variablePrincipal={};
                 var infoIndicador={};
                 return client.query(
-                    "SELECT i.dimension,i.indicador,i.denominacion,i.def_con,i.def_ope,i.cob,i.desagregaciones,i.uso_alc_lim,i.universo, v.variable variable_principal, "+
+                    "SELECT i.dimension,i.indicador,i.denominacion,i.def_con,i.def_ope,i.cob,i.desagregaciones,i.uso_alc_lim,i.universo, i.metas, v.variable variable_principal, "+
                            "f.denominacion fte,u.denominacion um "+
                         "FROM indicadores i LEFT JOIN fte f ON i.fte=f.fte LEFT JOIN um u ON u.um=i.um LEFT JOIN variables v ON i.variable_principal=v.variable "+
                         "WHERE i.indicador=$1 ORDER BY i.indicador,i.dimension",[indicador]
@@ -686,8 +686,8 @@ class AppSIGBA extends backend.AppBackend{
                         return [];
                     }
                 }).then(function(filasDeVariablesPrincipales){
-                    var camposAFicha=['denominacion','def_con','def_ope','um','universo','cob','fte'];
-                    var camposLabels=['Nombre del indicador','Definición conceptual','Definición operativa','Unidad de medida','Universo','Cobertura','Fuente'];
+                    var camposAFicha=['denominacion','def_con','def_ope','metas','um','universo','cob','fte'];
+                    var camposLabels=['Nombre del indicador','Definición conceptual','Definición operativa','Metas','Unidad de medida','Universo','Cobertura','Fuente'];
                     var objetosCamposDef={};
                     camposAFicha.forEach(function(campo,icampo){
                         objetosCamposDef[campo]={

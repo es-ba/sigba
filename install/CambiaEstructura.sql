@@ -15,3 +15,5 @@ alter table dimension
 alter table indicadores
     add column ods      text;
 
+--17/11/15
+FALTA AGREGAR LOS GRANT QUE CORRIO EMILIO EN PRODUCCIÓN PARA calcular_totales y diferencia totales (ver dif para_install)

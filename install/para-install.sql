@@ -168,17 +168,16 @@ $BODY$
   LANGUAGE plpgsql IMMUTABLE
   COST 100;
 
- CREATE TABLE sigba.totales_calculados
-(
+CREATE TABLE sigba.totales_calculados(
   indicador text NOT NULL,
   cortante jsonb,
   corte jsonb,
   valor_sum text,
   CONSTRAINT totales_calculados_pkey PRIMARY KEY (indicador, corte)
-)
-WITH (
-  OIDS=FALSE
 );
+
+grant select on "totales_calculados" to "sigba_user";
+
 
 CREATE OR REPLACE VIEW sigba.diferencia_totales AS 
   SELECT x.val,x.val_cal, i.denominacion,x.indicador,x.cortes FROM (
@@ -186,6 +185,8 @@ CREATE OR REPLACE VIEW sigba.diferencia_totales AS
           SELECT valor_sum,indicador, corte FROM totales_calculados 
       ) tc ON tc.indicador=v.indicador AND tc.corte=v.cortes WHERE es_automatico IS FALSE
   ) x LEFT JOIN indicadores i ON i.indicador= x. indicador WHERE val<>val_cal ;
+
+grant select on "diferencia_totales" to "sigba_user";
 
 CREATE OR REPLACE FUNCTION sigba.cargar_totales()
   RETURNS integer AS
@@ -230,18 +231,15 @@ BEGIN
   return filas_insertadas;
 END;
 $BODY$
-  LANGUAGE plpgsql VOLATILE
-  COST 100;
+  LANGUAGE plpgsql VOLATILE;
 
-  
- CREATE OR REPLACE FUNCTION subsets_list(_arr anyarray)
+CREATE OR REPLACE FUNCTION subsets_list(_arr anyarray)
   RETURNS TABLE (sets anyarray) LANGUAGE plpgsql AS
 $BODY$
 BEGIN
     IF array_upper(_arr, 1) IS NULL THEN
         sets := _arr; RETURN NEXT; RETURN;
     END IF;
-
     CASE array_upper(_arr, 1)
     WHEN 1 THEN
         RETURN QUERY VALUES ('{}'), (_arr);
@@ -330,8 +328,7 @@ begin
    RETURN filas_calculadas;
 end;
 $BODY$
-  LANGUAGE plpgsql VOLATILE
-  COST 100;
+  LANGUAGE plpgsql VOLATILE;
   
   
 -- TRIGGERS EN TABLAS EN SCHEMA SIGBACREATE TRIGGER changes_trg

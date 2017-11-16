@@ -55,12 +55,39 @@ function showChart() {
     chartContainer.appendChild(chartTitle);
     chartContainer.appendChild(chartElement);
     chartContainer.style.display = 'none';
+    // chartContainer.style.width = '500px';
 
     var tabuladoHtml = tabuladoElement();
-    tabuladoHtml.parentNode.insertBefore(chartContainer, tabuladoHtml);
+    tabuladoHtml.parentNode.insertBefore(chartContainer, tabuladoHtml.nextElementSibling);
 
-    var graficador = new LineChartGraphicator('chartElement', tabulatorMatrix);
-    graficador.renderTabulation();
+    setTimeout(function(){
+        var graficador = new LineChartGraphicator('chartElement', tabulatorMatrix);
+        var ancho=window.innerWidth - document.getElementById("div-pantalla-izquierda").offsetWidth - 32;
+        var max=Number.MIN_VALUE;
+        var min=Number.MAX_VALUE;
+        if(tabulatorMatrix.lines.length>1&&tabulatorMatrix.lines[0].titles[0]==null){
+            tabulatorMatrix.lines.shift();
+        }
+        tabulatorMatrix.lines.forEach(function(line, i_line){
+            line.cells.forEach(function(cell, i_cell){
+                max = Math.max(cell.valor,max);
+                min = Math.min(cell.valor,min);
+            });
+        });
+        graficador.renderTabulation({
+            size:{width:ancho},
+            axis:{
+                x:{
+                    label: {position:'outer-center', text:tabulatorMatrix.vars[tabulatorMatrix.columnVariables[0]].label},
+                    tick: { fit: false }
+                },
+                y:{ 
+                    label: {position:'outer-middle', text:(document.getElementById('tabulado-um-descripcion')||{}).textContent||''},
+                    min: min<0?min:(max-2*min>0?max-2*min:0) // acomoda el 0 automáticamente, si los datos útiles ocupan menos de la mitad cambio el 0
+                },
+            }
+        });
+    },100);
 }
 
 function getMatrix() {
@@ -82,6 +109,7 @@ function toggleChartTabuladoDisplay(){
     updateVisualization();
 }
 
+// when browser back or next button are used
 window.onpopstate = function (event) {
     updateVisualization();
 };
@@ -90,17 +118,23 @@ function updateVisualization(){
     if (window.location.search.includes(displayChartParamName)) {
         chartElement().style.display='block';
         tabuladoElement().style.display='none';
+        document.getElementById('toogleButton').src = 'img/tabulado.png';
     } else {
         chartElement().style.display='none';
         tabuladoElement().style.display='block';
+        document.getElementById('toogleButton').src= 'img/grafico.png';
     }
 }
 
 window.displayChartParamName = '&type=grafico';
 
 function buildToggleButton(){
-    var toggleButton = document.createElement('button');
-    toggleButton.innerText='Cambiar visualización de datos (grafico/tabulado)';
+    var toggleButton = document.createElement('input');
+    toggleButton.type='image';
+    toggleButton.id = 'toogleButton';
+    toggleButton.className += "boton_tabulados";
+    toggleButton.width='40';
+    toggleButton.style.margin='5';
     toggleButton.onclick= function(){
         toggleChartTabuladoDisplay();
     }
@@ -115,8 +149,12 @@ function copyInputToClipboard(inputToCopy) {
 }
 
 function buildCopyUrlButton(){
-    var copyUrlButton = document.createElement('button');
-    copyUrlButton.innerText='Copiar dirección para compartir';
+    var copyUrlButton = document.createElement('input');
+    copyUrlButton.type='image';
+    copyUrlButton.src='img/copiarlink.png';
+    copyUrlButton.className += "boton_tabulados";
+    copyUrlButton.width="40";
+    copyUrlButton.style.margin='5';
     copyUrlButton.onclick= copyUrlFunc;
     return copyUrlButton;
 }
@@ -137,18 +175,22 @@ function buildHiddenInputUrl() {
 }
 
 function insertNewButton(newButton){
-    tabuladoElement().parentNode.insertBefore(newButton, tabuladoElement().nextElementSibling);
+    // tabuladoElement().parentNode.insertBefore(newButton, tabuladoElement().nextElementSibling);
+    tabuladoElement().parentNode.insertBefore(newButton, tabuladoElement())
 }
 
 function buildExportExcelButton(){
     var exportButton = document.createElement('input');
-    exportButton.type='button';
-    exportButton.value='Exportar a excel';
+    exportButton.type='image';
+    exportButton.src='img/exportar.png';
+    exportButton.className += "boton_tabulados";
+    exportButton.style.margin='5';
+    exportButton.width="40";
     exportButton.onclick = function(){
         var t = new Tabulator();
         t.toExcel(tabuladoElement(), {
             filename:getMatrix().caption, 
-            username: (window.my)?window.my.config.username: 'anónimo'
+            username: (window.my)?window.my.config.username: null
         });
     };
     return exportButton
@@ -163,8 +205,8 @@ window.addEventListener('load', function () {
     if (tabuladoElement()){       
         try {
             showChart();
-            updateVisualization();                       
             insertNewButton(buildToggleButton());
+            updateVisualization();                       
         } catch (error) {
             console.error('No es posible graficar el tabulado en pantalla');
         }                      
