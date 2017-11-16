@@ -13,6 +13,6 @@
     "xlsx": "0.11.8",
     "tabulator": "~0.2.27",
     "pg-triggers": "~0.2.1",
-    "graphicator": "~0.26.1"
+    "graphicator": "~0.26.2"
   }
 }
