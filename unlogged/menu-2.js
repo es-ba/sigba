@@ -64,16 +64,20 @@ function showChart() {
         var graficador = new LineChartGraphicator('chartElement', tabulatorMatrix);
         var ancho=window.innerWidth - document.getElementById("div-pantalla-izquierda").offsetWidth - 32;
         var max=Number.MIN_VALUE;
-        var min=Number.MAX_VALUE;
+        var minCellValue=Number.MAX_VALUE;
+        var minYValue=0; //default min Y value
         if(tabulatorMatrix.lines.length>1&&tabulatorMatrix.lines[0].titles[0]==null){
             tabulatorMatrix.lines.shift();
         }
         tabulatorMatrix.lines.forEach(function(line, i_line){
             line.cells.forEach(function(cell, i_cell){
-                max = Math.max(cell.valor,max);
-                min = Math.min(cell.valor,min);
+                if (cell && cell.valor){
+                    max = Math.max(cell.valor,max);
+                    minCellValue = Math.min(cell.valor,minCellValue);
+                }
             });
         });
+        minYValue = minCellValue<0?minCellValue:(2*minCellValue-max>0?2*minCellValue-max:0); // acomoda el 0 automáticamente, si los datos útiles ocupan menos de la mitad cambio el 0        
         graficador.renderTabulation({
             size:{width:ancho},
             axis:{
@@ -83,7 +87,8 @@ function showChart() {
                 },
                 y:{ 
                     label: {position:'outer-middle', text:(document.getElementById('tabulado-um-descripcion')||{}).textContent||''},
-                    min: min<0?min:(2*min-max>0?2*min-max:0) // acomoda el 0 automáticamente, si los datos útiles ocupan menos de la mitad cambio el 0
+                    min: minYValue,
+                    padding: minYValue<=0?{bottom: 0}:null,
                 },
             }
         });
