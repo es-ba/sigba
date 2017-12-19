@@ -495,6 +495,7 @@ class AppSIGBA extends backend.AppBackend{
                             fila=filar;
                         }
                         if((filar.cantidad_cortantes!=1 )&&(esAdmin || filar.habilitado )){
+                            fila=filar;
                             cortantesPosibles.push({    
                                 variable: filar.variables,
                                 denominacion: filar.denominacion,
