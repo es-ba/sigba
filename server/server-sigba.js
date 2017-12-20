@@ -139,9 +139,7 @@ class AppSIGBA extends backend.AppBackend{
                                 var sufijoTab=defTables[0].tabla||'';
                                 var htmlIcono= html.span({class:'span-img-icono'+sufijoTab},
                                     registro.icono?html.img({class:'img-icono-'+sufijoTab,src:skinUrl+'img/'+registro.icono}):null);
-                                var htmlA=(
-                                    defTables[0].mostrarIndicadoresYLinks && result.row.cant_cortantes>1
-                                )?{href:''+absolutePath+''+urlYClasesTabulados+'-indicador?indicador='+(registro.indicador||''),class:'es-link' ,'cant-cortantes':result.row.cant_cortantes}:{class:'no-es-link'};
+                                var htmlA={href:''+absolutePath+''+urlYClasesTabulados+'-indicador?indicador='+(registro.indicador||''),class:'es-link' ,'cant-cortantes':result.row.cant_cortantes};
                             return html.td(attributes,[
                                     htmlIcono,
                                     html.span({id:id, class:'ancla'},"\u00a0"),
@@ -460,7 +458,6 @@ class AppSIGBA extends backend.AppBackend{
             var client;
             var annio=req.query.annio;
             var indicador=req.query.indicador;
-            var cortante=req.query.cortante;
             return be.getDbClient(req).then(function(cli){
                 var esAdmin=be.esAdminSigba(req);
                 var usuarioRevisor=false; // true si tiene permiso de revisor
@@ -471,51 +468,42 @@ class AppSIGBA extends backend.AppBackend{
                 "\n case when cant_filcol=cantidad_cortantes then var_ubiFilCol else '' end ubicacion, cant_filcol "+
                 "\n , ARRAY[v.cortantes] <@ i.nohabilitados is not true habilitado, v.cortantes cortante_orig" +
                 "\n FROM celdas v, LATERAL ( "+ 
-                        "\n SELECT COUNT(*) as cantidad_cortantes, string_agg(c.c, ',' ORDER BY vc.orden, vc.variable) AS variables,"+
-                            "\n string_agg(vc.denominacion,'|' ORDER BY vc.orden, vc.variable) as denominacion, " + 
-                            "\n min(vc.orden) AS orden, "+
-                            "\n string_agg( iv.variable ,',' ORDER BY iv.ubicacion,iv.orden, iv.variable) AS var_ordFilCol, "+
-                            "\n string_agg(vc.denominacion,'|' ORDER BY iv.ubicacion,iv.orden, iv.variable) as var_denomFilCol, " + 
-                            "\n string_agg( iv.ubicacion,',' ORDER BY iv.ubicacion,iv.orden, iv.variable) AS var_ubiFilCol, "+
-                            "\n count(iv.ubicacion) AS cant_FilCol , coalesce(string_agg(c.c::text||'-'||vc.orden::text||'-'||vc.variable::text, ',' ORDER BY vc.orden, vc.variable),'/')||'--'||coalesce(string_agg( iv.ubicacion||'-'||iv.orden||'-'||iv.variable ,',' ORDER BY iv.ubicacion,iv.orden, iv.variable),'/') AS variables_info " +
-                            "\n FROM jsonb_object_keys(v.cortantes) c INNER JOIN variables vc ON c.c = vc.variable "+
-                            "\n    INNER JOIN indicadores_variables iv ON iv.indicador=v.indicador AND iv.variable= vc.variable "+
-                    "\n ) c , indicadores i " +
+                "\n SELECT COUNT(*) as cantidad_cortantes, string_agg(c.c, ',' ORDER BY vc.orden, vc.variable) AS variables,"+
+                "\n string_agg(vc.denominacion,'|' ORDER BY vc.orden, vc.variable) as denominacion, " + 
+                "\n min(vc.orden) AS orden, "+
+                "\n string_agg( iv.variable ,',' ORDER BY iv.ubicacion,iv.orden, iv.variable) AS var_ordFilCol, "+
+                "\n string_agg(vc.denominacion,'|' ORDER BY iv.ubicacion,iv.orden, iv.variable) as var_denomFilCol, " + 
+                "\n string_agg( iv.ubicacion,',' ORDER BY iv.ubicacion,iv.orden, iv.variable) AS var_ubiFilCol, "+
+                "\n count(iv.ubicacion) AS cant_FilCol , coalesce(string_agg(c.c::text||'-'||vc.orden::text||'-'||vc.variable::text, ',' ORDER BY vc.orden, vc.variable),'/')||'--'||coalesce(string_agg( iv.ubicacion||'-'||iv.orden||'-'||iv.variable ,',' ORDER BY iv.ubicacion,iv.orden, iv.variable),'/') AS variables_info " +
+                "\n FROM jsonb_object_keys(v.cortantes) c INNER JOIN variables vc ON c.c = vc.variable "+
+                "\n    INNER JOIN indicadores_variables iv ON iv.indicador=v.indicador AND iv.variable= vc.variable "+
+                "\n ) c , indicadores i " +
                 "\n WHERE cortes ? 'annio' AND v.indicador = $1"+
-                    "\n  AND i.indicador=v.indicador AND " + be.defs_annio(annio).cond_cortantes_posibles/*" cortes ->> 'annio' = $2":" TRUE")*/+
+                "\n  AND i.indicador=v.indicador AND " + be.defs_annio(annio).cond_cortantes_posibles/*" cortes ->> 'annio' = $2":" TRUE")*/+
                 "\n GROUP BY v.indicador, cortantes, cantidad_cortantes, variables, c.orden,c.denominacion, "+
                 "\n     var_ordFilCol,var_denomFilCol,var_ubiFilCol, cant_filcol, habilitado, variables_info " +
                 "\n ORDER BY v.indicador, c.orden, cantidad_cortantes;";
                 return client.query(queryStr, be.defs_annio(annio).f_param_cortantes_posibles([indicador,annio])
                 ).fetchAll().then(function(result){
-                    var fila;
-                    var cortantesPosibles=[];
-                    result.rows.forEach(function(filar){
-                        if(cortante && filar.variables==cortante){
-                            fila=filar;
-                        }
-                        if((filar.cantidad_cortantes!=1 )&&(esAdmin || filar.habilitado )){
-                            fila=filar;
-                            cortantesPosibles.push({    
-                                variable: filar.variables,
-                                denominacion: filar.denominacion,
-                                fila:filar,
-                                cantidad:filar.cantidad_cortantes
-                            });
-                        }
-                    });
-                    if(!cortante){
-                        fila=cortantesPosibles[0].fila;
-                        cortante=cortantesPosibles[0].variable;
+                    var cortantesPosibles = result.rows.filter(row => (row.habilitado || esAdmin) && row.variables != 'annio');
+
+                    if (cortantesPosibles.length == 0){
+                        cortantesPosibles = result.rows.filter(row => (row.habilitado || esAdmin));
                     }
+
+                    //parametro GET (CSV con todos los cortantes que hay que mostrar, lo cual define un tabulado) //cortantes por defecto son las del primer tabulado
+                    var cortante = !req.query.cortante?cortantesPosibles[0].variables:req.query.cortante;
+                    // tabulado que se va as mostrar
+                    var fila = cortantesPosibles.filter(tabulado => tabulado.variables == cortante)[0];
+
                     var descripcionTabulado={};
                     return be.armarUnTabulado(client, fila, annio, indicador,descripcionTabulado).then(function(tabuladoHtmlYDescripcion){
                         var trCortantes=cortantesPosibles.map(function(cortanteAElegir){
                             var denominaciones=cortanteAElegir.denominacion.split('|');
-                            annio?denominaciones.splice(cortanteAElegir.variable.split(',').indexOf('annio'),1):true;
-                            var href=''+absolutePath+''+urlYClasesTabulados+'-indicador?'+(annio?'annio='+annio+'&':'')+'indicador='+indicador+'&cortante='+cortanteAElegir.variable;
+                            annio?denominaciones.splice(cortanteAElegir.variables.split(',').indexOf('annio'),1):true;
+                            var href=''+absolutePath+''+urlYClasesTabulados+'-indicador?'+(annio?'annio='+annio+'&':'')+'indicador='+indicador+'&cortante='+cortanteAElegir.variables;
                             return html.tr({class:'tr-cortante-posible'},[
-                                html.td({class:'td-cortante-posible', 'menu-item-selected':cortanteAElegir.variable==cortante},[
+                                html.td({class:'td-cortante-posible', 'menu-item-selected':cortanteAElegir.variables==cortante},[
                                     html.a({class:'a-cortante-posible',href:href},denominaciones.join('-'))
                                 ])
                             ]);
@@ -555,22 +543,22 @@ class AppSIGBA extends backend.AppBackend{
                                 ]),
                                 html.div({class:'div-pantallas',id:'div-pantalla-derecha'},[
                                     html.h2({class:'tabulado-descripcion'},annio),
-                                    fila.habilitado?html.div({id:'tabulado-html','para-graficador':JSON.stringify(tabuladoHtmlYDescripcion.matrix)},[tabuladoHtmlYDescripcion.tabuladoHtml]):null,                                    
+                                    (fila.habilitado || esAdmin)?html.div({id:'tabulado-html','para-graficador':JSON.stringify(tabuladoHtmlYDescripcion.matrix)},[tabuladoHtmlYDescripcion.tabuladoHtml]):null,                                    
                                     esAdmin?html.div([
                                         validationButton,
                                         habilitationButton
                                     ]):null,
                                     html.div({class:'tabulado-descripcion',id:'tabulado-descripcion-um'},[
-                                        fila.habilitado?html.span({id:"tabulado-um"},"Unidad de Medida: "):null,
-                                        fila.habilitado?html.span({id:"tabulado-um-descripcion"},tabuladoHtmlYDescripcion.descripcionTabulado.um_denominacion):null
+                                        (fila.habilitado || esAdmin)?html.span({id:"tabulado-um"},"Unidad de Medida: "):null,
+                                        (fila.habilitado || esAdmin)?html.span({id:"tabulado-um-descripcion"},tabuladoHtmlYDescripcion.descripcionTabulado.um_denominacion):null
                                     ]),
                                     html.div({class:'tabulado-descripcion',id:'tabulado-descripcion-nota'},[
-                                        (fila.habilitado&&tabuladoHtmlYDescripcion.descripcionTabulado.nota_pie)?html.span({id:"nota-porcentaje-label"},'Nota: '):null,
-                                        (fila.habilitado&&tabuladoHtmlYDescripcion.descripcionTabulado.nota_pie)?html.span({id:"nota-porcentaje"},tabuladoHtmlYDescripcion.descripcionTabulado.nota_pie):null,
+                                        ((fila.habilitado || esAdmin)&&tabuladoHtmlYDescripcion.descripcionTabulado.nota_pie)?html.span({id:"nota-porcentaje-label"},'Nota: '):null,
+                                        ((fila.habilitado || esAdmin)&&tabuladoHtmlYDescripcion.descripcionTabulado.nota_pie)?html.span({id:"nota-porcentaje"},tabuladoHtmlYDescripcion.descripcionTabulado.nota_pie):null,
                                     ]),
                                     html.div({class:'tabulado-descripcion',id:'tabulado-descripcion-fuente'},[
-                                        fila.habilitado?html.span({id:"tabulado-fuente"},'Fuente: '):null,
-                                        fila.habilitado?html.span({id:"tabulado-fuente-descripcion"},tabuladoHtmlYDescripcion.descripcionTabulado.fuente):null,
+                                        (fila.habilitado || esAdmin)?html.span({id:"tabulado-fuente"},'Fuente: '):null,
+                                        (fila.habilitado || esAdmin)?html.span({id:"tabulado-fuente-descripcion"},tabuladoHtmlYDescripcion.descripcionTabulado.fuente):null,
                                     ]),
                                 ])
                             ]);
