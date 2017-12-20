@@ -486,17 +486,15 @@ class AppSIGBA extends backend.AppBackend{
                 return client.query(queryStr, be.defs_annio(annio).f_param_cortantes_posibles([indicador,annio])
                 ).fetchAll().then(function(result){
                     var cortantesPosibles = result.rows.filter(row => (row.habilitado || esAdmin) && row.variables != 'annio');
-
                     if (cortantesPosibles.length == 0){
                         cortantesPosibles = result.rows.filter(row => (row.habilitado || esAdmin));
                     }
-
                     //parametro GET (CSV con todos los cortantes que hay que mostrar, lo cual define un tabulado) //cortantes por defecto son las del primer tabulado
                     var cortante = !req.query.cortante?cortantesPosibles[0].variables:req.query.cortante;
                     // tabulado que se va as mostrar
                     var fila = cortantesPosibles.filter(tabulado => tabulado.variables == cortante)[0];
-
                     var descripcionTabulado={};
+                    
                     return be.armarUnTabulado(client, fila, annio, indicador,descripcionTabulado).then(function(tabuladoHtmlYDescripcion){
                         var trCortantes=cortantesPosibles.map(function(cortanteAElegir){
                             var denominaciones=cortanteAElegir.denominacion.split('|');
