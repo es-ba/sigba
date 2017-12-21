@@ -6,14 +6,17 @@ module.exports = function(context){
         name:'indicadores_variables',
         editable: puedeEditar,
         fields: [
-            {name: 'indicador'  ,typeName:'text'      ,nullable:false},        
-            {name: 'variable'   ,typeName:'text'      ,nullable:false},
-            {name: 'ctrl_totales'   ,typeName:'text'   /*, label: 'control totales'*/},
-            {name: 'ubicacion'  ,typeName:'text'      },
-            {name: 'orden'      ,typeName:'integer'   },
+            {name: 'indicador'    ,typeName:'text'      ,nullable:false},        
+            {name: 'variable'     ,typeName:'text'      ,nullable:false},
+            {name: 'ctrl_totales' ,typeName:'text'  /*, label: 'control totales'*/},
+            {name: 'ubicacion'    ,typeName:'text'      },
+            {name: 'orden'        ,typeName:'integer'   },
         ],
         primaryKey:['indicador','variable'],
         foreignKeys:[{references:'indicadores', fields:['indicador']},
                     {references:'variables'   , fields:['variable' ]} ],
+        constraints:[
+            {constraintType:'check' , consName:"valor invalido en ubicacion", expr:"ubicacion in ('fil', 'col')"},
+        ]
     },context);
 }

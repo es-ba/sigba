@@ -9,6 +9,10 @@ module.exports = function(context){
             {name: 'indicador'            ,typeName:'text'          ,nullable:false},
             {name: 'annio'                ,typeName:'text'          ,nullable:false},
         ],
-        primaryKey:['indicador','annio']
+        primaryKey:['indicador','annio'],
+        foreignKeys:[
+            {references:'indicadores', fields:['indicador']},
+        ]
+
     },context);
 }

@@ -29,7 +29,10 @@ module.exports = function(context){
             {name:'ods'                      , label:'ODS'                                   , typeName:'text'},
         ],
         primaryKey:['indicador'],
-        foreignKeys:[{references:'dimension', fields:['dimension']} ],
+        foreignKeys:[{references:'dimension', fields:['dimension']},
+            {references:'fte'  , fields:['fte']},
+            {references:'um'   , fields:['um']}
+        ],
         detailTables:[
             {table: 'valores', fields:[{source:'indicador', target:'indicador'}], abr:'V', label:'valores'}
         ]

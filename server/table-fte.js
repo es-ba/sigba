@@ -12,7 +12,7 @@ module.exports = function(context){
         ],
         primaryKey:['fte'],
         detailTables:[
-            {table: 'valores', fields:[{source:'fte', target:'fte'}], abr:'V', label:'valores'}
+            {table: 'indicadores', fields:['fte'], abr:'I', label:'indicadores'}
         ]
     },context);
 }

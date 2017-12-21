@@ -6,14 +6,14 @@ module.exports = function(context){
         name:'um',
         editable: puedeEditar,
         fields: [
-            {name: 'um'           ,typeName:'text'          ,nullable:false},
-            {name: 'denominacion' ,typeName:'text'        },
-            {name: 'descripcion'  ,typeName:'text'        },
-            {name: 'nota_pie'     ,typeName:'text'        },
+            {name: 'um'           ,typeName:'text'        ,nullable:false},
+            {name: 'denominacion' ,typeName:'text'      },
+            {name: 'descripcion'  ,typeName:'text'      },
+            {name: 'nota_pie'     ,typeName:'text'      },
         ],
         primaryKey:['um'],
         detailTables:[
-            {table: 'valores', fields:[{source:'um', target:'um'}], abr:'V', label:'valores'}
+            {table: 'indicadores', fields:['um'], abr:'I', label:'indicadores'}
         ]
     },context);
 }
