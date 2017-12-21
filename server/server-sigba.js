@@ -834,6 +834,7 @@ class AppSIGBA extends backend.AppBackend{
                 {menuType:'table', name:'um'              , label:'Unidad de medida'                      },
                 {menuType:'table', name:'cv'              , label:'Coeficientes de variación'             },
                 {menuType:'table', name:'indicador_annio' , label:'Cobertura'                             },
+                {menuType:'table', name:'tabulados'       , label:'Tabulados'                             },
             ]},
             {menuType:'menu'    , name:'Variables de corte' , menuContent:[
                 {menuType:'table', name:'variables'       , label:'Variables'            },
@@ -873,6 +874,7 @@ class AppSIGBA extends backend.AppBackend{
             'valores',
             'celdas',
             'cortes_celdas',
+            'tabulados',
             'diferencia_totales',
             'signos_convencionales'
         ]);

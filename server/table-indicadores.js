@@ -34,7 +34,8 @@ module.exports = function(context){
             {references:'um'   , fields:['um']}
         ],
         detailTables:[
-            {table: 'valores', fields:[{source:'indicador', target:'indicador'}], abr:'V', label:'valores'}
+            {table: 'valores', fields:[{source:'indicador', target:'indicador'}], abr:'V', label:'valores'},
+            {table: 'tabulados', fields:[{source:'indicador', target: 'indicador'}], abr: 'T', label: 'tabulados'}
         ]
     },context);
 }
