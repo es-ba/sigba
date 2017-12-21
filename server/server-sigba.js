@@ -485,9 +485,9 @@ class AppSIGBA extends backend.AppBackend{
                 "\n ORDER BY v.indicador, c.orden, cantidad_cortantes;";
                 return client.query(queryStr, be.defs_annio(annio).f_param_cortantes_posibles([indicador,annio])
                 ).fetchAll().then(function(result){
-                    var cortantesPosibles = result.rows.filter(row => (row.habilitado || esAdmin) && row.variables != 'annio');
-                    if (cortantesPosibles.length == 0){
-                        cortantesPosibles = result.rows.filter(row => (row.habilitado || esAdmin));
+                    var cortantesPosibles = result.rows.filter(row => (row.habilitado || esAdmin));
+                    if (cortantesPosibles.length > 1){
+                        cortantesPosibles = cortantesPosibles.filter(row => row.variable != 'annio');
                     }
                     //parametro GET (CSV con todos los cortantes que hay que mostrar, lo cual define un tabulado) //cortantes por defecto son las del primer tabulado
                     var cortante = !req.query.cortante?cortantesPosibles[0].variables:req.query.cortante;
