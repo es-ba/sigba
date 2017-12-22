@@ -512,6 +512,10 @@ class AppSIGBA extends backend.AppBackend{
                         tabuladoHtmlYDescripcion.descripcionTabulado.info.usuario=req.user?req.user.usu_usu:{};
                         tabuladoHtmlYDescripcion.descripcionTabulado.info.habilitar=!fila.habilitado;
                         tabuladoHtmlYDescripcion.descripcionTabulado.info.cortante_orig=fila.cortante_orig;
+                        tabuladoHtmlYDescripcion.descripcionTabulado.info.mostrar_cuadro=false;
+                        tabuladoHtmlYDescripcion.descripcionTabulado.info.mostrar_grafico=false;
+                        tabuladoHtmlYDescripcion.descripcionTabulado.info.tipo_grafico='linea';
+                        tabuladoHtmlYDescripcion.descripcionTabulado.info.orientacion='horizontal';
                         var validationButton=html.button({id:'validacion-tabulado',type:'button','more-info':JSON.stringify(tabuladoHtmlYDescripcion.descripcionTabulado.info)},'Validar tabulado')
                         var habilitationButton=html.button({id:'habilitacion-tabulado',type:'button','more-info':JSON.stringify(tabuladoHtmlYDescripcion.descripcionTabulado.info)}/*,bb*/);
                         be.anniosCortantes(client,annios,anniosA,indicador).then(function(){
@@ -541,7 +545,7 @@ class AppSIGBA extends backend.AppBackend{
                                 ]),
                                 html.div({class:'div-pantallas',id:'div-pantalla-derecha'},[
                                     html.h2({class:'tabulado-descripcion'},annio),
-                                    (fila.habilitado || esAdmin)?html.div({id:'tabulado-html','para-graficador':JSON.stringify(tabuladoHtmlYDescripcion.matrix)},[tabuladoHtmlYDescripcion.tabuladoHtml]):null,                                    
+                                    (fila.habilitado || esAdmin)?html.div({id:'tabulado-html','para-graficador':JSON.stringify(tabuladoHtmlYDescripcion.matrix), 'tabulado-info':JSON.stringify(tabuladoHtmlYDescripcion.descripcionTabulado.info)},[tabuladoHtmlYDescripcion.tabuladoHtml]):null,                                    
                                     esAdmin?html.div([
                                         validationButton,
                                         habilitationButton

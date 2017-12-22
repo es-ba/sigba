@@ -99,6 +99,10 @@ function getMatrix() {
     return JSON.parse(tabuladoElement().getAttribute('para-graficador'));
 }
 
+function getTabuladoInfo() {
+    return JSON.parse(tabuladoElement().getAttribute('tabulado-info'));
+}
+
 function chartElement(){ 
     return document.getElementById('chartContainer');
 }
@@ -120,11 +124,11 @@ window.onpopstate = function (event) {
 };
 
 function updateVisualization(){
-    if (window.location.search.includes(displayChartParamName)) {
+    if (window.location.search.includes(displayChartParamName) && mostrarGrafico()) {
         chartElement().style.display='block';
         tabuladoElement().style.display='none';
         document.getElementById('toogleButton').src = 'img/tabulado.png';
-    } else {
+    } else if(!window.location.search.includes(displayChartParamName) && mostrarCuadro()) {
         chartElement().style.display='none';
         tabuladoElement().style.display='block';
         document.getElementById('toogleButton').src= 'img/grafico.png';
@@ -206,17 +210,35 @@ function insertCopyUrlButton(){
     insertNewButton(buildCopyUrlButton());
 }
 
+function mostrarGrafico(){
+    return getTabuladoInfo().mostrar_grafico;
+}
+
+function mostrarCuadro(){
+    return getTabuladoInfo().mostrar_cuadro;
+}
+
 window.addEventListener('load', function () {
     if (tabuladoElement()){       
-        try {
-            showChart();
-            insertNewButton(buildToggleButton());
-            updateVisualization();                       
-        } catch (error) {
-            console.error('No es posible graficar el tabulado en pantalla');
-        }                      
-        insertNewButton(buildExportExcelButton());
-        insertCopyUrlButton();
+        if (mostrarGrafico()){
+            try {
+                showChart();
+                if(mostrarCuadro()){
+                    insertNewButton(buildToggleButton());
+                }else{
+                    var newUrl = location.href+displayChartParamName;  
+                    window.history.pushState("Cambiar visualización entre gráfico y tabulado", "Visualización", newUrl);
+                }
+            } catch (error) {
+                //TODO: reemplazar html de gráfico por el siguiente cartel para el usuario
+                console.error('No es posible graficar el tabulado en pantalla');
+            }                      
+        }
+        if(mostrarCuadro()){
+            insertNewButton(buildExportExcelButton());
+            insertCopyUrlButton();
+        }
+        updateVisualization();
     }
 
     var encabezadoChico =document.getElementById('id-encabezado-chico');
