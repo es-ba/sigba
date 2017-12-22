@@ -10,7 +10,7 @@ module.exports = function(context){
             {name:'habilitado'       , label:'Habilitado'      , typeName:'boolean'  , defaultValue:true},
             {name:'mostrar_cuadro'   , label:'Mostrar Cuadro'  , typeName:'boolean'  , defaultValue:true},
             {name:'mostrar_grafico'  , label:'Mostrar Gráfico' , typeName:'boolean'  , defaultValue:true},
-            {name:'tipo_grafico'     , label:'Tipo Gráfico'    , typeName:'text'     , defaultValue:'line', },
+            {name:'tipo_grafico'     , label:'Tipo Gráfico'    , typeName:'text'     , defaultValue:'linea', },
             {name:'orientacion'      , label:'Orientación'     , typeName:'text'     , defaultValue:'horizontal'},
         ], 
         primaryKey:['indicador','cortantes'],
