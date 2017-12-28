@@ -59,9 +59,23 @@ function showChart() {
 
     var tabuladoHtml = tabuladoElement();
     tabuladoHtml.parentNode.insertBefore(chartContainer, tabuladoHtml.nextElementSibling);
-
     setTimeout(function(){
-        var graficador = new LineChartGraphicator('chartElement', tabulatorMatrix);
+        var graficador;
+        var specificOptions={};
+        if(getTabuladoInfo().tipo_grafico=='barra'){
+            graficador = new BarChartGraphicator('chartElement', tabulatorMatrix);
+            console.log("graficador",graficador.buildChartParams())
+            specificOptions={
+                axis:{
+                    x:{
+                        type: 'category',
+                    }
+                }
+            };
+        }else{
+            graficador = new LineChartGraphicator('chartElement', tabulatorMatrix);
+            //console.log("graficador",graficador)
+        }
         var ancho=window.innerWidth - document.getElementById("div-pantalla-izquierda").offsetWidth - 32;
         var max=Number.MIN_VALUE;
         var minCellValue=Number.MAX_VALUE;
@@ -69,6 +83,7 @@ function showChart() {
         if(tabulatorMatrix.lines.length>1&&tabulatorMatrix.lines[0].titles[0]==null){
             tabulatorMatrix.lines.shift();
         }
+        console.log(graficador)
         tabulatorMatrix.lines.forEach(function(line, i_line){
             line.cells.forEach(function(cell, i_cell){
                 if (cell && cell.valor){
@@ -78,25 +93,33 @@ function showChart() {
             });
         });
         minYValue = minCellValue<0?minCellValue:(2*minCellValue-max>0?2*minCellValue-max:0); // acomoda el 0 automáticamente, si los datos útiles ocupan menos de la mitad cambio el 0        
-        graficador.renderTabulation({
+        graficador.renderTabulation(changing({
             size:{width:ancho},
             axis:{
                 x:{
                     label: {position:'outer-center', text:tabulatorMatrix.vars[tabulatorMatrix.columnVariables[0]].label},
-                    tick: { fit: false }
+                    // tick: { fit: false }
+                    tick: { culling: true }
                 },
                 y:{ 
                     label: {position:'outer-middle', text:(document.getElementById('tabulado-um-descripcion')||{}).textContent||''},
                     min: minYValue,
                     padding: minYValue<=0?{bottom: 0}:null,
                 },
+            },
+            data:{
+                // groups:null
             }
-        });
+        },specificOptions));
     },100);
 }
 
 function getMatrix() {
     return JSON.parse(tabuladoElement().getAttribute('para-graficador'));
+}
+
+function getTabuladoInfo(){
+    return JSON.parse(tabuladoElement().getAttribute('info-tabulado'));
 }
 
 function chartElement(){ 
@@ -207,11 +230,11 @@ function insertCopyUrlButton(){
 }
 
 window.addEventListener('load', function () {
-    if (tabuladoElement()){       
+    if (tabuladoElement()){
         try {
             showChart();
             insertNewButton(buildToggleButton());
-            updateVisualization();                       
+            updateVisualization();
         } catch (error) {
             console.error('No es posible graficar el tabulado en pantalla');
         }                      
