@@ -61,7 +61,22 @@ function showChart() {
     tabuladoHtml.parentNode.insertBefore(chartContainer, tabuladoHtml.nextElementSibling);
 
     setTimeout(function(){
-        var graficador = new LineChartGraphicator('chartElement', tabulatorMatrix);
+    var graficador;
+        var specificOptions={};
+        if(getTabuladoInfo().tipo_grafico=='barra'){
+            graficador = new BarChartGraphicator('chartElement', tabulatorMatrix);
+            specificOptions={
+                axis:{
+                    x:{
+                        type: 'category',
+                        tick:{values: false}
+                    }
+                }
+            };
+        }else{
+            graficador = new LineChartGraphicator('chartElement', tabulatorMatrix);
+            //console.log("graficador",graficador)
+        }
         var ancho=window.innerWidth - document.getElementById("div-pantalla-izquierda").offsetWidth - 32;
         var max=Number.MIN_VALUE;
         var minCellValue=Number.MAX_VALUE;
@@ -78,25 +93,35 @@ function showChart() {
             });
         });
         minYValue = minCellValue<0?minCellValue:(2*minCellValue-max>0?2*minCellValue-max:0); // acomoda el 0 automáticamente, si los datos útiles ocupan menos de la mitad cambio el 0        
-        graficador.renderTabulation({
-            size:{width:ancho},
-            axis:{
-                x:{
-                    label: {position:'outer-center', text:tabulatorMatrix.vars[tabulatorMatrix.columnVariables[0]].label},
-                    tick: { fit: false }
+        graficador.renderTabulation(changing(
+            {
+                size:{width:ancho},
+                axis:{
+                    x:{
+                        label: {position:'outer-center', text:tabulatorMatrix.vars[tabulatorMatrix.columnVariables[0]].label},
+                        tick: { culling: false }
+                    },
+                    y:{ 
+                        label: {position:'outer-middle', text:(document.getElementById('tabulado-um-descripcion')||{}).textContent||''},
+                        min: minYValue,
+                        padding: minYValue<=0?{bottom: 0}:null,
+                    },
                 },
-                y:{ 
-                    label: {position:'outer-middle', text:(document.getElementById('tabulado-um-descripcion')||{}).textContent||''},
-                    min: minYValue,
-                    padding: minYValue<=0?{bottom: 0}:null,
-                },
-            }
-        });
+                data:{
+                     groups:false
+                }
+            },
+            specificOptions, 
+        ));
     },100);
 }
 
 function getMatrix() {
     return JSON.parse(tabuladoElement().getAttribute('para-graficador'));
+}
+
+function getTabuladoInfo(){
+    return JSON.parse(tabuladoElement().getAttribute('info-tabulado'));
 }
 
 function chartElement(){ 
