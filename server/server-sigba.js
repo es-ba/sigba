@@ -410,6 +410,7 @@ class AppSIGBA extends backend.AppBackend{
     ownClientIncludes(){
         return [
             { type: 'js', module: 'graphicator', path:'graphicator'},
+            { type: 'js', module: 'best-globals', path:'best-globals'},
             { type: 'js', module: 'require-bro'},
             { type: 'js', module: 'xlsx', path:'xlsx',  modPath: 'dist', file:'xlsx.full.min.js'},
             { type: 'js', module: 'like-ar' },
@@ -928,3 +929,4 @@ process.on('unhandledRejection', function(err){
 });
 
 new AppSIGBA().start();
+    

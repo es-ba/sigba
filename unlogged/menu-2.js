@@ -1,5 +1,5 @@
 "use strict";
-
+var changing = require('best-globals').changing;
 function tableCreate(info,data) {
     var rows=JSON.parse(data);
     var tablaId=rows[0].indicador;

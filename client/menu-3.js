@@ -52,10 +52,8 @@ function activarBoton(id, nombreEvento){
             });
         }
         if(nombreEvento=='habilitar'){
-            console.log("parametros.habilitar",parametros.habilitar)
             elemento.innerHTML= cartelHabilitar(parametros.habilitar); 
             elemento.addEventListener('click',function(){
-                console.log("hace click");
                  eventosBotones[nombreEvento](parametros);
             })
 
