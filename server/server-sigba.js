@@ -532,7 +532,7 @@ class AppSIGBA extends backend.AppBackend{
                             var denominaciones=cortanteAElegir.denominacion.split('|');
                             annio?denominaciones.splice(cortanteAElegir.variables.split(',').indexOf('annio'),1):true;
                             var href=''+absolutePath+''+urlYClasesTabulados+'-indicador?'+(annio?'annio='+annio+'&':'')+'indicador='+indicador+'&cortante='+cortanteAElegir.variables;
-                            return html.tr({class:'tr-cortante-posible'},[
+                            return html.tr({class:'tr-cortante-posible','esta-habilitado':cortanteAElegir.habilitado?'si':'no'},[
                                 html.td({class:'td-cortante-posible', 'menu-item-selected':cortanteAElegir.variables==cortante},[
                                     html.a({class:'a-cortante-posible',href:href},denominaciones.join('-'))
                                 ])
