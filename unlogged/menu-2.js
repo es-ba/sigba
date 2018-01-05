@@ -63,6 +63,7 @@ function showChart() {
     setTimeout(function(){
     var graficador;
         var specificOptions={};
+        var esHorizontal=getTabuladoInfo().orientacion=='vertical'?true:false;
         if(getTabuladoInfo().tipo_grafico=='barra'){
             graficador = new BarChartGraphicator('chartElement', tabulatorMatrix);
             specificOptions={
@@ -75,7 +76,6 @@ function showChart() {
             };
         }else{
             graficador = new LineChartGraphicator('chartElement', tabulatorMatrix);
-            //console.log("graficador",graficador)
         }
         var ancho=window.innerWidth - document.getElementById("div-pantalla-izquierda").offsetWidth - 32;
         var max=Number.MIN_VALUE;
@@ -97,6 +97,7 @@ function showChart() {
             {
                 size:{width:ancho},
                 axis:{
+                    rotated:esHorizontal,
                     x:{
                         label: {position:'outer-center', text:tabulatorMatrix.vars[tabulatorMatrix.columnVariables[0]].label},
                         tick: { culling: false }
