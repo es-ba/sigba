@@ -330,7 +330,9 @@ class AppSIGBA extends backend.AppBackend{
                     be.defs_annio(annio).f_param_cortantes_posibles([indicador,fila.crt,annio])
                 ).fetchAll();
             }).then(function(result){
+                //Si el annio está fijo lo quito de las variables
                 datum.list=result.rows;
+                //datum.list=annio?result.rows.map(function(row){delete row.annio;return row;}):result.rows;
                 datum.vars.push({name:'valor', place:'data'});
                 datum.vars.push({name:'cv', place:'data'});
                 datum.list.forEach(function(row){

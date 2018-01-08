@@ -18,7 +18,7 @@ module.exports = function(context){
             {references:'indicadores', fields:['indicador']},
         ],
         constraints:[
-            {constraintType:'check' , consName:"tipo de gráfico", expr:"tipo_grafico in ('linea', 'barra')"},
+            {constraintType:'check' , consName:"tipo de gráfico", expr:"tipo_grafico in ('linea', 'barra','piramide')"},
             {constraintType:'check' , consName:"orientación", expr:"orientacion in ('horizontal', 'vertical')"},
         ],
         detailTables:[
