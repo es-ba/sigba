@@ -308,6 +308,10 @@ class AppSIGBA extends backend.AppBackend{
                     camposCortantes:be.defs_annio(annio).cortantes,
                     cortantes: fila.crt,
                     annioCortante:annio?annio:'TRUE',
+                    cuadro:fila.cuadro,
+                    grafico:fila.grafico,
+                    tipo_grafico:fila.tipo_grafico,
+                    orientacion:fila.orientacion
                 };
                 return client.query(
                     "SELECT "+ variables.map(function(varInv){
@@ -326,7 +330,9 @@ class AppSIGBA extends backend.AppBackend{
                     be.defs_annio(annio).f_param_cortantes_posibles([indicador,fila.crt,annio])
                 ).fetchAll();
             }).then(function(result){
+                //Si el annio está fijo lo quito de las variables
                 datum.list=result.rows;
+                //datum.list=annio?result.rows.map(function(row){delete row.annio;return row;}):result.rows;
                 datum.vars.push({name:'valor', place:'data'});
                 datum.vars.push({name:'cv', place:'data'});
                 datum.list.forEach(function(row){
@@ -406,6 +412,7 @@ class AppSIGBA extends backend.AppBackend{
     ownClientIncludes(){
         return [
             { type: 'js', module: 'graphicator', path:'graphicator'},
+            { type: 'js', module: 'best-globals', path:'best-globals'},
             { type: 'js', module: 'require-bro'},
             { type: 'js', module: 'xlsx', path:'xlsx',  modPath: 'dist', file:'xlsx.full.min.js'},
             { type: 'js', module: 'like-ar' },
@@ -462,45 +469,72 @@ class AppSIGBA extends backend.AppBackend{
                 var esAdmin=be.esAdminSigba(req);
                 var usuarioRevisor=false; // true si tiene permiso de revisor
                 client=cli;
-                var queryStr = "SELECT v.indicador, v.cortantes crt, COUNT(*), cantidad_cortantes, variables_info, "+
-                "\n case when cant_filcol=cantidad_cortantes then var_ordFilCol else variables end variables, "+
-                "\n c.orden, case when cant_filcol=cantidad_cortantes then var_denomFilCol else c.denominacion end denominacion ,"+
-                "\n case when cant_filcol=cantidad_cortantes then var_ubiFilCol else '' end ubicacion, cant_filcol "+
-                "\n , ARRAY[v.cortantes] <@ i.nohabilitados is not true habilitado, v.cortantes cortante_orig" +
-                "\n FROM celdas v, LATERAL ( "+ 
-                "\n SELECT COUNT(*) as cantidad_cortantes, string_agg(c.c, ',' ORDER BY vc.orden, vc.variable) AS variables,"+
-                "\n string_agg(vc.denominacion,'|' ORDER BY vc.orden, vc.variable) as denominacion, " + 
-                "\n min(vc.orden) AS orden, "+
-                "\n string_agg( iv.variable ,',' ORDER BY iv.ubicacion,iv.orden, iv.variable) AS var_ordFilCol, "+
-                "\n string_agg(vc.denominacion,'|' ORDER BY iv.ubicacion,iv.orden, iv.variable) as var_denomFilCol, " + 
-                "\n string_agg( iv.ubicacion,',' ORDER BY iv.ubicacion,iv.orden, iv.variable) AS var_ubiFilCol, "+
-                "\n count(iv.ubicacion) AS cant_FilCol , coalesce(string_agg(c.c::text||'-'||vc.orden::text||'-'||vc.variable::text, ',' ORDER BY vc.orden, vc.variable),'/')||'--'||coalesce(string_agg( iv.ubicacion||'-'||iv.orden||'-'||iv.variable ,',' ORDER BY iv.ubicacion,iv.orden, iv.variable),'/') AS variables_info " +
-                "\n FROM jsonb_object_keys(v.cortantes) c INNER JOIN variables vc ON c.c = vc.variable "+
-                "\n    INNER JOIN indicadores_variables iv ON iv.indicador=v.indicador AND iv.variable= vc.variable "+
-                "\n ) c , indicadores i " +
-                "\n WHERE cortes ? 'annio' AND v.indicador = $1"+
-                "\n  AND i.indicador=v.indicador AND " + be.defs_annio(annio).cond_cortantes_posibles/*" cortes ->> 'annio' = $2":" TRUE")*/+
-                "\n GROUP BY v.indicador, cortantes, cantidad_cortantes, variables, c.orden,c.denominacion, "+
-                "\n     var_ordFilCol,var_denomFilCol,var_ubiFilCol, cant_filcol, habilitado, variables_info " +
-                "\n ORDER BY v.indicador, c.orden, cantidad_cortantes;";
+              //  var queryStr = "SELECT v.indicador, v.cortantes crt, COUNT(*), cantidad_cortantes, variables_info, "+
+              //  "\n case when cant_filcol=cantidad_cortantes then var_ordFilCol else variables end variables, "+
+              //  "\n c.orden, case when cant_filcol=cantidad_cortantes then var_denomFilCol else c.denominacion end denominacion ,"+
+              //  "\n case when cant_filcol=cantidad_cortantes then var_ubiFilCol else '' end ubicacion, cant_filcol "+
+              //  "\n , ARRAY[v.cortantes] <@ i.nohabilitados is not true habilitado, v.cortantes cortante_orig" +
+              //  "\n FROM celdas v, LATERAL ( "+ 
+              //  "\n SELECT COUNT(*) as cantidad_cortantes, string_agg(c.c, ',' ORDER BY vc.orden, vc.variable) AS variables,"+
+              //  "\n string_agg(vc.denominacion,'|' ORDER BY vc.orden, vc.variable) as denominacion, " + 
+              //  "\n min(vc.orden) AS orden, "+
+              //  "\n string_agg( iv.variable ,',' ORDER BY iv.ubicacion,iv.orden, iv.variable) AS var_ordFilCol, "+
+              //  "\n string_agg(vc.denominacion,'|' ORDER BY iv.ubicacion,iv.orden, iv.variable) as var_denomFilCol, " + 
+              //  "\n string_agg( iv.ubicacion,',' ORDER BY iv.ubicacion,iv.orden, iv.variable) AS var_ubiFilCol, "+
+              //  "\n count(iv.ubicacion) AS cant_FilCol , coalesce(string_agg(c.c::text||'-'||vc.orden::text||'-'||vc.variable::text, ',' ORDER BY vc.orden, vc.variable),'/')||'--'||coalesce(string_agg( iv.ubicacion||'-'||iv.orden||'-'||iv.variable ,',' ORDER BY iv.ubicacion,iv.orden, iv.variable),'/') AS variables_info " +
+              //  "\n FROM jsonb_object_keys(v.cortantes) c INNER JOIN variables vc ON c.c = vc.variable "+
+              //  "\n    INNER JOIN indicadores_variables iv ON iv.indicador=v.indicador AND iv.variable= vc.variable "+
+              //  "\n ) c , indicadores i " +
+              //  "\n WHERE cortes ? 'annio' AND v.indicador = $1"+
+              //  "\n  AND i.indicador=v.indicador AND " + be.defs_annio(annio).cond_cortantes_posibles/*" cortes ->> 'annio' = $2":" TRUE")*/+
+              //  "\n GROUP BY v.indicador, cortantes, cantidad_cortantes, variables, c.orden,c.denominacion, "+
+              //  "\n     var_ordFilCol,var_denomFilCol,var_ubiFilCol, cant_filcol, habilitado, variables_info " +
+              //  "\n ORDER BY v.indicador, c.orden, cantidad_cortantes;";
+                var queryStr=
+                    " SELECT v.indicador, v.cortantes crt, COUNT(*), cantidad_cortantes, variables_info, "+
+                    "\n  case when cant_filcol=cantidad_cortantes then var_ordFilCol else variables end variables, "+
+                    "\n  c.orden, case when cant_filcol=cantidad_cortantes then var_denomFilCol else c.denominacion end denominacion , "+
+                    "\n  case when cant_filcol=cantidad_cortantes then var_ubiFilCol else '' end ubicacion, cant_filcol "+
+                    "\n  , tt.habilitado as habilitado,/*ARRAY[v.cortantes] <@ i.nohabilitados is not true habilitado,*/  "+
+                    "\n  tt.mostrar_cuadro cuadro, tt.mostrar_grafico grafico, tt.tipo_grafico, tt.orientacion, "+
+                    "\n  v.cortantes cortante_orig "+
+                    "\n  FROM celdas v ,LATERAL ( "+
+                    "\n  select * from tabulados t where v.indicador=t.indicador AND v.cortantes=t.cortantes "+
+                    "\n  ) tt, LATERAL ( "+
+                    "\n  SELECT COUNT(*) as cantidad_cortantes, string_agg(c.c, ',' ORDER BY vc.orden, vc.variable) AS variables, "+
+                    "\n  string_agg(vc.denominacion,'|' ORDER BY vc.orden, vc.variable) as denominacion, "+
+                    "\n  min(vc.orden) AS orden, "+
+                    "\n  string_agg( iv.variable ,',' ORDER BY iv.ubicacion,iv.orden, iv.variable) AS var_ordFilCol, "+
+                    "\n  string_agg(vc.denominacion,'|' ORDER BY iv.ubicacion,iv.orden, iv.variable) as var_denomFilCol, "+
+                    "\n  string_agg( iv.ubicacion,',' ORDER BY iv.ubicacion,iv.orden, iv.variable) AS var_ubiFilCol, "+
+                    "\n  count(iv.ubicacion) AS cant_FilCol , coalesce(string_agg(c.c::text||'-'||vc.orden::text||'-'||vc.variable::text, ',' ORDER BY vc.orden, vc.variable),'/')||'--'|| "+
+                    "\n  coalesce(string_agg( iv.ubicacion||'-'||iv.orden||'-'||iv.variable ,',' ORDER BY iv.ubicacion,iv.orden, iv.variable),'/') AS variables_info "+
+                    "\n  FROM jsonb_object_keys(v.cortantes) c INNER JOIN variables vc ON c.c = vc.variable "+
+                    "\n      INNER JOIN indicadores_variables iv ON iv.indicador=v.indicador AND iv.variable= vc.variable "+
+                    "\n  ) c , indicadores i "+
+                    "\n  WHERE cortes ? 'annio' AND v.indicador = $1 "+
+                    "\n  AND i.indicador=v.indicador AND "+ be.defs_annio(annio).cond_cortantes_posibles  +
+                    "\n  GROUP BY v.indicador, v.cortantes, cantidad_cortantes, variables, c.orden,c.denominacion, "+
+                    "\n      var_ordFilCol,var_denomFilCol,var_ubiFilCol, cant_filcol, habilitado, variables_info, "+
+                    "\n      tt.mostrar_cuadro, tt.mostrar_grafico, tt.tipo_grafico, tt.orientacion "+
+                    "\n  ORDER BY v.indicador, c.orden, cantidad_cortantes; ";
                 return client.query(queryStr, be.defs_annio(annio).f_param_cortantes_posibles([indicador,annio])
                 ).fetchAll().then(function(result){
                     var cortantesPosibles = result.rows.filter(row => (row.habilitado || esAdmin));
                     if (cortantesPosibles.length > 1){
-                        cortantesPosibles = cortantesPosibles.filter(row => row.variable != 'annio');
+                        cortantesPosibles = cortantesPosibles.filter(row => row.variables != 'annio');
                     }
                     //parametro GET (CSV con todos los cortantes que hay que mostrar, lo cual define un tabulado) //cortantes por defecto son las del primer tabulado
                     var cortante = !req.query.cortante?cortantesPosibles[0].variables:req.query.cortante;
                     // tabulado que se va as mostrar
                     var fila = cortantesPosibles.filter(tabulado => tabulado.variables == cortante)[0];
                     var descripcionTabulado={};
-                    
                     return be.armarUnTabulado(client, fila, annio, indicador,descripcionTabulado).then(function(tabuladoHtmlYDescripcion){
                         var trCortantes=cortantesPosibles.map(function(cortanteAElegir){
                             var denominaciones=cortanteAElegir.denominacion.split('|');
                             annio?denominaciones.splice(cortanteAElegir.variables.split(',').indexOf('annio'),1):true;
                             var href=''+absolutePath+''+urlYClasesTabulados+'-indicador?'+(annio?'annio='+annio+'&':'')+'indicador='+indicador+'&cortante='+cortanteAElegir.variables;
-                            return html.tr({class:'tr-cortante-posible'},[
+                            return html.tr({class:'tr-cortante-posible','esta-habilitado':cortanteAElegir.habilitado?'si':'no'},[
                                 html.td({class:'td-cortante-posible', 'menu-item-selected':cortanteAElegir.variables==cortante},[
                                     html.a({class:'a-cortante-posible',href:href},denominaciones.join('-'))
                                 ])
@@ -541,7 +575,11 @@ class AppSIGBA extends backend.AppBackend{
                                 ]),
                                 html.div({class:'div-pantallas',id:'div-pantalla-derecha'},[
                                     html.h2({class:'tabulado-descripcion'},annio),
-                                    (fila.habilitado || esAdmin)?html.div({id:'tabulado-html','para-graficador':JSON.stringify(tabuladoHtmlYDescripcion.matrix)},[tabuladoHtmlYDescripcion.tabuladoHtml]):null,                                    
+                                    ((fila.habilitado) || esAdmin)?html.div({
+                                        id:'tabulado-html',
+                                        'para-graficador':JSON.stringify(tabuladoHtmlYDescripcion.matrix),
+                                        'info-tabulado':JSON.stringify(tabuladoHtmlYDescripcion.descripcionTabulado.info)
+                                    },[tabuladoHtmlYDescripcion.tabuladoHtml]):null,
                                     esAdmin?html.div([
                                         validationButton,
                                         habilitationButton
@@ -830,6 +868,7 @@ class AppSIGBA extends backend.AppBackend{
                 {menuType:'table', name:'agrupacion_principal', label:be.config['client-setup'].labels['agrupacion-principal'], },
                 {menuType:'table', name:'dimension'       , label:'Dimensión'                             },
                 {menuType:'table', name:'indicadores'     , label:'Indicadores'                           },
+                {menuType:'table', name:'tabulados'       , label:'Tabulados'                           },
                 {menuType:'table', name:'fte'             , label:'Fuente de datos '                      },
                 {menuType:'table', name:'um'              , label:'Unidad de medida'                      },
                 {menuType:'table', name:'cv'              , label:'Coeficientes de variación'             },
@@ -873,6 +912,7 @@ class AppSIGBA extends backend.AppBackend{
             'cortes',
             'valores',
             'celdas',
+            'tabulados',
             'cortes_celdas',
             'tabulados',
             'diferencia_totales',
@@ -893,3 +933,4 @@ process.on('unhandledRejection', function(err){
 });
 
 new AppSIGBA().start();
+    
