@@ -64,19 +64,7 @@ function showChart() {
     var graficador;
         var specificOptions={};
         var esHorizontal=getTabuladoInfo().orientacion=='vertical'?true:false;
-        if(getTabuladoInfo().tipo_grafico=='barra'){
-            graficador = new BarChartGraphicator('chartElement', tabulatorMatrix);
-            specificOptions={
-                axis:{
-                    x:{
-                        type: 'category',
-                        tick:{values: false}
-                    }
-                }
-            };
-        }else{
-            graficador = new LineChartGraphicator('chartElement', tabulatorMatrix);
-        }
+        
         var ancho=window.innerWidth - document.getElementById("div-pantalla-izquierda").offsetWidth - 32;
         var max=Number.MIN_VALUE;
         var minCellValue=Number.MAX_VALUE;
@@ -93,6 +81,28 @@ function showChart() {
             });
         });
         minYValue = minCellValue<0?minCellValue:(2*minCellValue-max>0?2*minCellValue-max:0); // acomoda el 0 automáticamente, si los datos útiles ocupan menos de la mitad cambio el 0        
+
+        if(getTabuladoInfo().tipo_grafico=='barra'){
+            graficador = new BarChartGraphicator('chartElement', tabulatorMatrix);
+            specificOptions={
+                axis:{
+                    x:{
+                        type: 'category',
+                        tick:{values: false}
+                    }              
+                }
+            };
+        }else{
+            graficador = new LineChartGraphicator('chartElement', tabulatorMatrix);
+            specificOptions={
+                axis:{
+                    y:{
+                        min: minYValue // en line charts si todas las lineas están tiradas para arriba le subimos un poco el minValue para que no quede tanto espacio entre el cero y las lineas
+                    }
+                }
+            };
+        }
+
         graficador.renderTabulation(changing(
             {
                 size:{width:ancho},
@@ -104,12 +114,14 @@ function showChart() {
                     },
                     y:{ 
                         label: {position:'outer-middle', text:(document.getElementById('tabulado-um-descripcion')||{}).textContent||''},
-                        min: minYValue,
                         padding: minYValue<=0?{bottom: 0}:null,
                     },
                 },
                 data:{
                      groups:false
+                },
+                tooltip: {
+                    order:false
                 }
             },
             specificOptions, 
