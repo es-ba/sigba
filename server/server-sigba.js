@@ -75,11 +75,11 @@ class AppSIGBA extends backend.AppBackend{
         }
         var table=defTables[0].tabla;
         var be = this;
-        return client.query(
+        return client.query(inlineLog(
             'SELECT * FROM '+be.db.quoteObject(table)+
             ' WHERE '+(where||'true')+
             ' ORDER BY '+(defTables[0].orderBy||["orden", "denominacion"]).map(function(campoOrden){ return be.db.quoteObject(campoOrden); }).join(',')
-        ).fetchAll().then(function(result){
+        )).fetchAll().then(function(result){
             var tablaHija=(defTables[1]||{}).tabla;
             return Promise.all(result.rows.map(function(registro){
                 if(defTables[0].color){
@@ -632,11 +632,12 @@ class AppSIGBA extends backend.AppBackend{
                         campoId:"dimension",
                         camposAMostrar:["denominacion"],
                         joinSiguiente:["dimension"],
+                        condicion: ['ocultar IS NOT TRUE'],
                     },{
                         tabla:"indicadores",
                         campoId:"indicador",
                         camposAMostrar:["denominacion"],
-                        mostrarIndicadoresYLinks:true
+                        mostrarIndicadoresYLinks:true,
                     }], annios,'ocultar IS NOT TRUE');
                 });
             }).then(function(listaDeTr){

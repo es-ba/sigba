@@ -27,6 +27,7 @@ module.exports = function(context){
             {name:'icono'                    , label:'Archivo contenedor del Icono ODS'      , typeName:'text'},
             {name:'metas'                    , label:'Metas'                                 , typeName:'text'},
             {name:'ods'                      , label:'ODS'                                   , typeName:'text'},
+            {name:'ocultar'                  , label:'ocultar indicador'                     , typeName:'boolean'},
         ],
         primaryKey:['indicador'],
         foreignKeys:[{references:'dimension', fields:['dimension']},
