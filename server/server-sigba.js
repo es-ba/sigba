@@ -67,7 +67,14 @@ class AppSIGBA extends backend.AppBackend{
        return str.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
     }
     
-    
+    //nombreDelHome(){
+    //    return  client.query(
+    //        'SELECT nombre_home FROM parametros'
+    //    ).fetchOneRowIfExists().then(function(result){
+    //        var nombreHome=result.row.nombre_home||'otro nombre';
+    //        return result.row;
+    //    });
+    //}
     reporteBonito(client, defTables, annios, where,color) {
         var urlYClasesTabulados='principal';
         if(!defTables.length){
@@ -75,11 +82,11 @@ class AppSIGBA extends backend.AppBackend{
         }
         var table=defTables[0].tabla;
         var be = this;
-        return client.query(inlineLog(
+        return client.query(
             'SELECT * FROM '+be.db.quoteObject(table)+
             ' WHERE '+(where||'true')+
             ' ORDER BY '+(defTables[0].orderBy||["orden", "denominacion"]).map(function(campoOrden){ return be.db.quoteObject(campoOrden); }).join(',')
-        )).fetchAll().then(function(result){
+        ).fetchAll().then(function(result){
             var tablaHija=(defTables[1]||{}).tabla;
             return Promise.all(result.rows.map(function(registro){
                 if(defTables[0].color){
@@ -94,8 +101,9 @@ class AppSIGBA extends backend.AppBackend{
                     var paraFicha;
                     return client.query(
                         `SELECT  count(distinct cortantes) cant_cortantes 
-                            FROM sigba.celdas 
-                            WHERE indicador=$1`,[registro.indicador]
+                            FROM celdas 
+                            WHERE indicador=$1`
+                            ,[registro.indicador]
                     ).fetchOneRowIfExists().then(function(resultCortantes){
                         result=resultCortantes;
                         return client.query(`
@@ -874,7 +882,7 @@ class AppSIGBA extends backend.AppBackend{
                 {menuType:'table', name:'um'              , label:'Unidad de medida'                      },
                 {menuType:'table', name:'cv'              , label:'Coeficientes de variación'             },
                 {menuType:'table', name:'indicador_annio' , label:'Cobertura'                             },
-                {menuType:'table', name:'tabulados'       , label:'Tabulados'                             },
+                {menuType:'proc' , name:'alta/tabulados'  , label:'Dar de alta nuevos tabulados'                             },
             ]},
             {menuType:'menu'    , name:'Variables de corte' , menuContent:[
                 {menuType:'table', name:'variables'       , label:'Variables'            },
@@ -894,12 +902,14 @@ class AppSIGBA extends backend.AppBackend{
             ]},
             {menuType:'menu'     , name:'configuración'                 , menuContent:[
                 {menuType:'table'    , name:'signos_convencionales', label:'signos convencionales'},
+               // {menuType:'table'    , name:'parametros'           , label:'Parámetros del home'},
                 {menuType:'table'    , name:'usuarios'},
             ]},
         ]}
     }
     getTables(){
         return super.getTables().concat([
+            //'parametros',
             'usuarios',
             'fte',
             'um',
