@@ -422,7 +422,7 @@ class AppSIGBA extends backend.AppBackend{
             { type: 'js', module: 'graphicator', path:'graphicator'},
             { type: 'js', module: 'best-globals', path:'best-globals'},
             { type: 'js', module: 'require-bro'},
-            { type: 'js', module: 'xlsx', path:'xlsx',  modPath: 'dist', file:'xlsx.full.min.js'},
+            { type: 'js', module: 'codenautas-xlsx', modPath: 'dist', file:'xlsx.full.min.js'},
             { type: 'js', module: 'like-ar' },
             { type: 'js', module: 'file-saver' },
             { type: 'js', module: 'js-to-html' },
