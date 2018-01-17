@@ -27,6 +27,10 @@ module.exports = function(context){
             {name:'icono'                    , label:'Archivo contenedor del Icono ODS'      , typeName:'text'},
             {name:'metas'                    , label:'Metas'                                 , typeName:'text'},
             {name:'ods'                      , label:'ODS'                                   , typeName:'text'},
+            {name:'ocultar'                  , label:'ocultar indicador'                     , typeName:'boolean'},
+            //{name:'home_variable'            , label:'Variable del home'                     , typeName:'text'    },
+            //{name:'home_valor'               , label:'Valor del home'                        , typeName:'text'    },
+            //{name:'home_texto'               , label:'Texto del home'                        , typeName:'text'    },
         ],
         primaryKey:['indicador'],
         foreignKeys:[{references:'dimension', fields:['dimension']},
@@ -34,7 +38,8 @@ module.exports = function(context){
             {references:'um'   , fields:['um']}
         ],
         detailTables:[
-            {table: 'valores', fields:[{source:'indicador', target:'indicador'}], abr:'V', label:'valores'}
+            {table: 'valores', fields:[{source:'indicador', target:'indicador'}], abr:'V', label:'valores'},
+            {table: 'tabulados', fields:[{source:'indicador', target: 'indicador'}], abr: 'T', label: 'tabulados'}
         ]
     },context);
 }

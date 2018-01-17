@@ -13,7 +13,7 @@ body
 .tabla inicio
   background-color #fff
 
-.a-cortante-posible
+[esta-habilitado="si"] .a-cortante-posible
   font-size 95%
   color #FFF
   font-weight bold
@@ -21,7 +21,18 @@ body
   padding 5px
   line-height 20px
   
-.a-cortante-posible:visited
+[esta-habilitado="no"] .a-cortante-posible
+  font-size 95%
+  color #bfbfbf
+  font-weight bold
+  text-decoration none
+  padding 5px
+  line-height 20px
+  
+[esta-habilitado="no"] .a-cortante-posible:visited
+  color bfbfbf
+  
+[esta-habilitado="si"] .a-cortante-posible:visited
   color fff
   
 .annio-cortante-posible[menu-item-selected=true]
@@ -31,13 +42,23 @@ body
 .td-cortante-posible[menu-item-selected=true]
   background-color #eba029
 
-.td-cortante-posible
+[esta-habilitado="no"] .td-cortante-posible
+  background-color #929292
+  color #7f7f7f
+  border-bottom 1px solid #FFF
+  min-width 230px
+
+[esta-habilitado="no"] .td-cortante-posible:hover  
+  background-color #929292
+  text-decoration underline
+  
+[esta-habilitado="si"] .td-cortante-posible
   font-size 85%
   background-color #2b2b2b
   border-bottom 1px solid #FFF
   min-width 230px
    
-.td-cortante-posible:hover  
+[esta-habilitado="si"] .td-cortante-posible:hover  
   background-color #e56025
   text-decoration underline
 

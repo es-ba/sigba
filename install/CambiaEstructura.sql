@@ -29,3 +29,12 @@ update tabulados t
   set habilitado=false
   from (select indicador, nohabilitados, x from indicadores , unnest(nohabilitados)x) as y
   where t.indicador=y.indicador and t.cortantes=y.x 
+ 
+--11/01/2018
+--carga de tabla tabulados
+insert into tabulados(indicador, cortantes)
+  select indicador, cortantes
+  from celdas
+  where (indicador,cortantes) not in (select indicador,cortantes from tabulados)
+  group by indicador, cortantes
+  order by indicador, cortantes;

@@ -67,13 +67,12 @@ ProceduresExamples = [
             //{name:'annioCortante'   ,typeName:'text'},
            // {name:'usuario'         ,typeName:'text'},
             {name:'habilitar'       ,typeName:'boolean'},
-            {name:'cortante_orig'   ,typeName:'jsonb'}
+            {name:'cortantes'   ,typeName:'jsonb'}
         ],
         coreFunction:function(context, parameters){
-            var updateString="UPDATE indicadores set nohabilitados="+(parameters.habilitar?
-                'case when array_remove(nohabilitados,$1)=array[]::jsonb[] then null else array_remove(nohabilitados,$1) end ':
-                ' array_append(nohabilitados,$1)')+' where indicador=$2';
-            return context.client.query(updateString,[parameters.cortante_orig,parameters.indicador]
+            var updateString="UPDATE tabulados set habilitado="+parameters.habilitar+
+                ' where indicador=$1 and cortantes=$2';
+            return context.client.query(inlineLog(updateString),[parameters.indicador,parameters.cortantes]
             ).fetchOneRowIfExists().then(function(result){
                 return result.rowCount;
             });
@@ -110,6 +109,22 @@ ProceduresExamples = [
             }
             return context.client.query(`delete from valores`).fetchOneRowIfExists().then(function(result){
                 return result.rowCount||' registros borrados';
+            });
+        }
+    },
+    {
+        action:'alta/tabulados',
+        parameters:[],
+        coreFunction:function(context, parameters){
+            return context.client.query(`insert into tabulados(indicador, cortantes)
+                select indicador, cortantes
+                from celdas
+                where (indicador,cortantes) not in (select indicador,cortantes from tabulados)
+                group by indicador, cortantes 
+                order by indicador, cortantes
+                returning indicador, cortantes;`).fetchAll().then(function(result){
+                    //var ntabulados=result.rows.length
+                    return 'Se dieron de alta '+result.rows.length+' tabulados';
             });
         }
     },

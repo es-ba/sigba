@@ -8,8 +8,8 @@ module.exports = function(context){
             {name:'indicador'        , label:'Código indicador', typeName:'text'     , allow:{select: true,insert:false, update:false}},
             {name:'cortantes'        , label:'Cortantes'       , typeName:'jsonb'    , allow:{select: true,insert:false, update:false}},
             {name:'habilitado'       , label:'Habilitado'      , typeName:'boolean'  , defaultValue:true},
-            {name:'mostrar_cuadro'   , label:'Mostrar Cuadro'  , typeName:'boolean'  , defaultValue:true},
-            {name:'mostrar_grafico'  , label:'Mostrar Gráfico' , typeName:'boolean'  , defaultValue:true},
+            //{name:'mostrar_cuadro'   , label:'Mostrar Cuadro'  , typeName:'boolean'  , defaultValue:true},
+            //{name:'mostrar_grafico'  , label:'Mostrar Gráfico' , typeName:'boolean'  , defaultValue:true},
             {name:'tipo_grafico'     , label:'Tipo Gráfico'    , typeName:'text'     , defaultValue:'linea', },
             {name:'orientacion'      , label:'Orientación'     , typeName:'text'     , defaultValue:'horizontal'},
         ], 
@@ -18,7 +18,7 @@ module.exports = function(context){
             {references:'indicadores', fields:['indicador']},
         ],
         constraints:[
-            {constraintType:'check' , consName:"tipo de gráfico", expr:"tipo_grafico in ('linea', 'barra')"},
+            {constraintType:'check' , consName:"tipo de gráfico", expr:"tipo_grafico in ('linea', 'barra','piramide')"},
             {constraintType:'check' , consName:"orientación", expr:"orientacion in ('horizontal', 'vertical')"},
         ],
         detailTables:[
