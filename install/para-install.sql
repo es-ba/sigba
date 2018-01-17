@@ -77,19 +77,19 @@ begin
     end if;
     if TG_OP = 'UPDATE' then 
       UPDATE celdas 
-        SET indicador = new.indicador,
+        SET --indicador = new.indicador,
             valor = new.valor,
             cv = new.cv,
             num = new.num,
             dem = new.dem,
-            cortes = new.cortes,
+            --cortes = new.cortes,
             cortantes = new.cortantes,
             usu_validacion = new.usu_validacion,
             fecha_validacion = new.fecha_validacion,
             origen_validacion = new.origen_validacion,
             es_automatico = new.es_automatico
-        WHERE indicador = old.indicador
-          AND cortes = old.cortes;
+        WHERE indicador = new.indicador
+          AND cortes = new.cortes;
       DELETE FROM cortes_celdas
         WHERE indicador = old.indicador AND cortes = old.cortes 
           AND variable IN (select jsonb_object_keys(old.cortantes) EXCEPT select jsonb_object_keys(new.cortantes));  /* los cortes que ya no estén (delete old.cortantes - new.cortantes)*/

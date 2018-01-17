@@ -43,6 +43,7 @@ module.exports = function(context){
             {name:'t_cob_sal'      ,isSlicer:true, label:'Tipo de cobertura de salud'                                      , typeName:'text'},
             {name:'c_activ'        ,isSlicer:true, label:'Condición de actividad'                                          , typeName:'text'},
             {name:'t_activ'        ,isSlicer:true, label:'Tipo de actividad'                                               , typeName:'text'},
+            {name:'t_pres'         ,isSlicer:true, label:'T_PRES'                                                          , typeName:'text'},
             {name:'fte_ingr'       ,isSlicer:true, label:'Fuente de ingreso'                                               , typeName:'text'},
             {name:'g_g_activ'      ,isSlicer:true, label:'Grandes grupos de actividad'                                     , typeName:'text'},
             {name:'cortes'         ,isSlicer:true, label:'Cortes'                                , typeName:'jsonb', allow:{select: true,insert:false, update:false}},
