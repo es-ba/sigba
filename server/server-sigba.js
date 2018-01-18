@@ -577,33 +577,41 @@ class AppSIGBA extends backend.AppBackend{
                                     html.div({id:'barra-annios'},anniosLinks),
                                     html.div({id:'link-signos-convencionales'},[html.a({id:'signos_convencionales-link',href:''+absolutePath+'principal-signos_convencionales'},'Signos convencionales')])
                                 ]),
-                                html.div({class:'div-pantallas',id:'div-pantalla-izquierda'},[
-                                    html.h2('Tabulados'),
-                                    html.table({id:'tabla-izquierda'},trCortantes)
-                                ]),
-                                html.div({class:'div-pantallas',id:'div-pantalla-derecha'},[
-                                    html.h2({class:'tabulado-descripcion'},annio),
-                                    ((fila.habilitado) || esAdmin)?html.div({
-                                        id:'tabulado-html',
-                                        'para-graficador':JSON.stringify(tabuladoHtmlYDescripcion.matrix),
-                                        'info-tabulado':JSON.stringify(tabuladoHtmlYDescripcion.descripcionTabulado.info)
-                                    },[tabuladoHtmlYDescripcion.tabuladoHtml]):null,
-                                    esAdmin?html.div([
-                                        validationButton,
-                                        habilitationButton
-                                    ]):null,
-                                    html.div({class:'tabulado-descripcion',id:'tabulado-descripcion-um'},[
-                                        (fila.habilitado || esAdmin)?html.span({id:"tabulado-um"},"Unidad de Medida: "):null,
-                                        (fila.habilitado || esAdmin)?html.span({id:"tabulado-um-descripcion"},tabuladoHtmlYDescripcion.descripcionTabulado.um_denominacion):null
-                                    ]),
-                                    html.div({class:'tabulado-descripcion',id:'tabulado-descripcion-nota'},[
-                                        ((fila.habilitado || esAdmin)&&tabuladoHtmlYDescripcion.descripcionTabulado.nota_pie)?html.span({id:"nota-porcentaje-label"},'Nota: '):null,
-                                        ((fila.habilitado || esAdmin)&&tabuladoHtmlYDescripcion.descripcionTabulado.nota_pie)?html.span({id:"nota-porcentaje"},tabuladoHtmlYDescripcion.descripcionTabulado.nota_pie):null,
-                                    ]),
-                                    html.div({class:'tabulado-descripcion',id:'tabulado-descripcion-fuente'},[
-                                        (fila.habilitado || esAdmin)?html.span({id:"tabulado-fuente"},'Fuente: '):null,
-                                        (fila.habilitado || esAdmin)?html.span({id:"tabulado-fuente-descripcion"},tabuladoHtmlYDescripcion.descripcionTabulado.fuente):null,
-                                    ]),
+                                html.table({class:'tabla-links-tabulado-grafico'},[
+                                    html.tr({class:'tr-links-tabulado-grafico'},[
+                                        html.td({class:'td-links'},[
+                                            html.div({class:'div-pantallas',id:'div-pantalla-izquierda'},[
+                                                html.h2('Tabulados'),
+                                                html.table({id:'tabla-izquierda'},trCortantes)
+                                            ]),
+                                        ]),
+                                        html.td({class:'td-tabulado-grafico'},[
+                                            html.div({class:'div-pantallas',id:'div-pantalla-derecha'},[
+                                                html.h2({class:'tabulado-descripcion'},annio),
+                                                ((fila.habilitado) || esAdmin)?html.div({
+                                                    id:'tabulado-html',
+                                                    'para-graficador':JSON.stringify(tabuladoHtmlYDescripcion.matrix),
+                                                    'info-tabulado':JSON.stringify(tabuladoHtmlYDescripcion.descripcionTabulado.info)
+                                                },[tabuladoHtmlYDescripcion.tabuladoHtml]):null,
+                                                esAdmin?html.div([
+                                                    validationButton,
+                                                    habilitationButton
+                                                ]):null,
+                                                html.div({class:'tabulado-descripcion',id:'tabulado-descripcion-um'},[
+                                                    (fila.habilitado || esAdmin)?html.span({id:"tabulado-um"},"Unidad de Medida: "):null,
+                                                    (fila.habilitado || esAdmin)?html.span({id:"tabulado-um-descripcion"},tabuladoHtmlYDescripcion.descripcionTabulado.um_denominacion):null
+                                                ]),
+                                                html.div({class:'tabulado-descripcion',id:'tabulado-descripcion-nota'},[
+                                                    ((fila.habilitado || esAdmin)&&tabuladoHtmlYDescripcion.descripcionTabulado.nota_pie)?html.span({id:"nota-porcentaje-label"},'Nota: '):null,
+                                                    ((fila.habilitado || esAdmin)&&tabuladoHtmlYDescripcion.descripcionTabulado.nota_pie)?html.span({id:"nota-porcentaje"},tabuladoHtmlYDescripcion.descripcionTabulado.nota_pie):null,
+                                                ]),
+                                                html.div({class:'tabulado-descripcion',id:'tabulado-descripcion-fuente'},[
+                                                    (fila.habilitado || esAdmin)?html.span({id:"tabulado-fuente"},'Fuente: '):null,
+                                                    (fila.habilitado || esAdmin)?html.span({id:"tabulado-fuente-descripcion"},tabuladoHtmlYDescripcion.descripcionTabulado.fuente):null,
+                                                ]),
+                                            ])
+                                        ])
+                                    ])
                                 ])
                             ]);
                             var pagina=html.html([
