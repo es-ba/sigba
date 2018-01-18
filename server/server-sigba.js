@@ -328,7 +328,7 @@ class AppSIGBA extends backend.AppBackend{
                         "\n  FROM celdas v  LEFT JOIN "+ variables.map(function(varInv){
                             return (" cortes_celdas cc_"+varInv +
                                 " ON v.indicador=cc_"+varInv+".indicador AND v.cortes=cc_"+varInv+".cortes AND cc_"+varInv+".variable='"+varInv+"'" +
-                                "\n LEFT JOIN cortes corte_"+varInv+" ON cc_"+varInv+".variable=corte_"+varInv+".variable AND "+ "cc_"+varInv+".valor_corte="+"corte_"+varInv+".valor_corte");
+                                "\n LEFT JOIN cortes corte_"+varInv+" ON cc_"+varInv+".variable=corte_"+varInv+".variable AND cc_"+varInv+".valor_corte=corte_"+varInv+".valor_corte");
                         }).join('\n    LEFT JOIN ')+
                         "\n  WHERE v.indicador=$1 AND "+be.defs_annio(annio).cortantes+" <@ $2 AND "+be.defs_annio(annio).cond_annio_en_cortante+
                         "\n  ORDER BY " + variables.map(function(varInv){
@@ -540,7 +540,7 @@ class AppSIGBA extends backend.AppBackend{
                     return be.armarUnTabulado(client, fila, annio, indicador,descripcionTabulado).then(function(tabuladoHtmlYDescripcion){
                         var trCortantes=cortantesPosibles.map(function(cortanteAElegir){
                             var denominaciones=cortanteAElegir.denominacion.split('|');
-                            annio?denominaciones.splice(cortanteAElegir.variables.split(',').indexOf('annio'),1):true;
+                            if(annio) denominaciones.splice(cortanteAElegir.variables.split(',').indexOf('annio'),1);
                             var href=''+absolutePath+''+urlYClasesTabulados+'-indicador?'+(annio?'annio='+annio+'&':'')+'indicador='+indicador+'&cortante='+cortanteAElegir.variables;
                             return html.tr({class:'tr-cortante-posible','esta-habilitado':cortanteAElegir.habilitado?'si':'no'},[
                                 html.td({class:'td-cortante-posible', 'menu-item-selected':cortanteAElegir.variables==cortante},[

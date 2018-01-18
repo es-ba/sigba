@@ -35,4 +35,4 @@ node_modules
 local-*
 *-local.*
 sessions/
-.vscode/launch.json
+.vscode
