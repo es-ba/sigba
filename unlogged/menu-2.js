@@ -71,6 +71,9 @@ function showChart() {
         if(getTabuladoInfo().tipo_grafico=='barra'){
             graficador = new BarChartGraphicator('chartElement', tabulatorMatrix);
             specificOptions={
+                data:{
+                    agrupar: true
+                }
                 // axis:{
                 //     x:{
                 //         type: 'category',
@@ -100,9 +103,6 @@ function showChart() {
                     y:{ 
                         label: {position:'outer-middle', text:(document.getElementById('tabulado-um-descripcion')||{}).textContent||''}
                     },
-                },
-                tooltip: {
-                    order:false
                 }
             },
             specificOptions
