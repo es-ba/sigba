@@ -427,7 +427,8 @@ class AppSIGBA extends backend.AppBackend{
             { type: 'js', module: 'file-saver' },
             { type: 'js', module: 'js-to-html' },
             { type: 'js', module: 'tabulator', path:'tabulator'},
-            { type: 'css', module: 'c3' }
+            { type: 'css', module: 'c3' },
+            { type: 'css', module: 'graphicator'},
         ];
     }
 
