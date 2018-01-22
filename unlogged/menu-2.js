@@ -36,18 +36,18 @@ function tableCreate(info,data) {
 }
 
 function showChart() {
-    var tabulatorMatrix = getMatrix();
-    if (!(tabulatorMatrix.columns.length > 1 && tabulatorMatrix.lineVariables.length == tabulatorMatrix.columnVariables.length == 1)) {
+    var matrix = getTabulatorMatrix();
+    if (!(matrix.columns.length > 1 && matrix.lineVariables.length == matrix.columnVariables.length == 1)) {
         throw 'no cumple las condiciones requeridas';
     }
-    tabulatorMatrix.dataVariables = [tabulatorMatrix.dataVariables[0]]; //descarto coeficiente de variación
+    matrix.dataVariables = [matrix.dataVariables[0]]; //descarto coeficiente de variación
 
     //TODO: pasar esto a un template por favor! y a graphicator
     var chartElement = document.createElement('div');
     chartElement.setAttribute('id', 'chartElement');
 
     var chartTitle = document.createElement('h3');
-    chartTitle.innerText = tabulatorMatrix.caption;
+    chartTitle.innerText = matrix.caption;
     chartTitle.style.textAlign='center';
 
     var chartContainer = document.createElement('div');
@@ -64,15 +64,15 @@ function showChart() {
         var graficador;
         var pepe;
         var specificOptions={};       
-        if(tabulatorMatrix.lines.length>1&&tabulatorMatrix.lines[0].titles[0]==null){
-            tabulatorMatrix.lines.shift();
+        if(matrix.lines.length>1&&matrix.lines[0].titles[0]==null){
+            matrix.lines.shift();
         }
 
         if(getTabuladoInfo().tipo_grafico=='barra'){
-            graficador = new BarChartGraphicator('chartElement', tabulatorMatrix);
+            graficador = new BarChartGraphicator('chartElement', matrix);
             specificOptions={
                 data:{
-                    agrupar: true
+                    groups: true
                 }
                 // axis:{
                 //     x:{
@@ -82,7 +82,7 @@ function showChart() {
                 // }
             };
         }else{
-            graficador = new LineChartGraphicator('chartElement', tabulatorMatrix);
+            graficador = new LineChartGraphicator('chartElement', matrix);
             specificOptions={
                 // axis:{
                 //     y:{
@@ -98,19 +98,19 @@ function showChart() {
                 axis:{
                     rotated:getTabuladoInfo().orientacion=='vertical'?true:false,
                     x:{
-                        label: {position:'outer-center', text:tabulatorMatrix.vars[tabulatorMatrix.columnVariables[0]].label},
+                        label: {position:'outer-center', text:matrix.vars[matrix.columnVariables[0]].label},
                     },
                     y:{ 
-                        label: {position:'outer-middle', text:(document.getElementById('tabulado-um-descripcion')||{}).textContent||''}
+                        label: {position:'outer-middle', text:(document.getElementById('tabulado-um-descripcion')||{}).textContent||''},
                     },
-                }
+                } 
             },
             specificOptions
         ));
     },100);
 }
 
-function getMatrix() {
+function getTabulatorMatrix() {
     return JSON.parse(tabuladoElement().getAttribute('para-graficador'));
 }
 
@@ -213,7 +213,7 @@ function buildExportExcelButton(){
     exportButton.onclick = function(){
         var t = new Tabulator();
         t.toExcel(tabuladoElement(), {
-            filename:getMatrix().caption, 
+            filename:getTabulatorMatrix().caption, 
             username: (window.my)?window.my.config.username: null
         });
     };
