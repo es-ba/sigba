@@ -48,9 +48,12 @@ body
   background-color #1d4263
   color #ceeced
 
-.td-cortante-posible[menu-item-selected=true]
+[esta-habilitado="si"] .td-cortante-posible[menu-item-selected=true]
   background-color #eba029
-    
+
+[esta-habilitado="no"] .td-cortante-posible[menu-item-selected=true]
+  background-color #6b8882
+  
 [esta-habilitado="no"] .td-cortante-posible
   background-color #929292
   color #7f7f7f
@@ -416,9 +419,9 @@ h2
   font-size 80%
   line-height 20px
   padding 5px
-  display flex
   border-bottom 2px solid #15BCAF 
-
+  width 100%
+  
 #annios-links
   background-color #1a9698
   background -webkit-linear-gradient(#1a9698, #3a668f)
@@ -457,12 +460,12 @@ h2
 #tabulado-fuente, #tabulado-um, #nota-porcentaje-label
   font-weight bold
   max-width 700px
-
+    
 .tabla-links-tabulado-grafico 
   width 100%
   
 .td-links
-  width 20%
+  width 300px
   margin-right 0px
   position -webkit-sticky
   position sticky
