@@ -47,3 +47,9 @@ select v.indicador, v.cortantes cor_correctos,c.cortantes,c.cortes--, *
  where c.cortantes is distinct from v.cortantes
 
 )x where  x.indicador=cc.indicador and cc.cortes=x.cortes
+
+--------------------------------------------------------------------------------
+--19/01/2018     
+alter table tabulados add column invalido boolean;
+---------------------------------------------------
+

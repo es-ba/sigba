@@ -365,3 +365,59 @@ CREATE TRIGGER valores_validar_trg
   FOR EACH ROW
   EXECUTE PROCEDURE sigba.valores_validar_trg();
 
+----------------------------------------------------------------------
+
+-- Function: sigba.syncro_tabulados()
+
+-- DROP FUNCTION sigba.syncro_tabulados();
+CREATE OR REPLACE FUNCTION sigba.syncro_tabulados()
+  RETURNS void AS  --RETURNS integer AS
+$BODY$
+declare
+  test text;
+begin
+    insert into tabulados(indicador, cortantes,habilitado)
+        select indicador, cortantes,false
+        from celdas
+        where (indicador,cortantes) not in (select indicador,cortantes from tabulados)
+        group by indicador, cortantes 
+        order by indicador, cortantes;
+       -- returning indicador into test;--indicador, cortantes;
+    update  tabulados tt 
+        set invalido=true 
+        from ( select indicador,cortantes from tabulados where (indicador,cortantes) not in (select indicador,cortantes from celdas)) t
+        where t.indicador=tt.indicador and t.cortantes=tt.cortantes;
+       -- returning tt.indicador,tt.cortantes;
+   -- return test;
+end;
+$BODY$
+  LANGUAGE plpgsql  /*SECURITY DEFINER*/;
+ALTER FUNCTION sigba.syncro_tabulados()
+  OWNER TO sigba_owner;
+----------------------------------------------------------------------
+ALTER TABLE tabulados_variables
+DROP  CONSTRAINT "tabulados_variables tabulados REL ";
+ALTER TABLE tabulados_variables
+ADD CONSTRAINT "tabulados_variables tabulados REL " FOREIGN KEY (indicador, cortantes)
+      REFERENCES sigba.tabulados (indicador, cortantes) MATCH SIMPLE
+      ON UPDATE CASCADE ON DELETE CASCADE;
+----------------------------------------------------------------------
+
+  CREATE TRIGGER tabulados_variables_syncro_trg
+  AFTER INSERT
+  ON sigba.tabulados
+  FOR EACH ROW
+  EXECUTE PROCEDURE sigba.tabulados_variables_syncro_trg();
+  
+----------------------------------------------------------------------
+CREATE OR REPLACE FUNCTION sigba.tabulados_variables_syncro_trg()
+  RETURNS trigger AS
+$BODY$
+begin
+    insert into tabulados_variables (indicador,cortantes,variable)
+        select indicador,cortantes,jsonb_object_keys(cortantes) from tabulados WHERE  indicador=new.indicador and cortantes=new.cortantes;
+end;
+$BODY$
+  LANGUAGE plpgsql  /*SECURITY DEFINER*/;
+ALTER FUNCTION sigba.tabulados_variables_syncro_trg()
+  OWNER TO sigba_owner;
