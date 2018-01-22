@@ -38,3 +38,12 @@ insert into tabulados(indicador, cortantes)
   where (indicador,cortantes) not in (select indicador,cortantes from tabulados)
   group by indicador, cortantes
   order by indicador, cortantes;
+  
+-- Sincronización momentánea entre las tablas celdas y valores
+update celdas cc set cortantes=x.cor_correctos
+from (
+select v.indicador, v.cortantes cor_correctos,c.cortantes,c.cortes--, *
+ from valores v inner join celdas c on v.indicador=c.indicador and v.cortes=c.cortes
+ where c.cortantes is distinct from v.cortantes
+
+)x where  x.indicador=cc.indicador and cc.cortes=x.cortes

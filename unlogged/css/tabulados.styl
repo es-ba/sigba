@@ -1,6 +1,6 @@
 body
   font-family Arial
-  background-color e6e7e9
+  background-color #ffffff
   margin 0
   width 100%
   height 100
@@ -14,54 +14,60 @@ body
   background-color #fff
 
 [esta-habilitado="si"] .a-cortante-posible
-  font-size 95%
-  color #FFF
+  color #686868
   font-weight bold
+  font-size 80%
   text-decoration none
-  padding 5px
-  line-height 20px
+  padding 15px
+  line-height 25px
+  &:before
+      content "\25b6" "\00a0" "\00a0" "\00a0"
+      
+[esta-habilitado="si"] .a-cortante-posible:hover
+  color #fff
   
 [esta-habilitado="no"] .a-cortante-posible
-  font-size 95%
   color #bfbfbf
+  font-size 80%
   font-weight bold
   text-decoration none
-  padding 5px
   line-height 20px
+  &:before
+    content "\25b6" "\00a0" "\00a0" "\00a0"
   
 [esta-habilitado="no"] .a-cortante-posible:visited
   color bfbfbf
-  
+    
 [esta-habilitado="si"] .a-cortante-posible:visited
-  color fff
-  
+  color #686868
+
+[esta-habilitado="si"] .a-cortante-posible:hover
+  color #FFF  
+
 .annio-cortante-posible[menu-item-selected=true]
-  background-color #efb050
-  color #865c19
+  background-color #1d4263
+  color #ceeced
 
 .td-cortante-posible[menu-item-selected=true]
   background-color #eba029
-
+    
 [esta-habilitado="no"] .td-cortante-posible
   background-color #929292
   color #7f7f7f
   border-bottom 1px solid #FFF
-  min-width 230px
-
+  
 [esta-habilitado="no"] .td-cortante-posible:hover  
-  background-color #929292
-  text-decoration underline
+  background-color #37BCB2
   
 [esta-habilitado="si"] .td-cortante-posible
-  font-size 85%
-  background-color #2b2b2b
+  background-color #EEEEEE
   border-bottom 1px solid #FFF
-  min-width 230px
-   
+  border-top 1px solid #FFF
+  
 [esta-habilitado="si"] .td-cortante-posible:hover  
-  background-color #e56025
-  text-decoration underline
-
+  background-color #37BCB2
+  color #ffff
+  
 .img-info-indicador
   width 16px
   padding 3px
@@ -74,6 +80,9 @@ body
   -webkit-transition .2s ease-in-out
   transition .3s ease-in-out
 
+.boton_tabulados
+  padding-bottom 10px
+  
 .boton_tabulados:hover
   cursor pointer
   -webkit-transform scale(1.2)
@@ -95,7 +104,8 @@ body
   
 .encabezado-interno
   width 100%
- 
+  left 0
+  
 #div-encabezado-titulo-tabulado
   font-family helvetica
   font-size 100%
@@ -174,9 +184,9 @@ th
 thead th, #caption-signos_convencionales
   font-size 80%
   padding 5px
-  background-color #5c5c5c
+  background-color #EEEEEE
   white-space nowrap
-  color #FFF
+  color #1D4263
   position sticky
   top 0 /* required */
   
@@ -201,10 +211,10 @@ thead th, #caption-signos_convencionales
   margin 10px
 
 #th-signo
-  border-right 1px solid #808080
+  border-right 1px solid #9cb6b4
   
 .signos-convencionales-encabezado
-  border-bottom 1px solid #808080
+  border-bottom 1px solid #9cb6b4
   
 .td-signos_convencionales 
   font-family helvetica
@@ -223,7 +233,7 @@ thead th, #caption-signos_convencionales
   border-collapse collapse
 
 .tabulator-table caption
-  background-color #2b2b2b
+  background-color #1D4263
   border-bottom 1px #FFF
   color #FFF
   padding 5px
@@ -273,13 +283,13 @@ thead th, #caption-signos_convencionales
   background-color #646464
   color #FFF  
 
-.var_t_vacu, .var_t_viv, .var_c_sit_hac
-  background-color #646464
+.var_t_vacu, .var_t_viv, .var_c_sit_hac, .var_t_hog, .var_s_jefe, .var_l_nac, .var_ringr_ctotcaba, .var_r_ten_viv, .var_calif_ocup, .var_jer_ocup, .var_quin_ingr_fliar, .var_l_residen, .var_l_ocu
+  background-color #9cb6b4
   color #FFF
   font-size 80%
   max-width 120px
   min-width 90px
-  height 60px
+  height 45px
   white-space normal
   border-right 1px solid #FFF
   border-top 1px solid #FFF
@@ -296,28 +306,28 @@ thead th, #caption-signos_convencionales
   border-right 1px solid #FFF
 
 .var_t_est_salud, .var_g_edad, .var_s_gest
-  background-color #808080
-  color #FFF
+  background-color #9cb6b4
+  color #fff
   font-size 90%
   border-right 1px solid #FFF
   border-top 1px solid #FFF
 
 .var_sexo
-  background-color #afafaf
+  background-color #9cb6b4
   color #FFF
   font-size 90%
   border-right 1px solid #FFF 
   border-bottom 1px solid #FFF
 
 .var_desagr, .var_edad, .var_v_a_nht, .var_n_instruc, .var_genero, .var_sit_conv_dm
-  background-color #afafaf
-  color #FFF
+  background-color #9cb6b4
+  color #fff
   font-size 90%
   border-right 1px solid #FFF 
   border-bottom 2px solid #FFF
 
 .var_annio
-  color #d6c09c
+  color #317391
 
 .annio-cortante-posible
   color #FFF
@@ -329,8 +339,8 @@ thead th, #caption-signos_convencionales
   background-color #f1b940
 
 .annio-cortante-posible:hover
-  color #403b3b
-  background-color #f1d340
+  color #0f314a
+  background-color #18beb6
 
 .annio-cortante-posible:focus
   color #403b3b
@@ -401,16 +411,20 @@ thead th, #caption-signos_convencionales
   color #3c4043
 
 h2
-  background-color #646464
+  background-color #375677
   color #FFF
   font-size 80%
   line-height 20px
   padding 5px
   display flex
-  border-bottom 2px solid #fdb84b 
+  border-bottom 2px solid #15BCAF 
 
 #annios-links
-  background-color #646565
+  background-color #1a9698
+  background -webkit-linear-gradient(#1a9698, #3a668f)
+  background -o-linear-gradient(#1a9698, #3a668f)
+  background -moz-linear-gradient(#1a9698, #3a668f)
+  background linear-gradient(#1a9698, #3a668f)
   color #FFF
   font-size 100%
   line-height 30px
@@ -419,7 +433,7 @@ h2
   font-weight bold
   line-height 30px
   display inline-block
-  
+
 #barra-annios
   float left
   
@@ -432,27 +446,42 @@ h2
   
 #tabulado-descripcion-um 
   font-size 80%
-  color #5b5b5c
+  color #686868
   margin-top 7px
-  max-width 700px
   
 #tabulado-descripcion-fuente, #tabulado-descripcion-nota
   font-size 80%
-  color #5b5b5c
+  color #686868
   max-width 700px
   
 #tabulado-fuente, #tabulado-um, #nota-porcentaje-label
   font-weight bold
   max-width 700px
-  
-#div-pantalla-izquierda
-  margin-right 3px
-  float left
-  
-#div-pantalla-derecha
-  margin-left 10px  
-  display table
 
+.tabla-links-tabulado-grafico 
+  width 100%
+  
+.td-links
+  width 20%
+  margin-right 0px
+  position -webkit-sticky
+  position sticky
+  left 0
+  background-color #f5f5f5
+  vertical-align top
+  border-right 1px solid #e5e5e5
+  padding 0px
+  padding-top 5px
+  z-index 1000
+
+#tabla-izquierda
+  width 100%
+  overflow visible
+  position relative
+  
+#id-encabezado
+  position sticky
+  
 #barra-superior
   background-image -webkit-gradient(linear left top left bottom from(#ffd300) to(#ffbc00))
   background-image -webkit-linear-gradient(top, #ffd300 0%, #ffbc00 100%)
@@ -461,18 +490,17 @@ h2
   border-color #d7a721
   color #5f4600
   height 48px
-  overflow:hidden
+  overflow hidden
     
 #barra-inferior
   width 100%
   background-color #fff
-  box-shadow 0 1.5em 9px -20px #687178
   padding 0
   z-index 2
   top 0
   margin 0 auto
   min-height 125px
-  overflow:hidden
+  overflow hidden
   
 #bs-izq
   margin-left 50px
@@ -505,10 +533,6 @@ h2
   background-repeat no-repeat
   background-size 12px
 
-#texto:hover
-  overflow-y scroll
-  padding-right 0px
-
 #logo-estadistica
   margin-top 5px
   margin-left 15px
@@ -535,13 +559,13 @@ h2
 #foot
   height 177px
   background-color #111111
-  width 143%
+  width 100%
   right 0
   bottom 0
   left 0
   margin-bottom 0
   clear both
-  margin-top 138px
+  margin-top 0px
   
 #foot-texto
   font-family Open Sans,Arial, Helvetica, sans-serif
@@ -566,11 +590,11 @@ h2
 #contiene-textos-foot
   float right
   margin-top -45px
-  margin-right 800px
+  margin-right 300px
   
 [nivel-titulo="3"]
   font-size 110%
-  background-color #808080
+  background-color #9cb6b4
   color #FFF
 
 [nivel-titulo="2"]
