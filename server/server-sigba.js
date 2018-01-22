@@ -486,56 +486,6 @@ class AppSIGBA extends backend.AppBackend{
                 var usuarioRevisor=false; // true si tiene permiso de revisor
                 client=cli;
                 var queryStr=
-<<<<<<< HEAD
-                    " SELECT v.indicador, v.cortantes crt, COUNT(*), cantidad_cortantes, variables_info, "+
-                    "\n  case when cant_filcol=cantidad_cortantes then var_ordFilCol else variables end variables, "+
-                    "\n  c.orden, case when cant_filcol=cantidad_cortantes then var_denomFilCol else c.denominacion end denominacion , "+
-                    "\n  case when cant_filcol=cantidad_cortantes then var_ubiFilCol else '' end ubicacion, cant_filcol "+
-                    "\n  , tt.habilitado as habilitado,/*ARRAY[v.cortantes] <@ i.nohabilitados is not true habilitado,*/  "+
-                    "\n  tt.mostrar_cuadro cuadro, tt.mostrar_grafico grafico, tt.tipo_grafico, tt.orientacion, "+
-                    "\n  v.cortantes cortante_orig "+
-                    "\n  FROM celdas v ,LATERAL ( "+
-                    "\n  select * from tabulados t where v.indicador=t.indicador AND v.cortantes=t.cortantes "+
-                    "\n  ) tt, LATERAL ( "+
-                    "\n  SELECT COUNT(*) as cantidad_cortantes, string_agg(c.c, ',' ORDER BY vc.orden, vc.variable) AS variables, "+
-                    "\n  string_agg(vc.denominacion,'|' ORDER BY vc.orden, vc.variable) as denominacion, "+
-                    "\n  min(vc.orden) AS orden, "+
-                    "\n  string_agg( iv.variable ,',' ORDER BY iv.ubicacion,iv.orden, iv.variable) AS var_ordFilCol, "+
-                    "\n  string_agg(vc.denominacion,'|' ORDER BY iv.ubicacion,iv.orden, iv.variable) as var_denomFilCol, "+
-                    "\n  string_agg( iv.ubicacion,',' ORDER BY iv.ubicacion,iv.orden, iv.variable) AS var_ubiFilCol, "+
-                    "\n  count(iv.ubicacion) AS cant_FilCol , coalesce(string_agg(c.c::text||'-'||vc.orden::text||'-'||vc.variable::text, ',' ORDER BY vc.orden, vc.variable),'/')||'--'|| "+
-                    "\n  coalesce(string_agg( iv.ubicacion||'-'||iv.orden||'-'||iv.variable ,',' ORDER BY iv.ubicacion,iv.orden, iv.variable),'/') AS variables_info "+
-                    "\n  FROM jsonb_object_keys(v.cortantes) c INNER JOIN variables vc ON c.c = vc.variable "+
-                    "\n      INNER JOIN indicadores_variables iv ON iv.indicador=v.indicador AND iv.variable= vc.variable "+
-                    "\n  ) c , indicadores i "+
-                    "\n  WHERE cortes ? 'annio' AND v.indicador = $1 "+
-                    "\n  AND i.indicador=v.indicador AND "+ be.defs_annio(annio).cond_cortantes_posibles  +
-                    "\n  GROUP BY v.indicador, v.cortantes, cantidad_cortantes, variables, c.orden,c.denominacion, "+
-                    "\n      var_ordFilCol,var_denomFilCol,var_ubiFilCol, cant_filcol, habilitado, variables_info, "+
-                    "\n      tt.mostrar_cuadro, tt.mostrar_grafico, tt.tipo_grafico, tt.orientacion "+
-                    "\n  ORDER BY v.indicador, c.orden, cantidad_cortantes; ";
-                return client.query(queryStr, be.defs_annio(annio).f_param_cortantes_posibles([indicador,annio])
-                ).fetchAll().then(function(result){
-                    var cortantesPosibles = result.rows.filter(row => (row.habilitado || esAdmin));
-                    if (cortantesPosibles.length > 1){
-                        cortantesPosibles = cortantesPosibles.filter(row => row.variables != 'annio');
-                    }
-                    //parametro GET (CSV con todos los cortantes que hay que mostrar, lo cual define un tabulado) //cortantes por defecto son las del primer tabulado
-                    var cortante = !req.query.cortante?cortantesPosibles[0].variables:req.query.cortante;
-                    // tabulado que se va as mostrar
-                    var fila = cortantesPosibles.filter(tabulado => tabulado.variables == cortante)[0];
-                    var descripcionTabulado={};
-                    return be.armarUnTabulado(client, fila, annio, indicador,descripcionTabulado).then(function(tabuladoHtmlYDescripcion){
-                        var trCortantes=cortantesPosibles.map(function(cortanteAElegir){
-                            var denominaciones=cortanteAElegir.denominacion.split('|');
-                            if(annio) denominaciones.splice(cortanteAElegir.variables.split(',').indexOf('annio'),1);
-                            var href=''+absolutePath+''+urlYClasesTabulados+'-indicador?'+(annio?'annio='+annio+'&':'')+'indicador='+indicador+'&cortante='+cortanteAElegir.variables;
-                            return html.tr({class:'tr-cortante-posible','esta-habilitado':cortanteAElegir.habilitado?'si':'no'},[
-                                html.td({class:'td-cortante-posible', 'menu-item-selected':cortanteAElegir.variables==cortante},[
-                                    html.a({class:'a-cortante-posible',href:href},denominaciones.join('-'))
-                                ])
-                            ]);
-=======
                     "select c.cor cortantes , count(*) as cantidad_cortantes,c.count,c.var arr_cortantes from ( "+
                         "select cortantes cor,jsonb_object_keys(cortantes) cor_keys,count(*),ARRAY(select jsonb_object_keys(cortantes)) var  "+
                         "from celdas where indicador=$1 group by cortantes "+
@@ -587,7 +537,6 @@ class AppSIGBA extends backend.AppBackend{
                                 })
                                 return tabulado;
                             })
->>>>>>> a2c37d480babc7e0e3b9c8fb19e76b61d53506f2
                         });
                     })).then(function(){
                         var cortantesPosibles = tabuladosPorIndicador.filter(row => (row.habilitado || esAdmin));
@@ -602,7 +551,7 @@ class AppSIGBA extends backend.AppBackend{
                         return be.armarUnTabulado(client, fila, annio, indicador,descripcionTabulado).then(function(tabuladoHtmlYDescripcion){
                             var trCortantes=cortantesPosibles.map(function(cortanteAElegir){
                                 var denominaciones=cortanteAElegir.denominacion.split('|');
-                                annio?denominaciones.splice(cortanteAElegir.variables.split(',').indexOf('annio'),1):true;
+                                if(annio) denominaciones.splice(cortanteAElegir.variables.split(',').indexOf('annio'),1);
                                 var href=''+absolutePath+''+urlYClasesTabulados+'-indicador?'+(annio?'annio='+annio+'&':'')+'indicador='+indicador+'&cortante='+cortanteAElegir.variables;
                                 return html.tr({class:'tr-cortante-posible','esta-habilitado':cortanteAElegir.habilitado?'si':'no'},[
                                     html.td({class:'td-cortante-posible', 'menu-item-selected':cortanteAElegir.variables==cortante},[
