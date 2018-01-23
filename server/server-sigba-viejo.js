@@ -464,9 +464,6 @@ class AppSIGBA extends backend.AppBackend{
             return esAdmin && skin?html.link({href: skinUrl+css, rel: "stylesheet"}):null;
         })));
     }
-    mostrarError(admin,mensajeError,res){
-        return res.send(html.div(admin?mensajeError:'').toHtmlText({pretty:true}));
-    }
     addSchrödingerServices(mainApp, baseUrl){
         mainApp.use(baseUrl+'/',function(req, res, next) {
             if (req.path.substr(-1) == '/' && req.path.length > 1) {
@@ -601,10 +598,7 @@ class AppSIGBA extends backend.AppBackend{
                                         ]),
                                         html.td({class:'td-tabulado-grafico'},[
                                             html.div({class:'div-pantallas',id:'div-pantalla-derecha'},[
-                                                html.h2({class:'tabulado-descripcion'},[
-                                                    html.div({class:'tabulado-descripcion-annio'},annio),
-                                                    html.div({class:'botones-tabulado-descripcion'})
-                                                ]),
+                                                html.h2({class:'tabulado-descripcion'},annio),
                                                 ((fila.habilitado) || esAdmin)?html.div({
                                                     id:'tabulado-html',
                                                     'para-graficador':JSON.stringify(tabuladoHtmlYDescripcion.matrix),
@@ -883,9 +877,7 @@ class AppSIGBA extends backend.AppBackend{
                     return html.img({class:'encabezado',id:'logo-'+logoName,src:skinUrl+'img/img-logo-'+logoName+'.png','volver-a-home':true});
                 })).concat([
                     be.config['client-setup'].conTextoPrincipal?html.div({class:'encabezado',id:'texto-encabezado-grande','volver-a-home':true}):null
-                ]).concat([html.div(
-                    ['logo1','logo2','logo3','logo4','logo5'].map(function(logo){return html.a({class:'autonomia-a'},[html.img({class:'autonomia-img'})])})
-                )]))
+                ]))
             ])
         ]);
     }
@@ -916,11 +908,7 @@ class AppSIGBA extends backend.AppBackend{
                 {menuType:'table', name:'variables'       , label:'Variables'            },
                 {menuType:'table', name:'cortes'          , label:'Cortes'                                },
             ]},
-            {menuType:'menu'    , name:'Ubicación Variables'   , menuContent:[
-                {menuType:'table'    , name:'Indicadores-Variables'   , table:'indicadores_variables'},
-                {menuType:'table'    , name:'Tabulados-Variables'     , table:'tabulados_variables'},
-            ]},
-            
+            {menuType:'table'    , name:'Indicadores-Variables'   , table:'indicadores_variables'},
             {menuType:'menu'     , name:'Valores'                 , menuContent:[
                 {menuType:'proc', label:'Borrar datos valores', name:'borrar/valores'},
                 {menuType:'table'    , name:'Valores'                 , table:'valores'              },
@@ -957,7 +945,7 @@ class AppSIGBA extends backend.AppBackend{
             'celdas',
             'tabulados',
             'cortes_celdas',
-            'tabulados_variables',
+            'tabulados',
             'diferencia_totales',
             'signos_convencionales'
         ]);

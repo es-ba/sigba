@@ -200,7 +200,8 @@ function buildHiddenInputUrl() {
 
 function insertNewButton(newButton){
     // tabuladoElement().parentNode.insertBefore(newButton, tabuladoElement().nextElementSibling);
-    tabuladoElement().parentNode.insertBefore(newButton, tabuladoElement())
+    var tabuladoDescripcion=document.getElementsByClassName('botones-tabulado-descripcion')[0].appendChild(newButton)
+   // tabuladoElement().parentNode.insertBefore(newButton, tabuladoElement())
 }
 
 function buildExportExcelButton(){

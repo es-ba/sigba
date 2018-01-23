@@ -53,3 +53,21 @@ select v.indicador, v.cortantes cor_correctos,c.cortantes,c.cortes--, *
 alter table tabulados add column invalido boolean;
 ---------------------------------------------------
 
+create table "tabulados_variables" (
+  "indicador" text NOT NULL, 
+  "cortantes" jsonb NOT NULL, 
+  "variable" text NOT NULL, 
+  "ubicacion_tabulado" text, 
+  "orden_tabulado" integer, 
+  "ubicacion_grafico" text, 
+  "orden_grafico" integer
+, primary key ("indicador", "cortantes", "variable")
+);
+grant select, insert, update, delete on "tabulados_variables" to "sigba_user";
+
+alter table "tabulados_variables" add constraint "valor invalido en ubicacion_tabulado" check (ubicacion_tabulado in ('fil', 'col','z'));
+alter table "tabulados_variables" add constraint "valor invalido en ubicacion_grafico" check (ubicacion_grafico in ('fil', 'col','z'));-- FKs
+
+alter table "tabulados_variables" add constraint  "tabulados_variables tabulados REL " foreign key ("indicador", "cortantes") references "tabulados" ("indicador", "cortantes")  on update cascade;
+alter table "tabulados_variables" add constraint  "tabulados_variables indicadores_variables REL " foreign key ("indicador", "variable") references "indicadores_variables" ("indicador", "variable")  on update cascade;--CONSTRAINS SCHEMA SIGBA
+alter table "cortes_celdas" add constraint  "cortes_celdas indicadores_variables REL " foreign key ("indicador", "variable") references "indicadores_variables" ("indicador", "variable")  on delete cascade on update cascade;

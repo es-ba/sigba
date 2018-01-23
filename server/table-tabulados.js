@@ -1,14 +1,20 @@
 "use strict";
 
 module.exports = function(context){
+    var puedeEditar = context.user.usu_rol === 'ingresador'  || context.user.usu_rol ==='admin'  || context.user.usu_rol ==='programador';
     return context.be.tableDefAdapt({
         name: 'tabulados',
-        editable: context.user.usu_rol === 'ingresador' || context.user.usu_rol === 'admin' || context.user.usu_rol === 'programador',
+        editable: puedeEditar,
+        allow:{
+            insert:false,
+            delete:false,
+            update:puedeEditar,
+        },
         fields: [
-            {name:'indicador'        , label:'Código indicador', typeName:'text'     , allow:{select: true,insert:false, update:false}},
-            {name:'cortantes'        , label:'Cortantes'       , typeName:'jsonb'    , allow:{select: true,insert:false, update:false}},
+            {name:'indicador'        , label:'Código indicador', typeName:'text'     , allow:{ update:false}},
+            {name:'cortantes'        , label:'Cortantes'       , typeName:'jsonb'    , allow:{ update:false}},
             {name:'habilitado'       , label:'Habilitado'      , typeName:'boolean'  , defaultValue:true},
-           // {name:'invalido'         , label:'Inválido'        , typeName:'boolean'  , defaultValue:false},
+            {name:'invalido'         , label:'Inválido'        , typeName:'boolean'  , defaultValue:false},
             {name:'mostrar_cuadro'   , label:'Mostrar Cuadro'  , typeName:'boolean'  , defaultValue:true},
             {name:'mostrar_grafico'  , label:'Mostrar Gráfico' , typeName:'boolean'  , defaultValue:true},
             {name:'tipo_grafico'     , label:'Tipo Gráfico'    , typeName:'text'     , defaultValue:'linea', },

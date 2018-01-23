@@ -116,15 +116,8 @@ ProceduresExamples = [
         action:'alta/tabulados',
         parameters:[],
         coreFunction:function(context, parameters){
-            return context.client.query(`insert into tabulados(indicador, cortantes)
-                select indicador, cortantes
-                from celdas
-                where (indicador,cortantes) not in (select indicador,cortantes from tabulados)
-                group by indicador, cortantes 
-                order by indicador, cortantes
-                returning indicador, cortantes;`).fetchAll().then(function(result){
-                    //var ntabulados=result.rows.length
-                    return 'Se dieron de alta '+result.rows.length+' tabulados';
+            return context.client.query(`SELECT syncro_tabulados()`).fetchOneRowIfExists().then(function(result){
+                    return 'Se dieron de alta '+result.row.syncro_tabulados+' tabulados';
             });
         }
     },
