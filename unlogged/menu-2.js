@@ -36,18 +36,18 @@ function tableCreate(info,data) {
 }
 
 function showChart() {
-    var matrix = getTabulatorMatrix();
-    if (!(matrix.columns.length > 1 && matrix.lineVariables.length == matrix.columnVariables.length == 1)) {
+    var tabulatorMatrix = getMatrix();
+    if (!(tabulatorMatrix.columns.length > 1 && tabulatorMatrix.lineVariables.length == tabulatorMatrix.columnVariables.length == 1)) {
         throw 'no cumple las condiciones requeridas';
     }
-    matrix.dataVariables = [matrix.dataVariables[0]]; //descarto coeficiente de variación
+    tabulatorMatrix.dataVariables = [tabulatorMatrix.dataVariables[0]]; //descarto coeficiente de variación
 
-    //TODO: pasar esto a un template por favor! y a graphicator
+    //TODO: pasar esto a un template por favor!
     var chartElement = document.createElement('div');
     chartElement.setAttribute('id', 'chartElement');
 
     var chartTitle = document.createElement('h3');
-    chartTitle.innerText = matrix.caption;
+    chartTitle.innerText = tabulatorMatrix.caption;
     chartTitle.style.textAlign='center';
 
     var chartContainer = document.createElement('div');
@@ -61,56 +61,75 @@ function showChart() {
     tabuladoHtml.parentNode.insertBefore(chartContainer, tabuladoHtml.nextElementSibling);
 
     setTimeout(function(){
-        var graficador;
-        var pepe;
-        var specificOptions={};       
-        if(matrix.lines.length>1&&matrix.lines[0].titles[0]==null){
-            matrix.lines.shift();
+    var graficador;
+        var specificOptions={};
+        var esHorizontal=getTabuladoInfo().orientacion=='vertical'?true:false;
+        
+        var ancho=window.innerWidth - document.getElementById("div-pantalla-izquierda").offsetWidth - 32;
+        var max=Number.MIN_VALUE;
+        var minCellValue=Number.MAX_VALUE;
+        var minYValue=0; //default min Y value
+        if(tabulatorMatrix.lines.length>1&&tabulatorMatrix.lines[0].titles[0]==null){
+            tabulatorMatrix.lines.shift();
         }
+        tabulatorMatrix.lines.forEach(function(line, i_line){
+            line.cells.forEach(function(cell, i_cell){
+                if (cell && cell.valor){
+                    max = Math.max(cell.valor,max);
+                    minCellValue = Math.min(cell.valor,minCellValue);
+                }
+            });
+        });
+        minYValue = minCellValue<0?minCellValue:(2*minCellValue-max>0?2*minCellValue-max:0); // acomoda el 0 automáticamente, si los datos útiles ocupan menos de la mitad cambio el 0        
 
         if(getTabuladoInfo().tipo_grafico=='barra'){
-            graficador = new BarChartGraphicator('chartElement', matrix);
+            graficador = new BarChartGraphicator('chartElement', tabulatorMatrix);
             specificOptions={
-                data:{
-                    groups: true
+                axis:{
+                    x:{
+                        type: 'category',
+                        tick:{values: false}
+                    }              
                 }
-                // axis:{
-                //     x:{
-                //         type: 'category',
-                //         tick:{values: false}
-                //     }
-                // }
             };
         }else{
-            graficador = new LineChartGraphicator('chartElement', matrix);
+            graficador = new LineChartGraphicator('chartElement', tabulatorMatrix);
             specificOptions={
-                // axis:{
-                //     y:{
-                //         min: minYValue // en line charts si todas las lineas están tiradas para arriba le subimos un poco el minValue para que no quede tanto espacio entre el cero y las lineas
-                //     }
-                // }
+                axis:{
+                    y:{
+                        min: minYValue // en line charts si todas las lineas están tiradas para arriba le subimos un poco el minValue para que no quede tanto espacio entre el cero y las lineas
+                    }
+                }
             };
         }
 
         graficador.renderTabulation(changing(
             {
-                size:{width:window.innerWidth - document.getElementById("div-pantalla-izquierda").offsetWidth - 32},
+                size:{width:ancho},
                 axis:{
-                    rotated:getTabuladoInfo().orientacion=='vertical'?true:false,
+                    rotated:esHorizontal,
                     x:{
-                        label: {position:'outer-center', text:matrix.vars[matrix.columnVariables[0]].label},
+                        label: {position:'outer-center', text:tabulatorMatrix.vars[tabulatorMatrix.columnVariables[0]].label},
+                        tick: { culling: false }
                     },
                     y:{ 
                         label: {position:'outer-middle', text:(document.getElementById('tabulado-um-descripcion')||{}).textContent||''},
+                        padding: minYValue<=0?{bottom: 0}:null,
                     },
-                } 
+                },
+                data:{
+                     groups:false
+                },
+                tooltip: {
+                    order:false
+                }
             },
-            specificOptions
+            specificOptions, 
         ));
     },100);
 }
 
-function getTabulatorMatrix() {
+function getMatrix() {
     return JSON.parse(tabuladoElement().getAttribute('para-graficador'));
 }
 
@@ -214,7 +233,7 @@ function buildExportExcelButton(){
     exportButton.onclick = function(){
         var t = new Tabulator();
         t.toExcel(tabuladoElement(), {
-            filename:getTabulatorMatrix().caption, 
+            filename:getMatrix().caption, 
             username: (window.my)?window.my.config.username: null
         });
     };
@@ -251,7 +270,34 @@ window.addEventListener('load', function () {
     var textoChico =document.getElementById('texto-encabezado-chico');
     var logoEstadistica=document.getElementById('logo-estadistica');
     var logoConsejo=document.getElementById('logo-consejo');
-
+    window.addEventListener('scroll', function(e){
+        var distanceY = window.pageYOffset || document.documentElement.scrollTop;
+        var shrinkOn = 0;
+        if (distanceY > shrinkOn) {
+            if(encabezadoChico){encabezadoChico.classList.add('al-reducir');}
+            if(encabezado){encabezado.classList.add('al-reducir');}
+            textoGrande?textoGrande.classList.add('al-reducir'):true;
+            logoEstadistica?logoEstadistica.classList.add('al-reducir'):true;
+            logoConsejo?logoConsejo.classList.add('al-reducir'):true;
+        } else {
+            if (encabezadoChico && encabezadoChico.getAttribute('class','al-reducir')) {
+                encabezadoChico.classList.remove('al-reducir');
+                textoGrande?textoGrande.innerHTML='El Sistema Integrado de Indicadores de Derechos de Niñas, Niños y Adolescentes, Ley Nº5.463/15, tiene por objetivo proveer información válida, relevante, mensurable y confiable, acorde con los nuevos estándares definidos en la Convención sobre los Derechos del Niño (CDN), la Ley Nacional Nº 26.061 y la Ley CABA Nº 114; así como la perspectiva de género y el respeto de los principios de intersectorialidad, transversalidad, integralidad, accesibilidad, transparencia y objetividad de la información. El Sistema presenta un conjunto de indicadores que establecen correspondencia con los derechos consagrados por la CDN, que permiten medir y cuantificar el acceso de dicha población a sus derechos. En tal sentido, constituye una herramienta eficaz que permite el monitoreo del cumplimiento de los derechos reconocidos a la población de 0 a 17 años de edad, residente en la Ciudad Autónoma de Buenos Aires, a través de la disponibilización sistemática.':true
+            }
+            if(textoGrande && textoGrande.getAttribute('class','al-reducir')){
+                textoGrande.classList.remove('al-reducir');
+            }
+            if(logoEstadistica && logoEstadistica.getAttribute('class','al-reducir')){
+                logoEstadistica.classList.add('al-reducir');
+            }
+            if(logoConsejo && logoConsejo.getAttribute('class','al-reducir')){
+                logoConsejo.classList.add('al-reducir');
+            }
+            if(encabezado && encabezado.getAttribute('class','al-reducir')){
+                encabezado.classList.remove('al-reducir');
+            }
+        }
+    });
     var foot=document.getElementById('foot-texto');
     var footOtroRenglon=document.getElementById('foot-texto-2');
     if(foot){
