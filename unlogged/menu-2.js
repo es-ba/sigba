@@ -36,11 +36,11 @@ function tableCreate(info, data) {
 }
 
 function showChart() {
-    var tabulatorMatrix = getMatrix();
-    if (!(tabulatorMatrix.columns.length > 1 && tabulatorMatrix.lineVariables.length == tabulatorMatrix.columnVariables.length == 1)) {
+    var matrix = getTabulatorMatrix();
+    if (!(matrix.columns.length > 1 && matrix.lineVariables.length == matrix.columnVariables.length == 1)) {
         throw 'no cumple las condiciones requeridas';
     }
-    tabulatorMatrix.dataVariables = [tabulatorMatrix.dataVariables[0]]; //descarto coeficiente de variación
+    matrix.dataVariables = [matrix.dataVariables[0]]; //descarto coeficiente de variación
 
     //TODO: pasar esto a un template por favor! y a graphicator
     var chartElementId = 'chartElement';
@@ -95,7 +95,7 @@ function showChart() {
     }, 100);
 }
 
-function getMatrix() {
+function getTabulatorMatrix() {
     return JSON.parse(tabuladoElement().getAttribute('para-graficador'));
 }
 
