@@ -602,7 +602,7 @@ class AppSIGBA extends backend.AppBackend{
                                                 ((fila.habilitado) || esAdmin)?html.div({
                                                     id:'tabulado-html',
                                                     'para-graficador':JSON.stringify(tabuladoHtmlYDescripcion.matrix),
-                                                    'info-tabulado':JSON.stringify(tabuladoHtmlYDescripcion.descripcionTabulado.info)
+                                                    'info-tabulado':JSON.stringify(tabuladoHtmlYDescripcion.descripcionTabulado)
                                                 },[tabuladoHtmlYDescripcion.tabuladoHtml]):null,
                                                 esAdmin?html.div([
                                                     validationButton,
