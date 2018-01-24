@@ -878,8 +878,8 @@ class AppSIGBA extends backend.AppBackend{
                     html.img({class:'encabezado',id:'bs-der',src:skinUrl+'img/logo-BA.png'})
                 ]),
             ]),
-            //html.a({class:'encabezado',id:'barra-inferior',href:''+absolutePath+''+'principal'},[
-            html.div({class:'encabezado',id:'barra-inferior'},[
+            html.a({class:'encabezado',id:'barra-inferior',href:''+absolutePath+''+'principal'},[
+           // html.div({class:'encabezado',id:'barra-inferior'},[
                 html.div({class:'encabezado-interno'},[
                     html.img({class:'encabezado',id:'img-logo',src:skinUrl+'img/img-logo.png'}),
                 ].concat(be.config['client-setup'].logos.map(function(logoName){
