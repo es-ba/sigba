@@ -378,22 +378,27 @@ $BODY$
 declare
   tabIn integer;
 begin
-with tabuladosInsertados  as( 
+  with tabuladosInsertados  as( 
     insert into tabulados(indicador, cortantes,habilitado)
         select indicador, cortantes,true
         from celdas
-        where (indicador,cortantes) not in (select indicador,cortantes from tabulados)
+        where  cortantes is distinct from '{}' and (indicador,cortantes) not in (select indicador,cortantes from tabulados)
         group by indicador, cortantes 
         order by indicador, cortantes
         returning 1
-) select count(*) into tabIn from tabuladosInsertados;
+  ) select count(*) into tabIn from tabuladosInsertados;
        -- returning indicador into test;--indicador, cortantes;
-    update  tabulados tt 
-        set invalido=false 
-        from ( select indicador,cortantes from tabulados where (indicador,cortantes) not in (select indicador,cortantes from celdas)) t
-        where t.indicador=tt.indicador and t.cortantes=tt.cortantes;
+  update  tabulados tt 
+    set invalido=true 
+    from ( select indicador,cortantes from tabulados where (indicador,cortantes) not in (select indicador,cortantes from celdas)) t
+    where t.indicador=tt.indicador and t.cortantes=tt.cortantes;
        -- returning tt.indicador,tt.cortantes;
-    return tabIn;
+  update  tabulados tt 
+    set invalido=false 
+    from ( select indicador,cortantes from tabulados where invalido = true and (indicador,cortantes) in (select indicador,cortantes from celdas)) t
+    where t.indicador=tt.indicador and t.cortantes=tt.cortantes;
+       
+  return tabIn;
 end;
 $BODY$
   LANGUAGE plpgsql  /*SECURITY DEFINER*/;
@@ -413,7 +418,7 @@ CREATE OR REPLACE FUNCTION sigba.tabulados_variables_syncro_trg()
 $BODY$
 begin
     insert into tabulados_variables (indicador,cortantes,variable)
-        select indicador,cortantes,jsonb_object_keys(cortantes) from tabulados WHERE  indicador=new.indicador and cortantes=new.cortantes and invalido=false;
+        select indicador,cortantes,jsonb_object_keys(cortantes) from tabulados WHERE  indicador=new.indicador and cortantes=new.cortantes;
     return new;
 end;
 $BODY$

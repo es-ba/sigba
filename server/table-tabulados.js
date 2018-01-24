@@ -7,7 +7,6 @@ module.exports = function(context){
         editable: puedeEditar,
         allow:{
             insert:false,
-            delete:false,
             update:puedeEditar,
         },
         fields: [

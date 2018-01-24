@@ -71,3 +71,50 @@ alter table "tabulados_variables" add constraint "valor invalido en ubicacion_gr
 alter table "tabulados_variables" add constraint  "tabulados_variables tabulados REL " foreign key ("indicador", "cortantes") references "tabulados" ("indicador", "cortantes")  on update cascade;
 alter table "tabulados_variables" add constraint  "tabulados_variables indicadores_variables REL " foreign key ("indicador", "variable") references "indicadores_variables" ("indicador", "variable")  on update cascade;--CONSTRAINS SCHEMA SIGBA
 alter table "cortes_celdas" add constraint  "cortes_celdas indicadores_variables REL " foreign key ("indicador", "variable") references "indicadores_variables" ("indicador", "variable")  on delete cascade on update cascade;
+alter table tabulados alter column invalido set default false
+-----------------------------------------------------------
+-- 23-01-2018
+alter table cortes add column color text;
+
+--nueva sincronizacion  FALTA PROBAR TODO!!!!
+-- el usuario puede borrar tabulados
+-- agregar a la condicion de la rutina de alta de tabulados que no inserte tabulados con cortantes={}
+-- sacar codicion de  invalido false al trigger de tabulados_tabulados_variables
+-- modificar rutina para el caso tabulado existente invalido y con dato en celdas => invalido false
+-- PASOS:
+select * INTO tabulados_bak from tabulados
+  order by indicador, cortantes;
+delete from tabulados;
+-- alta de tabulados desde boton de la aplicacion 
+-- insert invalidos consistentes
+with t as (
+   select indicador,cortantes, var.var
+   from tabulados_bak t ,jsonb_object_keys(cortantes) var
+   where 
+      not exists (select indicador,cortantes from celdas c where c.indicador=t.indicador and c.cortantes=t.cortantes)
+ ), t1 as (
+   select t.indicador, t.cortantes, var, variable, count(*) over (partition by t.indicador,t.cortantes) n_c, count(variable) over (partition by t.indicador, t.cortantes) n_v
+   from t left join indicadores_variables i on i.indicador=t.indicador and i.variable=t.var
+ ), t_ins as (
+   select indicador, cortantes  
+    from t1 where n_c=n_v
+   group by 1 ,2)
+insert into tabulados(indicador, cortantes, invalido)  
+ select indicador, cortantes, true
+ from t_ins;
+-- rescatar seteos del usuario desde bak  
+update tabulados t
+  set (habilitado   = b.habilitado     
+    ,mostrar_cuadro = b.mostrar_cuadro 
+    ,mostrar_grafico= b.mostrar_grafico
+    ,tipo_grafico   = b.tipo_grafico    
+    ,orientacion    = b.orientacion 
+    ,apilado        = b.apilado)
+ from tabulados_bak b
+ where b.indicador=t.indicador and b.cortantes=t.cortantes and 
+ (b.habilitado is distinct from t.habilitado or
+  b.mostrar_cuadro is distinct from t.mostrar_cuadro or        
+  b.mostrar_grafico is distinct from t.mostrar_grafico or 
+  b.tipo_grafico is distinct from t.tipo_grafico or 
+  b.orientacion is distinct from t.orientacion  
+  );

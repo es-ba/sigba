@@ -10,6 +10,7 @@ module.exports = function(context){
             {name: 'valor_corte'      ,typeName:'text'          ,nullable:false},
             {name: 'denominacion'     ,typeName:'text'          },
             {name: 'descripcion'      ,typeName:'text'          },
+            {name: 'color'            ,typeName:'text'          },
             {name: 'orden'            ,typeName:'integer'       },
         ],
         primaryKey:['variable', 'valor_corte'],

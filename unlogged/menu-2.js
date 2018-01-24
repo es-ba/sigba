@@ -306,12 +306,6 @@ window.addEventListener('load', function () {
     if(footOtroRenglon){
         footOtroRenglon.textContent='Gobierno de la Ciudad de Buenos Aires';
     }
-    var volverAHomeElements=document.querySelectorAll('[volver-a-home]');
-    volverAHomeElements.forEach(function(elemento){
-        elemento.addEventListener('click',function(){
-            window.location.href='principal';
-        });
-    })
     var despliegueEspecialDiv=document.querySelectorAll('[div-despliegue-especial]');
     var despliegueEspecialTd=document.querySelectorAll('[despliegue-especial]');
     despliegueEspecialDiv.forEach(function(div,i){

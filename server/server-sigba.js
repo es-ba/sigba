@@ -682,7 +682,8 @@ class AppSIGBA extends backend.AppBackend{
                         html.div({id:'total-layout', 'menu-type':'hidden'},[
                             be.encabezado(skinUrl,true,req),
                             html.div({id:'div-encabezado-titulo-tabulado',class:'titulo-tabulados'},[
-                                html.div({class:'encabezado-interno'},[
+                                html.a({class:'encabezado-interno',href:''+absolutePath+''+'principal'},[
+                                //html.div({class:'encabezado-interno'},[
                                     html.div({id:'indicadores-titulo',class:'titulo-tabulados'},'Indicadores'),
                                     html.div({id:'titulo-signos_convencionales',class:'titulo-tabulados'},[html.a({id:'signos_convencionales-link',href:''+absolutePath+'principal-signos_convencionales'},'Signos convencionales')]),
                                     html.div({class:'float-clear'},"")
@@ -868,22 +869,27 @@ class AppSIGBA extends backend.AppBackend{
     }
     encabezado(skinUrl,esPrincipal,req){
         var be = this;
-        return html.div({id:'id-encabezado','volver-a-home':true},[
-            html.div({class:'encabezado',id:'barra-superior','volver-a-home':true},[
+        return html.div({id:'id-encabezado'},[
+            html.a({class:'encabezado',id:'barra-superior',href:''+absolutePath+''+'principal'},[
                 html.div({class:'encabezado-interno'},[
-                    html.img({class:'encabezado',id:'bs-izq',src:skinUrl+'img/logo-ciudad.png','volver-a-home':true}),
-                    html.img({class:'encabezado',id:'bs-der',src:skinUrl+'img/logo-BA.png','volver-a-home':true})
+                    html.img({class:'encabezado',id:'bs-izq',src:skinUrl+'img/logo-ciudad.png'}),
+                    html.img({class:'encabezado',id:'bs-der',src:skinUrl+'img/logo-BA.png'})
                 ]),
             ]),
-            html.div({class:'encabezado',id:'barra-inferior','volver-a-home':true},[
+            //html.a({class:'encabezado',id:'barra-inferior',href:''+absolutePath+''+'principal'},[
+            html.div({class:'encabezado',id:'barra-inferior'},[
                 html.div({class:'encabezado-interno'},[
-                    html.img({class:'encabezado',id:'img-logo',src:skinUrl+'img/img-logo.png','volver-a-home':true}),
+                    html.img({class:'encabezado',id:'img-logo',src:skinUrl+'img/img-logo.png'}),
                 ].concat(be.config['client-setup'].logos.map(function(logoName){
-                    return html.img({class:'encabezado',id:'logo-'+logoName,src:skinUrl+'img/img-logo-'+logoName+'.png','volver-a-home':true});
+                    return html.img({class:'encabezado',id:'logo-'+logoName,src:skinUrl+'img/img-logo-'+logoName+'.png'});
                 })).concat([
-                    be.config['client-setup'].conTextoPrincipal?html.div({class:'encabezado',id:'texto-encabezado-grande','volver-a-home':true}):null
-                ]).concat([html.div(
-                    ['logo1','logo2','logo3','logo4','logo5'].map(function(logo){return html.a({class:'autonomia-a'},[html.img({class:'autonomia-img'})])})
+                    be.config['client-setup'].conTextoPrincipal?html.div({class:'encabezado',id:'texto-encabezado-grande'}):null
+                ]).concat([html.div({class:'autonomias'},
+                    esPrincipal?['auto0','auto1','auto2','auto3','auto5'].map(function(logo){
+                        var href=''+absolutePath+''+'principal'+'#'+logo;
+                        var src=skinUrl+'img/'+logo+'.png';
+                        return html.a({class:'autonomia-a',href:href},[html.img({class:'autonomia-img',src:src})])
+                    }):null
                 )]))
             ])
         ]);
