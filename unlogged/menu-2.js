@@ -71,7 +71,7 @@ function showChart() {
             matrix: matrix,
             tipo: getTabuladoInfo().info.tipo_grafico,
             idElemParaBindear: chartElementId,
-            apilado: false,
+            apilado: getTabuladoInfo().info.apilado,
             um: getTabuladoInfo().um_denominacion || '',
             c3Config: {
                 size: { width: window.innerWidth - document.getElementById("div-pantalla-izquierda").offsetWidth - 32 },
