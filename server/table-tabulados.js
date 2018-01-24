@@ -18,13 +18,14 @@ module.exports = function(context){
             {name:'mostrar_grafico'  , label:'Mostrar Gráfico' , typeName:'boolean'  , defaultValue:true},
             {name:'tipo_grafico'     , label:'Tipo Gráfico'    , typeName:'text'     , defaultValue:'linea', },
             {name:'orientacion'      , label:'Orientación'     , typeName:'text'     , defaultValue:'horizontal'},
+            {name:'apilado'          , label:'Apilado'         , typeName:'boolean'  , defaultValue:'false'},
         ], 
         primaryKey:['indicador','cortantes'],
         foreignKeys:[
             {references:'indicadores', fields:['indicador']},
         ],
         constraints:[
-            {constraintType:'check' , consName:"tipo de gráfico", expr:"tipo_grafico in ('linea', 'barra','piramide')"},
+            {constraintType:'check' , consName:"tipo de gráfico", expr:"tipo_grafico in ('linea', 'barra', 'piramide')"},
             {constraintType:'check' , consName:"orientación", expr:"orientacion in ('horizontal', 'vertical')"},
         ],
         detailTables:[
