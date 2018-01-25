@@ -37,62 +37,50 @@ function tableCreate(info, data) {
 
 function showChart() {
     var matrix = getTabulatorMatrix();
-    if (!(matrix.columns.length > 1 && matrix.lineVariables.length == matrix.columnVariables.length == 1)) {
-        throw 'no cumple las condiciones requeridas';
+
+    //Curados y validaciones particulares a sigba/sistema de indicadores 
+    // los totales se auto-calculan en tabulator? si es esto último pasar curado a graphicator
+    if (matrix.lines.length > 1 && matrix.lines[0].titles[0] == null) {
+        matrix.lines.shift(); //descarto lina de totales
     }
+    //idem, el cv es de tabulator o de sistemas de indicadores ?
     matrix.dataVariables = [matrix.dataVariables[0]]; //descarto coeficiente de variación
 
-    //TODO: pasar esto a un template por favor! y a graphicator
+    var generalConfig = {
+        matrix: matrix,
+        tipo: getTabuladoInfo().info.tipo_grafico,
+        idElemParaBindear: generateChartContainerId(matrix),
+        apilado: getTabuladoInfo().info.apilado,
+        um: getTabuladoInfo().um_denominacion || '',
+        c3Config: {
+            size: { width: window.innerWidth - document.getElementById("div-pantalla-izquierda").offsetWidth - 32 },
+            axis: {
+                rotated: getTabuladoInfo().info.orientacion == 'vertical' ? true : false,
+            }
+        }
+    };
+
+    var specificConfig = {}; // ver interfaz graph-configuration.d.ts en graphicator
+    var graficador = Graphicator.render(changing(generalConfig, specificConfig));
+}
+
+function generateChartContainerId(matrix) {
+    
     var chartElementId = 'chartElement';
     var chartElement = document.createElement('div');
     chartElement.setAttribute('id', chartElementId);
-
     var chartTitle = document.createElement('h3');
     chartTitle.innerText = matrix.caption;
     chartTitle.style.textAlign = 'center';
-
     var chartContainer = document.createElement('div');
     chartContainer.setAttribute('id', 'chartContainer');
     chartContainer.appendChild(chartTitle);
     chartContainer.appendChild(chartElement);
     chartContainer.style.display = 'none';
-    // chartContainer.style.width = '500px';
-
+    
     var tabuladoHtml = tabuladoElement();
     tabuladoHtml.parentNode.insertBefore(chartContainer, tabuladoHtml.nextElementSibling);
-
-    setTimeout(function () {
-        //TODO: pasar este curado a Graphicator
-        if (matrix.lines.length > 1 && matrix.lines[0].titles[0] == null) {
-            matrix.lines.shift();
-        }
-        
-        var generalConfig = {
-            matrix: matrix,
-            tipo: getTabuladoInfo().info.tipo_grafico,
-            idElemParaBindear: chartElementId,
-            apilado: getTabuladoInfo().info.apilado,
-            um: getTabuladoInfo().um_denominacion || '',
-            c3Config: {
-                size: { width: window.innerWidth - document.getElementById("div-pantalla-izquierda").offsetWidth - 32 },
-                axis: {
-                    rotated: getTabuladoInfo().info.orientacion == 'vertical' ? true : false,
-                }
-            }
-        };
-
-        var specificConfig = {};
-        // if (getTabuladoInfo().info.tipo_grafico == 'barra') {
-        //     specificConfig = {
-        //         apilado: true
-        //     };
-        // } else {
-        //     specificConfig = {
-        //     };
-        // }
-        var graficador = Graphicator.render(changing(generalConfig, specificConfig));
-
-    }, 100);
+    return chartElementId
 }
 
 function getTabulatorMatrix() {
