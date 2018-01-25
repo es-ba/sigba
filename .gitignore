@@ -36,4 +36,3 @@ local-*
 *-local.*
 sessions/
 .vscode/launch.json
-package-lock.json
