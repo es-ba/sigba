@@ -748,8 +748,8 @@ class AppSIGBA extends backend.AppBackend{
                         return [];
                     }
                 }).then(function(filasDeVariablesPrincipales){
-                    var camposAFicha=['denominacion','def_con','def_ope','metas','um','universo','cob','fte'];
-                    var camposLabels=['Nombre del indicador','Definición conceptual','Definición operativa','Metas','Unidad de medida','Universo','Cobertura','Fuente'];
+                    var camposAFicha=['denominacion','def_con','def_ope','um','universo','cob','fte','uso_alc_lim','metas'];
+                    var camposLabels=['Nombre del indicador','Definición conceptual','Definición operativa','Unidad de medida','Universo','Cobertura','Fuente','Uso, alcances, limitaciones','Metas'];
                     var objetosCamposDef={};
                     camposAFicha.forEach(function(campo,icampo){
                         objetosCamposDef[campo]={
