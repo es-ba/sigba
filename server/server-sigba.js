@@ -345,22 +345,20 @@ class AppSIGBA extends backend.AppBackend{
                     be.defs_annio(annio).f_param_cortantes_posibles([indicador,fila.cortantes,annio])
                 ).fetchAll();
             }).then(function(result){
-                //Si el annio está fijo lo quito de las variables
                 datum.list=result.rows;
-                //datum.list=annio?result.rows.map(function(row){delete row.annio;return row;}):result.rows;
                 datum.vars.push({name:'valor', place:'data'});
                 datum.vars.push({name:'cv', place:'data'});
                 datum.list.forEach(function(row){
                     if(row.desagr=='tcaba'){
                         row.desagr=null;
                     }
-                })
-                //falta testear! sacar annio si viene como parametro
-                //datum.vars=annio?datum.vars.filter(function(variable){if(variable.name !=='annio'){return variable}}):datum.vars;
-                //console.log('------------'+ stringify(datum.vars));
+                });
+                datum.list=annio?result.rows.map(function(row){delete row.annio;return row;}):result.rows;
+                datum.vars=annio?datum.vars.filter(e_var => e_var.name !=='annio'):datum.vars;
                 tabulator.defaultShowAttribute='valor';
                 //fs.writeFile('C:/compartida/datum/'+indicador+'_'+Date.now()+'_datum.json',JSON.stringify(datum),{encoding:'utf8'})
                 var matrix=tabulator.toMatrix(datum);
+                matrix.oneColumnTitle=(annio && matrix.columnVariables.length==0)?annio:''; 
                 return client.query(
                     "SELECT i.denominacion as i_denom ,i.con_nota_pie con_nota, f.denominacion as f_denom, u.denominacion as u_denom,u.um as um,u.nota_pie nota_pie, i.decimales FROM indicadores i " 
                         +"\n INNER JOIN fte f ON f.fte=i.fte " 
