@@ -40,11 +40,11 @@ function showChart() {
 
     //Curados y validaciones particulares a sigba/sistema de indicadores 
     // los totales se auto-calculan en tabulator? si es esto último pasar curado a graphicator
-    if (matrix.lines.length > 1 && matrix.lines[0].titles[0] == null) {
-        matrix.lines.shift(); //descarto lina de totales
+    while (matrix.lines.length > 1 && (matrix.lines[0].titles[0] == null)){
+        matrix.lines.shift(); //descarto linas de totales
     }
     //idem, el cv es de tabulator o de sistemas de indicadores ?
-    matrix.dataVariables = [matrix.dataVariables[0]]; //descarto coeficiente de variación
+    matrix.dataVariables.splice(matrix.dataVariables.indexOf('cv',1)); //descarto coeficiente de variación
 
     var generalConfig = {
         matrix: matrix,
