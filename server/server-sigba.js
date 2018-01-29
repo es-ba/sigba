@@ -77,14 +77,16 @@ class AppSIGBA extends backend.AppBackend{
         });
     }
     
-    reporteBonito(client, defTables, annios, where,color) {
+    reporteBonito(client, defTables, annios, where,color,controles) {
 //        var urlYClasesTabulados='principal';
+        var be = this;
+        var skin=be.config['client-setup'].skin;
+        var skinUrl=(skin?skin+'/':'');
         var urlYClasesTabulados;
         if(!defTables.length){
             return Promise.resolve([]);
         }
         var table=defTables[0].tabla;
-        var be = this;
         return be.nombreDelHome(client).then(function(homeName){
             urlYClasesTabulados=homeName;
             return client.query(
@@ -101,7 +103,7 @@ class AppSIGBA extends backend.AppBackend{
                 var whereHija=(defTables[0].joinSiguiente||[]).map(function(nombreCampo){
                     return be.db.quoteObject(nombreCampo)+" = "+be.db.quoteText(registro[nombreCampo]);
                 }).join(" and ").concat((defTables[0].condicion)?' and '+defTables[0].condicion:'');
-                return be.reporteBonito(client, defTables.slice(1), annios, whereHija,color).then(function(listaTrHijos){
+                return be.reporteBonito(client, defTables.slice(1), annios, whereHija,color,controles).then(function(listaTrHijos){
                     var listaTd;
                     var result;
                     var paraFicha;
@@ -124,8 +126,6 @@ class AppSIGBA extends backend.AppBackend{
                             defTables[0].camposAMostrar.map(function(nombreCampo,i){
                                 var id=registro[defTables[0].campoId];
                                 var attributes={colspan:i?1:defTables.length+1,class:'campo_'+nombreCampo};
-                                var skin=be.config['client-setup'].skin;
-                                var skinUrl=(skin?skin+'/':'');
                                 if(registro.indicador ){
                                     attributes.id=id;
                                     if(registro.def_con){
@@ -262,9 +262,27 @@ class AppSIGBA extends backend.AppBackend{
                                         html.td({colspan:5,class:'renglon-vacio'}),
                                         html.td({colspan:likeAr(annios).array().length,class:'renglon-vacio'})])];
                                 }
-                                return [
-                                    html.tr({class:'nivel-titulo',"nivel-titulo": defTables.length, "color-agrupacion_principal":color||'otro'},listaTd.concat(listaTdValores))
-                                ].concat(listaTrHijos);
+                                var recienElegido;
+                                if(table==='indicadores'){
+                                    controles.filasEnDimension[registro.dimension]=controles.filasEnDimension[registro.dimension]||[];
+                                    if(!controles.elegidoEnDimension[registro.dimension] && Math.random()<0.2){
+                                        listaTdValores.push(html.td({class:'sennial-indicador-elegido-grafico'}));
+                                        controles.elegidoEnDimension[registro.dimension]=true;
+                                        recienElegido=true;
+                                    }else{ 
+                                        listaTdValores.push(html.td({class:'sin-sennial-indicador-elegido-grafico'}));
+                                    }
+                                }
+                                var estaFila=html.tr({class:'nivel-titulo',"nivel-titulo": defTables.length, "color-agrupacion_principal":color||'otro'},listaTd.concat(listaTdValores))
+                                if(table==='indicadores'){
+                                    controles.filasEnDimension[registro.dimension].push(estaFila);
+                                    if(recienElegido){
+                                        controles.filasEnDimension[registro.dimension][
+                                            Math.max(0, controles.filasEnDimension[registro.dimension].length-6)
+                                        ].content.push(html.td({rowspan:6, class:'box-grafico-principal'},html.img({src:skinUrl+"img/grafico-ejemplo.png"})));
+                                    }
+                                }
+                                return [estaFila].concat(listaTrHijos);
                             });
                         });
                     })
@@ -655,6 +673,10 @@ class AppSIGBA extends backend.AppBackend{
             return be.getDbClient(req).then(function(cli){
                 client=cli;
                 return be.anniosCortantes(client,annios,anniosA).then(function(){
+                    var controles={
+                        elegidoEnDimension:{},
+                        filasEnDimension:{}
+                    };
                     return be.reporteBonito(client,[{
                         tabla:"agrupacion_principal",
                         campoId:"agrupacion_principal",
@@ -673,7 +695,7 @@ class AppSIGBA extends backend.AppBackend{
                         campoId:"indicador",
                         camposAMostrar:["denominacion"],
                         mostrarIndicadoresYLinks:true,
-                    }], annios,'ocultar IS NOT TRUE');
+                    }], annios,'ocultar IS NOT TRUE', null, controles);
                 });
             }).then(function(listaDeTr){
                 var skin=be.config['client-setup'].skin;
