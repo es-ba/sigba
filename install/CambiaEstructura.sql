@@ -118,3 +118,9 @@ update tabulados t
   b.tipo_grafico is distinct from t.tipo_grafico or 
   b.orientacion is distinct from t.orientacion  
   );
+
+alter table "indicadores" add constraint  "indicadores fte REL " foreign key ("fte") references "fte" ("fte")  on update cascade;
+alter table "indicadores" add constraint  "indicadores um REL " foreign key ("um") references "um" ("um")  on update cascade;
+
+select 'tabulados' as table_name, enance_table('tabulados','indicador,cortantes') as result 
+ UNION select 'tabulados_variables' as table_name, enance_table('tabulados_variables','indicador,cortantes,variable') as result;

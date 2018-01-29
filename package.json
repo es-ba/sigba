@@ -8,10 +8,10 @@
   "dependencies": {
     "backend-plus": "~0.18.49",
     "backend-skins": "~0.1.6",
-    "type-store": "~0.2.13",
     "file-saver": "~1.3.3",
-    "tabulator": "~0.2.29",
     "pg-triggers": "~0.2.1",
-    "graphicator": "~0.28.0"
+    "tabulator": "~0.2.29",
+    "type-store": "~0.2.13",
+    "graphicator": "~0.28.1"
   }
 }
