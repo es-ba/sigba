@@ -279,25 +279,25 @@ class AppSIGBA extends backend.AppBackend{
         //console.log('-----FILA---------'+ JSON.stringify(fila));
         return Promise.resolve().then(function(){
             var datum={};
-            var variables=fila.variables.split(',');
-            var var_ubiFilCol=fila.ubicacion.split(',');
-            var def_var_usu=fila.cant_filcol ==fila.cantidad_cortantes; 
-            var def_tab    =annio?fila.cant_ubitab  ==fila.cantidad_cortantes:fila.cant_ubitabserie ==fila.cantidad_cortantes;
-            var def_graf   =annio?fila.cant_ubigraf ==fila.cantidad_cortantes:fila.cant_ubigrafserie ==fila.cantidad_cortantes;
-            if(def_tab){
-                var_ubiFilCol=fila.ubi_ubitab.split(',');
-                variables=fila.var_ubitab.split(',');
-                fila.denominacion=fila.denom_ubitab;
-                
-            }
+            //var variables=fila.variables.split(',');
+            //var var_ubiFilCol=fila.ubicacion.split(',');
+            //var def_var_usu=fila.cant_filcol ==fila.cantidad_cortantes; 
+            //var def_tab    =annio?fila.cant_ubitab  ==fila.cantidad_cortantes:fila.cant_ubitabserie ==fila.cantidad_cortantes;
+            //var def_graf   =annio?fila.cant_ubigraf ==fila.cantidad_cortantes:fila.cant_ubigrafserie ==fila.cantidad_cortantes;
+            //if(def_tab){
+            //    var_ubiFilCol=fila.ubi_ubitab.split(',');
+            //    variables=fila.var_ubitab.split(',');
+            //    fila.denominacion=fila.denom_ubitab;
+            //    
+            //}
             var armaVars= function armaVars(filaVars){
                 var labels=filaVars.denominacion.split('|');
                 var vars=[];
                 for(var i=0;i<labels.length;i++){
                     vars.push({
-                        name: variables[i],
+                        name: fila.variables[i],
                         label:labels[i],
-                        place:def_var_usu?(var_ubiFilCol[i]=='col'?'top':'left'):((i===labels.length-1)?'top':'left')
+                        place:fila.def_var_usu?(fila.ubicacion[i]=='col'?'top':'left'):((i===labels.length-1)?'top':'left')
                     });
                 }
                 return vars;
@@ -338,16 +338,16 @@ class AppSIGBA extends backend.AppBackend{
                     apilado:fila.apilado
                 };
                 return client.query(
-                    "SELECT "+ variables.map(function(varInv){
+                    "SELECT "+ fila.variables.map(function(varInv){
                         return 'cc_'+varInv+'.valor_corte '+varInv;
                     }).join(',') +", valor, cv " + 
-                        "\n  FROM celdas v  LEFT JOIN "+ variables.map(function(varInv){
+                        "\n  FROM celdas v  LEFT JOIN "+ fila.variables.map(function(varInv){
                             return (" cortes_celdas cc_"+varInv +
                                 " ON v.indicador=cc_"+varInv+".indicador AND v.cortes=cc_"+varInv+".cortes AND cc_"+varInv+".variable='"+varInv+"'" +
                                 "\n LEFT JOIN cortes corte_"+varInv+" ON cc_"+varInv+".variable=corte_"+varInv+".variable AND cc_"+varInv+".valor_corte=corte_"+varInv+".valor_corte");
                         }).join('\n    LEFT JOIN ')+
                         "\n  WHERE v.indicador=$1 AND "+be.defs_annio(annio).cortantes+" <@ $2 AND "+be.defs_annio(annio).cond_annio_en_cortante+
-                        "\n  ORDER BY " + variables.map(function(varInv){
+                        "\n  ORDER BY " + fila.variables.map(function(varInv){
                                 
                                 return ((varInv!='annio')?'corte_'+varInv+'.orden NULLS FIRST':varInv+' desc');
                         }).join(' , '),
@@ -575,6 +575,28 @@ class AppSIGBA extends backend.AppBackend{
                         });
                     })).then(function(){
                         var cortantesPosibles = tabuladosPorIndicador.filter(row => (row.habilitado || esAdmin));
+                        cortantesPosibles.forEach(function(cortante){
+                            
+                             
+                            var variables=cortante.variables.split(',');
+                            var var_ubiFilCol=cortante.ubicacion.split(',');
+                            var def_var_usu=cortante.cant_filcol ==cortante.cantidad_cortantes; 
+                            var def_tab    =annio?cortante.cant_ubitab  ==cortante.cantidad_cortantes:cortante.cant_ubitabserie ==cortante.cantidad_cortantes;
+                            var def_graf   =annio?cortante.cant_ubigraf ==cortante.cantidad_cortantes:cortante.cant_ubigrafserie ==cortante.cantidad_cortantes;
+                            if(def_tab){
+                                var_ubiFilCol=cortante.ubi_ubitab.split(',');
+                                variables=cortante.var_ubitab.split(',');
+                                cortante.denominacion=cortante.denom_ubitab;
+                                
+                            }
+    
+                            //var filaConfigurada=fila;
+                            cortante.variables=variables;
+                            cortante.ubicacion=var_ubiFilCol;
+                            cortante.def_var_usu=def_var_usu;
+                                
+                            })
+                        
                         if (cortantesPosibles.length > 1){
                             //cortantesPosibles = cortantesPosibles.filter(row => row.variables != 'annio');
                             cortantesPosibles = cortantesPosibles.filter(row => row.cortantes != '{"annio":true}');
@@ -585,20 +607,22 @@ class AppSIGBA extends backend.AppBackend{
                         // tabulado que se va as mostrar
                        // var fila = cortantesPosibles.filter(tabulado => tabulado.variables == cortante)[0];
                         var fila = cortantesPosibles.filter(function(tabulado){
-                            console.log("-----JSON.stringify(tabulado.cortantes)",JSON.stringify(tabulado.cortantes))
-                            console.log("*******************************cortante",cortante)
                             return JSON.stringify(tabulado.cortantes) == cortante; 
                         })[0];
                         var descripcionTabulado={};
+                        
+                       
+                        
                         return be.armarUnTabulado(client, fila, annio, indicador,descripcionTabulado).then(function(tabuladoHtmlYDescripcion){
                             var trCortantes=cortantesPosibles.map(function(cortanteAElegir){
-                                var denominaciones=cortanteAElegir.cortantes;
+                                //var denominaciones=cortanteAElegir.variables;
+                                var denominaciones=cortanteAElegir.denominacion.split('|');
                                 //if(annio) delete denominaciones['annio'];
-                                //if(annio) denominaciones.splice(cortanteAElegir.variables.split(',').indexOf('annio'),1);
+                                //if(annio) denominaciones.splice(cortanteAElegir.variables.indexOf('annio'),1);
                                 var href=''+absolutePath+''+urlYClasesTabulados+'-indicador?'+(annio?'annio='+annio+'&':'')+'indicador='+indicador+'&cortante='+JSON.stringify(cortanteAElegir.cortantes)
                                 return html.tr({class:'tr-cortante-posible','esta-habilitado':cortanteAElegir.habilitado?'si':'no'},[
                                     html.td({class:'td-cortante-posible', 'menu-item-selected':cortanteAElegir.variables==cortante},[
-                                        html.a({class:'a-cortante-posible',href:href},JSON.stringify(denominaciones))
+                                        html.a({class:'a-cortante-posible',href:href},denominaciones.join('-'))
                                     ])
                                 ]);
                             });
