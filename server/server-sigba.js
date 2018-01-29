@@ -276,11 +276,20 @@ class AppSIGBA extends backend.AppBackend{
     }
     armarUnTabulado(client, fila,annio,indicador,descripcionTabulado){
         var be = this;
+        //console.log('-----FILA---------'+ JSON.stringify(fila));
         return Promise.resolve().then(function(){
             var datum={};
             var variables=fila.variables.split(',');
             var var_ubiFilCol=fila.ubicacion.split(',');
-            var def_var_usu=fila.cant_filcol ==fila.cantidad_cortantes;    
+            var def_var_usu=fila.cant_filcol ==fila.cantidad_cortantes; 
+            var def_tab    =annio?fila.cant_ubitab  ==fila.cantidad_cortantes:fila.cant_ubitabserie ==fila.cantidad_cortantes;
+            var def_graf   =annio?fila.cant_ubigraf ==fila.cantidad_cortantes:fila.cant_ubigrafserie ==fila.cantidad_cortantes;
+            if(def_tab){
+                var_ubiFilCol=fila.ubi_ubitab.split(',');
+                variables=fila.var_ubitab.split(',');
+                fila.denominacion=fila.denom_ubitab;
+                
+            }
             var armaVars= function armaVars(filaVars){
                 var labels=filaVars.denominacion.split('|');
                 var vars=[];
@@ -288,7 +297,7 @@ class AppSIGBA extends backend.AppBackend{
                     vars.push({
                         name: variables[i],
                         label:labels[i],
-                        place: def_var_usu?(var_ubiFilCol[i]=='col'?'top':'left'):((i===labels.length-1)?'top':'left')
+                        place:def_var_usu?(var_ubiFilCol[i]=='col'?'top':'left'):((i===labels.length-1)?'top':'left')
                     });
                 }
                 return vars;
@@ -505,22 +514,46 @@ class AppSIGBA extends backend.AppBackend{
                             "string_agg(v.denominacion,'|' ORDER BY iv.ubicacion,iv.orden, iv.variable) as var_denomfilcol, "+
                             "string_agg( iv.ubicacion,',' ORDER BY iv.ubicacion,iv.orden, iv.variable) AS var_ubifilcol, "+
                             "count(iv.ubicacion) AS cant_filcol , "+
+                            "string_agg( tv.variable ,',' ORDER BY tv.ubicacion_tabulado,tv.orden_tabulado, tv.variable) AS var_ubitab, "+
+                            "string_agg(v.denominacion,'|' ORDER BY tv.ubicacion_tabulado,tv.orden_tabulado, tv.variable) as denom_ubitab, "+
+                            "string_agg( tv.ubicacion_tabulado,',' ORDER BY tv.ubicacion_tabulado,tv.orden_tabulado, tv.variable) AS ubi_ubitab, "+
+                            "count(tv.ubicacion_tabulado) AS cant_ubitab , "+
+                            "string_agg( tv.variable ,',' ORDER BY tv.ubicacion_tabulado_serie,tv.orden_tabulado_serie, tv.variable) AS var_ubitabserie, "+
+                            "string_agg(v.denominacion,'|' ORDER BY tv.ubicacion_tabulado_serie,tv.orden_tabulado_serie, tv.variable) as denom_ubitabserie, "+
+                            "string_agg( tv.ubicacion_tabulado_serie,',' ORDER BY tv.ubicacion_tabulado_serie,tv.orden_tabulado_serie, tv.variable) AS ubi_ubitabserie, "+
+                            "count(tv.ubicacion_tabulado_serie) AS cant_ubitabserie , "+
+                            "string_agg( tv.variable ,',' ORDER BY tv.ubicacion_grafico, tv.variable) AS var_ubigraf, "+
+                            "string_agg(v.denominacion,'|' ORDER BY tv.ubicacion_grafico, tv.variable) as denom_ubigraf, "+
+                            "string_agg( tv.ubicacion_grafico,',' ORDER BY tv.ubicacion_grafico, tv.variable) AS ubi_ubigraf, "+
+                            "count(tv.ubicacion_grafico) AS cant_ubigraf , "+
+                            "string_agg( tv.variable ,',' ORDER BY tv.ubicacion_grafico_serie, tv.variable) AS var_ubigrafserie, "+
+                            "string_agg(v.denominacion,'|' ORDER BY tv.ubicacion_grafico_serie, tv.variable) as denom_ubigrafserie, "+
+                            "string_agg( tv.ubicacion_grafico_serie,',' ORDER BY tv.ubicacion_grafico_serie, tv.variable) AS ubi_ubigrafserie, "+
+                            "count(tv.ubicacion_grafico_serie) AS cant_ubigrafserie , "+                            
                             "coalesce(string_agg(iv.variable::text||'-'||v.orden::text||'-'||v.variable::text, ',' "+
                                 "ORDER BY v.orden, v.variable),'/')||'--'|| "+
                             "coalesce(string_agg( iv.ubicacion||'-'||iv.orden||'-'||iv.variable ,',' "+
-                                "ORDER BY iv.ubicacion,iv.orden, iv.variable),'/') AS variables_info "+
+                                "ORDER BY iv.ubicacion,iv.orden, iv.variable),'/') AS variables_info "+                                
                           "from indicadores_variables iv left join variables v on iv.variable=v.variable "+
-                          "where iv.indicador=$1 and iv.variable in ("+tabulado.arr_cortantes.map(function(cortante){return "'"+cortante+"'"}).join(',')+")",
-                        [indicador]).fetchAll().then(function(result){
+                          "    left join tabulados_variables tv on tv.indicador=iv.indicador and tv.variable=iv.variable "+
+                          "where iv.indicador=$1 and tv.cortantes= $2 and iv.variable in ("+tabulado.arr_cortantes.map(function(cortante){return "'"+cortante+"'"}).join(',')+")",
+                        [indicador, tabulado.cortantes]).fetchAll().then(function(result){
                             result.rows.forEach(function(rowInfo){
                                 tabulado.variables_info=rowInfo.variables_info;
                                 tabulado.denominacion=(rowInfo.cant_filcol==tabulado.cantidad_cortantes)?
                                     rowInfo.var_denomfilcol:rowInfo.denominacion;
-                                tabulado.variables=(rowInfo.cant_filcol==tabulado.cantidad_cortantes)?
-                                    rowInfo.var_ordfilcol:rowInfo.variables;
+                                tabulado.variables=rowInfo.cant_filcol==tabulado.cantidad_cortantes?
+                                    rowInfo.var_ordfilcol:rowInfo.variables; 
                                 tabulado.orden=rowInfo.orden;
                                 tabulado.ubicacion=(rowInfo.cant_filcol==tabulado.cantidad_cortantes)?rowInfo.var_ubifilcol:'';
                                 tabulado.cant_filcol=rowInfo.cant_filcol;
+                                ['ubitab', 'ubitabserie','ubigraf', 'ubigrafserie'].forEach(function(ubis){
+                                    ['var_','denom_','ubi_','cant_'].forEach(function(vnom){
+                                        tabulado[vnom + ubis]=rowInfo[vnom + ubis];
+                                        return tabulado;
+                                    })
+                                    return tabulado;
+                                });
                             })
                            return tabulado;
                         }).then(function(tabulado){
@@ -543,21 +576,29 @@ class AppSIGBA extends backend.AppBackend{
                     })).then(function(){
                         var cortantesPosibles = tabuladosPorIndicador.filter(row => (row.habilitado || esAdmin));
                         if (cortantesPosibles.length > 1){
-                            cortantesPosibles = cortantesPosibles.filter(row => row.variables != 'annio');
+                            //cortantesPosibles = cortantesPosibles.filter(row => row.variables != 'annio');
+                            cortantesPosibles = cortantesPosibles.filter(row => row.cortantes != '{"annio":true}');
                         }
                         //parametro GET (CSV con todos los cortantes que hay que mostrar, lo cual define un tabulado) //cortantes por defecto son las del primer tabulado
-                        var cortante = !req.query.cortante?cortantesPosibles[0].variables:req.query.cortante;
+                        //var cortante = !req.query.cortante?cortantesPosibles[0].variables:req.query.cortante;
+                        var cortante = !req.query.cortante?JSON.stringify(cortantesPosibles[0].cortantes):req.query.cortante;
                         // tabulado que se va as mostrar
-                        var fila = cortantesPosibles.filter(tabulado => tabulado.variables == cortante)[0];
+                       // var fila = cortantesPosibles.filter(tabulado => tabulado.variables == cortante)[0];
+                        var fila = cortantesPosibles.filter(function(tabulado){
+                            console.log("-----JSON.stringify(tabulado.cortantes)",JSON.stringify(tabulado.cortantes))
+                            console.log("*******************************cortante",cortante)
+                            return JSON.stringify(tabulado.cortantes) == cortante; 
+                        })[0];
                         var descripcionTabulado={};
                         return be.armarUnTabulado(client, fila, annio, indicador,descripcionTabulado).then(function(tabuladoHtmlYDescripcion){
                             var trCortantes=cortantesPosibles.map(function(cortanteAElegir){
-                                var denominaciones=cortanteAElegir.denominacion.split('|');
-                                if(annio) denominaciones.splice(cortanteAElegir.variables.split(',').indexOf('annio'),1);
-                                var href=''+absolutePath+''+urlYClasesTabulados+'-indicador?'+(annio?'annio='+annio+'&':'')+'indicador='+indicador+'&cortante='+cortanteAElegir.variables;
+                                var denominaciones=cortanteAElegir.cortantes;
+                                //if(annio) delete denominaciones['annio'];
+                                //if(annio) denominaciones.splice(cortanteAElegir.variables.split(',').indexOf('annio'),1);
+                                var href=''+absolutePath+''+urlYClasesTabulados+'-indicador?'+(annio?'annio='+annio+'&':'')+'indicador='+indicador+'&cortante='+JSON.stringify(cortanteAElegir.cortantes)
                                 return html.tr({class:'tr-cortante-posible','esta-habilitado':cortanteAElegir.habilitado?'si':'no'},[
                                     html.td({class:'td-cortante-posible', 'menu-item-selected':cortanteAElegir.variables==cortante},[
-                                        html.a({class:'a-cortante-posible',href:href},denominaciones.join('-'))
+                                        html.a({class:'a-cortante-posible',href:href},JSON.stringify(denominaciones))
                                     ])
                                 ]);
                             });
