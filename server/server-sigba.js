@@ -592,7 +592,6 @@ class AppSIGBA extends backend.AppBackend{
                             return JSON.stringify(tabulado.cortantes) == cortante; 
                         })[0];
                         return be.armaMatrices(client, fila, annio, indicador).then(function(matrices){
-                            
                             return client.query(
                                 "SELECT i.denominacion as i_denom ,i.con_nota_pie con_nota, f.denominacion as f_denom, u.denominacion as u_denom,u.um as um,u.nota_pie nota_pie, i.decimales FROM indicadores i " 
                                     +"\n LEFT JOIN fte f ON f.fte=i.fte " 
