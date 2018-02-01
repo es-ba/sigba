@@ -58,14 +58,14 @@ function showChart() {
 
     var generalConfig = {
         matrix: matrix,
-        tipo: getTabuladoInfo().info.tipo_grafico,
+        tipo: getTabuladoInfo().tipo_grafico,
         idElemParaBindear: generateChartContainerId(matrix),
-        apilado: getTabuladoInfo().info.apilado,
+        apilado: getTabuladoInfo().apilado,
         um: getTabuladoInfo().um_denominacion || '',
         c3Config: {
             size: { width: window.innerWidth - document.getElementById("div-pantalla-izquierda").offsetWidth - 32 },
             axis: {
-                rotated: getTabuladoInfo().info.orientacion == 'vertical' ? true : false,
+                rotated: getTabuladoInfo().orientacion == 'vertical' ? true : false,
             }
         }
     };
