@@ -215,7 +215,7 @@ window.addEventListener('load', function () {
             insertNewButton(buildToggleButton());
             updateVisualization();
         } catch (error) {
-            console.error('No es posible graficar el tabulado en pantalla');
+            console.error('No es posible graficar el tabulado. '+error);
         }
         insertNewButton(buildExportExcelButton());
         insertCopyUrlButton();
