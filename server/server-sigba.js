@@ -186,7 +186,7 @@ class AppSIGBA extends backend.AppBackend{
                                 indic_annio as (select indicador,annio from indicador_annio where indicador=$1 )
                                 SELECT a.annio, d.valor, d.cant_cortantes,d.despliegue_especial,d.var_despliegue_especial,indic_annio.indicador
                                 from annios a left join data d on a.annio=d.annio left join indic_annio on a.annio=indic_annio.annio
-                                order by a.annio desc                                   ;`,
+                                order by a.annio desc;`,
                                [registro.indicador||'']
                            ).fetchAll().then(function(result){
                                return result.rows;
@@ -282,6 +282,7 @@ class AppSIGBA extends backend.AppBackend{
             var denominacion=vDatum.denominacion;
             var datum=vDatum.datum;
             var usoSeteo=vDatum.usoSeteo;
+            var cantVariablesCol=0;
             var armaVars= function armaVars(){
                 var vars=[];
                 var cambio_place={col:'top',fil:'left',z:'left'};
@@ -291,6 +292,8 @@ class AppSIGBA extends backend.AppBackend{
                         label:denominacion[i],
                         place:usoSeteo?cambio_place[ubicacion[i]]:((i===denominacion.length-1)?'top':'left'),
                     }
+                    if(atributos.place=='top' && variables[i]!='annio'){cantVariablesCol++}
+                    
                     if(ubicacion[i]=='z'){
                         atributos.isZ=true
                     }
@@ -343,13 +346,10 @@ class AppSIGBA extends backend.AppBackend{
                         }
                     });
                     datum.list=annio?result.rows.map(function(row){delete row.annio;return row;}):result.rows;
-                    datum.vars=annio?datum.vars.filter(e_var => e_var.name !=='annio'):datum.vars;
-                    //tabulator.defaultShowAttribute='valor';
-                    //fs.writeFile('C:/compartida/datum/'+indicador+'_'+Date.now()+'_datum.json',JSON.stringify(datum),{encoding:'utf8'})
-                    datum.oneColumnTitle=(annio && matrix.columnVariables.length==0)?annio:''; 
+                    datum.vars=annio?datum.vars.filter(e_var => e_var.name !=='annio'):datum.vars;//fs.writeFile('C:/compartida/datum/'+indicador+'_'+Date.now()+'_datum.json',JSON.stringify(datum),{encoding:'utf8'}) 
+                    datum.oneColumnTitle=(annio && cantVariablesCol==0)?annio:'';
                 })
             })
-            
         }
         return Promise.resolve().then(function(){
             var tab={
@@ -467,7 +467,6 @@ class AppSIGBA extends backend.AppBackend{
             var client;
             var annio=req.query.annio;
             var indicador=req.query.indicador;
-            //var respuestas=
             return be.getDbClient(req).then(function(cli){
                 var esAdmin=be.esAdminSigba(req);
                 var usuarioRevisor=false; // true si tiene permiso de revisor
@@ -486,7 +485,6 @@ class AppSIGBA extends backend.AppBackend{
                         return client.query(
                         "select string_agg(v.denominacion,'|' ORDER BY v.orden, v.variable) as denom_default, "+
                             "string_agg(iv.variable, ',' ORDER BY v.orden, v.variable) AS var_default, "+
-                            //"min(v.orden) AS orden, "+
                             "string_agg( iv.variable ,',' ORDER BY iv.ubicacion,iv.orden, iv.variable) AS var_iv, "+
                             "string_agg(v.denominacion,'|' ORDER BY iv.ubicacion,iv.orden, iv.variable) as denom_iv, "+
                             "string_agg( iv.ubicacion,',' ORDER BY iv.ubicacion,iv.orden, iv.variable) AS ubi_iv, "+
@@ -494,7 +492,7 @@ class AppSIGBA extends backend.AppBackend{
                           "from indicadores_variables iv left join variables v on iv.variable=v.variable "+
                           "where iv.indicador=$1 "+
                           "and iv.variable in ("+tabulado.arr_cortantes.map(function(cortante){return "'"+cortante+"'"}).join(',')+")",
-                        [indicador/*, tabulado.cortantes*/]).fetchOneRowIfExists().then(function(result){
+                        [indicador]).fetchOneRowIfExists().then(function(result){
                             var rowInfo=result.row;
                             tabulado.cant_iv=rowInfo.cant_iv;
                             var uso_seteo_iv=rowInfo.cant_iv==tabulado.cantidad_cortantes;
@@ -580,14 +578,11 @@ class AppSIGBA extends backend.AppBackend{
                     })).then(function(){
                         var cortantesPosibles = tabuladosPorIndicador.filter(row => (row.habilitado || esAdmin));
                         if (cortantesPosibles.length > 1){
-                            //cortantesPosibles = cortantesPosibles.filter(row => row.variables != 'annio');
                             cortantesPosibles = cortantesPosibles.filter(row => row.cortantes != '{"annio":true}');
                         }
                         //parametro GET (CSV con todos los cortantes que hay que mostrar, lo cual define un tabulado) //cortantes por defecto son las del primer tabulado
-                        //var cortante = !req.query.cortante?cortantesPosibles[0].variables:req.query.cortante;
                         var cortante = !req.query.cortante?JSON.stringify(cortantesPosibles[0].cortantes):req.query.cortante;
                         // tabulado que se va as mostrar
-                       // var fila = cortantesPosibles.filter(tabulado => tabulado.variables == cortante)[0];
                         var fila = cortantesPosibles.filter(function(tabulado){
                             return JSON.stringify(tabulado.cortantes) == cortante; 
                         })[0];
@@ -620,9 +615,11 @@ class AppSIGBA extends backend.AppBackend{
                                 matrices.matrixTab.caption=result.row.i_denom;
                                 matrices.matrixGraf.caption=result.row.i_denom;
                                 return {matrices,descripcionTabulado};
-                            }).then(function(result){
+                            }).then(function(matricesYDescripcion){
+                                var matrices=matricesYDescripcion.matrices;
+                                var descripcion=matricesYDescripcion.descripcionTabulado;
                                 tabulator.toCellTable=function(cell){
-                                    var cellValor=(cell && cell.valor)?cellValor=be.decimalesYComa(cell.valor,result.descripcionTabulado.decimales,','):(cell?cell.valor:cell)
+                                    var cellValor=(cell && cell.valor)?cellValor=be.decimalesYComa(cell.valor,descripcion.decimales,','):(cell?cell.valor:cell)
                                     return html.td({class:'tabulator-cell'},[
                                         html.div({id:'valor-cv'},[
                                             html.div({id:'valor-en-tabulado'},cell?be.puntosEnMiles(cellValor):'///'),
@@ -630,16 +627,16 @@ class AppSIGBA extends backend.AppBackend{
                                         ])
                                     ]);
                                 };
-                                var tabuladoHtml=tabulator.toHtmlTable(result.matrices.matrixTab)
-                                return {tabuladoHtml,descripcionTabulado:result.descripcionTabulado, matrix:result.matrices.matrixGraf};
+                                var tabuladoHtml=tabulator.toHtmlTable(matrices.matrixTab)
+                                return {tabuladoHtml,descripcionTabulado:descripcion, matrix:matrices.matrixGraf};
                             })
-                        }).then(function(result){
+                        }).then(function(tabuladoDescripcionMatriz){
                             var tabuladoHtmlYDescripcion=result;
+                            var tabuladoHtml=tabuladoDescripcionMatriz.tabuladoHtml;
+                            var descripcion=tabuladoDescripcionMatriz.descripcionTabulado;
+                            var matrix=tabuladoDescripcionMatriz.matrix;
                             var trCortantes=cortantesPosibles.map(function(cortanteAElegir){
-                                //var denominaciones=cortanteAElegir.variables;
                                 var denominaciones=cortanteAElegir.denom_tab.split('|');
-                                //if(annio) delete denominaciones['annio'];
-                                //if(annio) denominaciones.splice(cortanteAElegir.variables.indexOf('annio'),1);
                                 var href=''+absolutePath+''+urlYClasesTabulados+'-indicador?'+(annio?'annio='+annio+'&':'')+'indicador='+indicador+'&cortante='+JSON.stringify(cortanteAElegir.cortantes)
                                 return html.tr({class:'tr-cortante-posible','esta-habilitado':cortanteAElegir.habilitado?'si':'no'},[
                                     html.td({class:'td-cortante-posible', 'menu-item-selected':cortanteAElegir.variables==cortante},[
@@ -650,11 +647,11 @@ class AppSIGBA extends backend.AppBackend{
                             var annios={};
                             var anniosA=[];
                             var anniosLinks=[];
-                            tabuladoHtmlYDescripcion.descripcionTabulado.usuario=req.user?req.user.usu_usu:{};
-                            tabuladoHtmlYDescripcion.descripcionTabulado.habilitar=!fila.habilitado;
-                            tabuladoHtmlYDescripcion.descripcionTabulado.cortante_orig=fila.cortante_orig;
-                            var validationButton=html.button({id:'validacion-tabulado',type:'button','more-info':JSON.stringify(tabuladoHtmlYDescripcion.descripcionTabulado)},'Validar tabulado')
-                            var habilitationButton=html.button({id:'habilitacion-tabulado',type:'button','more-info':JSON.stringify(tabuladoHtmlYDescripcion.descripcionTabulado)}/*,bb*/);
+                            descripcion.usuario=req.user?req.user.usu_usu:{};
+                            descripcion.habilitar=!fila.habilitado;
+                            descripcion.cortante_orig=fila.cortante_orig;
+                            var validationButton=html.button({id:'validacion-tabulado',type:'button','more-info':JSON.stringify(descripcion)},'Validar tabulado')
+                            var habilitationButton=html.button({id:'habilitacion-tabulado',type:'button','more-info':JSON.stringify(descripcion)}/*,bb*/);
                             be.anniosCortantes(client,annios,anniosA,indicador).then(function(){
                                 anniosLinks=anniosA.map(function(annioAElegir){
                                     var href=''+absolutePath+''+urlYClasesTabulados+'-indicador?annio='+annioAElegir+'&indicador='+indicador+
@@ -692,24 +689,24 @@ class AppSIGBA extends backend.AppBackend{
                                                     ]),
                                                     ((fila.habilitado) || esAdmin)?html.div({
                                                         id:'tabulado-html',
-                                                        'para-graficador':JSON.stringify(tabuladoHtmlYDescripcion.matrix),
-                                                        'info-tabulado':JSON.stringify(tabuladoHtmlYDescripcion.descripcionTabulado)
-                                                    },[tabuladoHtmlYDescripcion.tabuladoHtml]):null,
+                                                        'para-graficador':JSON.stringify(matrix),
+                                                        'info-tabulado':JSON.stringify(descripcion)
+                                                    },[tabuladoHtml]):null,
                                                     esAdmin?html.div([
                                                         validationButton,
                                                         habilitationButton
                                                     ]):null,
                                                     html.div({class:'tabulado-descripcion',id:'tabulado-descripcion-um'},[
                                                         (fila.habilitado || esAdmin)?html.span({id:"tabulado-um"},"Unidad de Medida: "):null,
-                                                        (fila.habilitado || esAdmin)?html.span({id:"tabulado-um-descripcion"},tabuladoHtmlYDescripcion.descripcionTabulado.um_denominacion):null
+                                                        (fila.habilitado || esAdmin)?html.span({id:"tabulado-um-descripcion"},descripcion.um_denominacion):null
                                                     ]),
                                                     html.div({class:'tabulado-descripcion',id:'tabulado-descripcion-nota'},[
-                                                        ((fila.habilitado || esAdmin)&&tabuladoHtmlYDescripcion.descripcionTabulado.nota_pie)?html.span({id:"nota-porcentaje-label"},'Nota: '):null,
-                                                        ((fila.habilitado || esAdmin)&&tabuladoHtmlYDescripcion.descripcionTabulado.nota_pie)?html.span({id:"nota-porcentaje"},tabuladoHtmlYDescripcion.descripcionTabulado.nota_pie):null,
+                                                        ((fila.habilitado || esAdmin)&&descripcion.nota_pie)?html.span({id:"nota-porcentaje-label"},'Nota: '):null,
+                                                        ((fila.habilitado || esAdmin)&&descripcion.nota_pie)?html.span({id:"nota-porcentaje"},descripcion.nota_pie):null,
                                                     ]),
                                                     html.div({class:'tabulado-descripcion',id:'tabulado-descripcion-fuente'},[
                                                         (fila.habilitado || esAdmin)?html.span({id:"tabulado-fuente"},'Fuente: '):null,
-                                                        (fila.habilitado || esAdmin)?html.span({id:"tabulado-fuente-descripcion"},tabuladoHtmlYDescripcion.descripcionTabulado.fuente):null,
+                                                        (fila.habilitado || esAdmin)?html.span({id:"tabulado-fuente-descripcion"},descripcion.fuente):null,
                                                     ]),
                                                 ])
                                             ])
@@ -717,7 +714,7 @@ class AppSIGBA extends backend.AppBackend{
                                     ])
                                 ]);
                                 var pagina=html.html([
-                                    be.headSigba(false,req,tabuladoHtmlYDescripcion.descripcionTabulado.indicador),
+                                    be.headSigba(false,req,descripcion.indicador),
                                     html.body([pantalla,be.foot(skinUrl)])
                                 ]);
                                 res.send(pagina.toHtmlText({pretty:true}));
