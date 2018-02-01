@@ -124,3 +124,14 @@ alter table "indicadores" add constraint  "indicadores um REL " foreign key ("um
 
 select 'tabulados' as table_name, enance_table('tabulados','indicador,cortantes') as result 
  UNION select 'tabulados_variables' as table_name, enance_table('tabulados_variables','indicador,cortantes,variable') as result;
+ 
+--18/01/26 modificaciones en tabulados_variables
+alter table tabulados_variables
+drop column "orden_grafico",
+add column  "ubicacion_tabulado_serie" text, 
+add column "orden_tabulado_serie" integer, 
+add column "ubicacion_grafico_serie" text;
+
+alter table "tabulados_variables" add constraint "valor invalido en ubicacion_tabulado_serie" check (ubicacion_tabulado_serie in ('fil', 'col','z'));
+alter table "tabulados_variables" add constraint "valor invalido en ubicacion_grafico_serie" check (ubicacion_grafico_serie in ('fil', 'col','z'));-- FKs
+ 

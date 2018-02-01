@@ -11,13 +11,15 @@ module.exports = function(context){
             update:puedeEditar,
         },
         fields: [
-            {name: 'indicador'            ,typeName:'text'      ,nullable:false,allow:{update:false}},
-            {name: 'cortantes'            ,typeName:'jsonb'     ,nullable:false,allow:{update:false}},
-            {name: 'variable'             ,typeName:'text'      ,nullable:false,allow:{update:false}},
-            {name: 'ubicacion_tabulado'   ,typeName:'text'      },
-            {name: 'orden_tabulado'       ,typeName:'integer'   },
-            {name: 'ubicacion_grafico'    ,typeName:'text'      },
-            {name: 'orden_grafico'        ,typeName:'integer'   },
+            {name: 'indicador'                  ,typeName:'text'    ,nullable:false,allow:{update:false}},
+            {name: 'cortantes'                  ,typeName:'jsonb'   ,nullable:false,allow:{update:false}},
+            {name: 'variable'                   ,typeName:'text'    ,nullable:false,allow:{update:false}},
+            {name: 'ubicacion_tabulado'         ,typeName:'text'    },
+            {name: 'orden_tabulado'             ,typeName:'integer' },
+            {name: 'ubicacion_tabulado_serie'   ,typeName:'text'    },
+            {name: 'orden_tabulado_serie'       ,typeName:'integer' },
+            {name: 'ubicacion_grafico'          ,typeName:'text'    },
+            {name: 'ubicacion_grafico_serie'    ,typeName:'text'    },
         ],
         primaryKey:['indicador','cortantes','variable'],
         foreignKeys:[{references:'tabulados', fields:['indicador','cortantes']},
@@ -25,7 +27,11 @@ module.exports = function(context){
         constraints:[
             {constraintType:'check' , consName:"valor invalido en ubicacion_tabulado", expr:"ubicacion_tabulado in ('fil', 'col')"},
             {constraintType:'check' , consName:"valor invalido en ubicacion_grafico" , expr:"ubicacion_grafico in ('fil', 'col','z')"},
+<<<<<<< HEAD
             {constraintType:'check' , consName:"valor invalido en ubicacion_tabulado_serie", expr:"ubicacion_tabulado_serie in ('fil', 'col')"},
+=======
+            {constraintType:'check' , consName:"valor invalido en ubicacion_tabulado_serie", expr:"ubicacion_tabulado_serie in ('fil', 'col','z')"},
+>>>>>>> 6d39009c400f4edec4d50cd83ad358c145c074c3
             {constraintType:'check' , consName:"valor invalido en ubicacion_grafico_serie" , expr:"ubicacion_grafico_serie in ('fil', 'col','z')"},
         ]
     },context);
