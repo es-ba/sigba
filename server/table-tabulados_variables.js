@@ -27,11 +27,7 @@ module.exports = function(context){
         constraints:[
             {constraintType:'check' , consName:"valor invalido en ubicacion_tabulado", expr:"ubicacion_tabulado in ('fil', 'col')"},
             {constraintType:'check' , consName:"valor invalido en ubicacion_grafico" , expr:"ubicacion_grafico in ('fil', 'col','z')"},
-<<<<<<< HEAD
             {constraintType:'check' , consName:"valor invalido en ubicacion_tabulado_serie", expr:"ubicacion_tabulado_serie in ('fil', 'col')"},
-=======
-            {constraintType:'check' , consName:"valor invalido en ubicacion_tabulado_serie", expr:"ubicacion_tabulado_serie in ('fil', 'col','z')"},
->>>>>>> 6d39009c400f4edec4d50cd83ad358c145c074c3
             {constraintType:'check' , consName:"valor invalido en ubicacion_grafico_serie" , expr:"ubicacion_grafico_serie in ('fil', 'col','z')"},
         ]
     },context);
