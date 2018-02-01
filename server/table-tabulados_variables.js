@@ -23,8 +23,10 @@ module.exports = function(context){
         foreignKeys:[{references:'tabulados', fields:['indicador','cortantes']},
                     {references:'indicadores_variables'   , fields:['indicador','variable' ]} ],
         constraints:[
-            {constraintType:'check' , consName:"valor invalido en ubicacion_tabulado", expr:"ubicacion_tabulado in ('fil', 'col','z')"},
+            {constraintType:'check' , consName:"valor invalido en ubicacion_tabulado", expr:"ubicacion_tabulado in ('fil', 'col')"},
             {constraintType:'check' , consName:"valor invalido en ubicacion_grafico" , expr:"ubicacion_grafico in ('fil', 'col','z')"},
+            {constraintType:'check' , consName:"valor invalido en ubicacion_tabulado_serie", expr:"ubicacion_tabulado_serie in ('fil', 'col')"},
+            {constraintType:'check' , consName:"valor invalido en ubicacion_grafico_serie" , expr:"ubicacion_grafico_serie in ('fil', 'col','z')"},
         ]
     },context);
 }
