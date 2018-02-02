@@ -35,20 +35,23 @@ function tableCreate(info, data) {
     return tabla;
 }
 
+//Curados y validaciones particulares a sigba/sistema de indicadores 
 function curarMatrix(matrix){
-    //Curados y validaciones particulares a sigba/sistema de indicadores 
-    // los totales se auto-calculan en tabulator? si es esto último pasar curado a graphicator
-    while (matrix.lines.length > 1 && (matrix.lines[0].titles[0] == null)){
-        matrix.lines.shift(); //descarto linas de totales
-    }
+    matrix = borrarTotales(matrix);
+    matrix.dataVariables.splice(matrix.dataVariables.indexOf('cv',1)); //descarto coeficiente de variación
+    return matrix;
+}
 
-    matrix.columns = matrix.columns.filter(function(col){
+function borrarTotales(matrix) {
+    if (matrix.lines[0].titles[0] == null) {
+        matrix.lines.shift(); // borro linea totales
+        matrix.lines.forEach(function (line) {
+            line.cells.shift(); //borro la primera celda de cada uno (de totales)
+        });
+    }
+    matrix.columns = matrix.columns.filter(function (col) {
         return (col.titles[0] !== null && col.titles[1] !== null);
     });
-
-    //idem, el cv es de tabulator o de sistemas de indicadores ?
-    matrix.dataVariables.splice(matrix.dataVariables.indexOf('cv',1)); //descarto coeficiente de variación
-    
     return matrix;
 }
 
