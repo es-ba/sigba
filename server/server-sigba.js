@@ -310,7 +310,7 @@ class AppSIGBA extends backend.AppBackend{
                         var filaValores=result.rows
                         var vValores={};
                         filaValores.forEach(function(fila){
-                            vValores[fila.valor_corte]={label:fila.denominacion}; 
+                            vValores[fila.valor_corte]={label:fila.denominacion,color:fila.color,signo_piramide:fila.signo_piramide}; 
                         });
                         vValores[null]={label:'TOTAL'};
                         return vValores;

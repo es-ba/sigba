@@ -12,10 +12,14 @@ module.exports = function(context){
             {name: 'descripcion'      ,typeName:'text'          },
             {name: 'color'            ,typeName:'text'          },
             {name: 'orden'            ,typeName:'integer'       },
+            {name: 'signo_piramide'   ,typeName:'integer'       ,defaultValue:1},
         ],
         primaryKey:['variable', 'valor_corte'],
         foreignKeys:[
             {references:'variables', fields:['variable']},
+        ],
+        constraints:[
+            {constraintType:'check' , consName:"valor invalido en signo_piramide", expr:"signo_piramide in (1, -1)"}
         ]
     },context);
 }
