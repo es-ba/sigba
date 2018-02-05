@@ -35,27 +35,43 @@ function tableCreate(info, data) {
     return tabla;
 }
 
+//Curados y validaciones particulares a sigba/sistema de indicadores 
+function curarMatrix(matrix){
+    matrix = borrarTotales(matrix);
+    matrix.dataVariables.splice(matrix.dataVariables.indexOf('cv',1)); //descarto coeficiente de variación
+    return matrix;
+}
+
+
+//TODO: si graficar totales depende de tabulado o indicador -> ponerle un campo en tabulado o indicador donde lo especifiquen, si depende del tipo de gráfico -> hacerlo en graphicator
+//no se grafican los totales actualmente
+function borrarTotales(matrix) {
+    if (matrix.lines[0].titles[0] == null && matrix.lines.lenght > 1) {
+        matrix.lines.shift(); // borro linea totales
+        matrix.lines.forEach(function (line) {
+            line.cells.shift(); //borro la primera celda de cada uno (de totales)
+        });
+    }
+    matrix.columns = matrix.columns.filter(function (col) {
+        return (col.titles[0] !== null && col.titles[1] !== null);
+    });
+    return matrix;
+}
+
 function showChart() {
     var matrix = getTabulatorMatrix();
-
-    //Curados y validaciones particulares a sigba/sistema de indicadores 
-    // los totales se auto-calculan en tabulator? si es esto último pasar curado a graphicator
-    while (matrix.lines.length > 1 && (matrix.lines[0].titles[0] == null)){
-        matrix.lines.shift(); //descarto linas de totales
-    }
-    //idem, el cv es de tabulator o de sistemas de indicadores ?
-    matrix.dataVariables.splice(matrix.dataVariables.indexOf('cv',1)); //descarto coeficiente de variación
+    matrix = curarMatrix(matrix);
 
     var generalConfig = {
         matrix: matrix,
-        tipo: getTabuladoInfo().info.tipo_grafico,
+        tipo: getTabuladoInfo().tipo_grafico,
         idElemParaBindear: generateChartContainerId(matrix),
-        apilado: getTabuladoInfo().info.apilado,
+        apilado: getTabuladoInfo().apilado,
         um: getTabuladoInfo().um_denominacion || '',
         c3Config: {
             size: { width: window.innerWidth - document.getElementById("div-pantalla-izquierda").offsetWidth - 32 },
             axis: {
-                rotated: getTabuladoInfo().info.orientacion == 'vertical' ? true : false,
+                rotated: getTabuladoInfo().orientacion == 'vertical' ? true : false,
             }
         }
     };
@@ -205,7 +221,7 @@ window.addEventListener('load', function () {
             insertNewButton(buildToggleButton());
             updateVisualization();
         } catch (error) {
-            console.error('No es posible graficar el tabulado en pantalla');
+            console.error('No es posible graficar el tabulado. '+error);
         }
         insertNewButton(buildExportExcelButton());
         insertCopyUrlButton();
