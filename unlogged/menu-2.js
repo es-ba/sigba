@@ -42,11 +42,10 @@ function curarMatrix(matrix){
     return matrix;
 }
 
-
 //TODO: si graficar totales depende de tabulado o indicador -> ponerle un campo en tabulado o indicador donde lo especifiquen, si depende del tipo de gráfico -> hacerlo en graphicator
 //no se grafican los totales actualmente
 function borrarTotales(matrix) {
-    if (matrix.lines[0].titles[0] == null && matrix.lines.lenght > 1) {
+    if (matrix.lines[0].titles[0] == null && matrix.lines.length > 1) {
         matrix.lines.shift(); // borro linea totales
         matrix.lines.forEach(function (line) {
             line.cells.shift(); //borro la primera celda de cada uno (de totales)
