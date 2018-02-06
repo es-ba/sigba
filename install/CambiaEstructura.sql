@@ -144,10 +144,11 @@ alter table "tabulados_variables" add constraint "valor invalido en ubicacion_ta
 
 ALTER TABLE indicadores ADD COLUMN  grafico_principal boolean DEFAULT false
 
+
 create table "parametros" (
   "unique_row" boolean NOT NULL, 
-  "nombre_home" text, 
-  "home_cortante" text NOT NULL
+  "nombre_principal" text, 
+  "cortante_principal" text NOT NULL
 , primary key ("unique_row")
 );
 grant select, update on "parametros" to "sigba_user";
@@ -166,4 +167,4 @@ set search_path=sigba;
 
 alter table cortes add column signo_piramide integer default '1';
 alter table "cortes" add constraint "valor invalido en signo_piramide" check (signo_piramide in (1, -1));
- 
+

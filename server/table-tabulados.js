@@ -19,9 +19,9 @@ module.exports = function(context){
             {name:'tipo_grafico'      , label:'Tipo Gráfico'    , typeName:'text'     , defaultValue:'linea', },
             {name:'orientacion'       , label:'Orientación'     , typeName:'text'     , defaultValue:'horizontal'},
             {name:'apilado'           , label:'Apilado'         , typeName:'boolean'  , defaultValue:'false'},
-            //{name:'tabulado_principal', label:'Se muestra tabulado en el principal'   , typeName:'boolean'  , defaultValue:'false'},
-            //{name:'denominacion'      , label:'Denominación'    , typeName:'text'     },
-            //{name:'nota_pie'          , label:'Nota al pie'     , typeName:'text'     },
+            {name:'tabulado_principal', label:'Se muestra tabulado en el principal'   , typeName:'boolean'  , defaultValue:'false'},
+            {name:'denominacion'      , label:'Denominación'    , typeName:'text'     },
+            {name:'nota_pie'          , label:'Nota al pie'     , typeName:'text'     },
         ], 
         primaryKey:['indicador','cortantes'],
         foreignKeys:[
