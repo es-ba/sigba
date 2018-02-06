@@ -160,7 +160,7 @@ alter table tabulados add column denominacion text;
 alter table tabulados add column nota_pie text; 
 
 -------------------------------------------
---02/02/2018
+--02/02/2018--Corrí esto en producción
 
 SET role to sigba_owner;
 set search_path=sigba;
