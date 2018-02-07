@@ -154,6 +154,7 @@ create table "parametros" (
 grant select, update on "parametros" to "sigba_user";
 
 select 'parametros' as table_name, enance_table('parametros','unique_row') as result;
+insert into parametros (unique_row,nombre_principal,cortante_principal) values (true,'principal','sexo');
 
 alter table tabulados add column tabulado_principal boolean default false;
 alter table tabulados add column denominacion text; 
@@ -168,3 +169,15 @@ set search_path=sigba;
 alter table cortes add column signo_piramide integer default '1';
 alter table "cortes" add constraint "valor invalido en signo_piramide" check (signo_piramide in (1, -1));
 
+-------------- 07/02/2018 corrido en producción
+SET role to sigba_owner;
+set search_path=sigba;
+
+alter table indicadores add column a_principal boolean default false;
+alter table indicadores add column especial_principal  boolean default false; 
+alter table indicadores add column denominacion_principal text;
+alter table indicadores add column corte_principal text;
+alter table indicadores add column valor_principal text;
+
+
+ ---------------------------------------------------------------------
