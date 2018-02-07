@@ -47,13 +47,15 @@ function curarMatrix(matrix){
 function borrarTotales(matrix) {
     if (matrix.lines[0].titles[0] == null && matrix.lines.length > 1) {
         matrix.lines.shift(); // borro linea totales
+    }
+
+    if (matrix.columns[0].titles[0] == null && matrix.columns.length > 1){
+        matrix.columns.shift();
         matrix.lines.forEach(function (line) {
             line.cells.shift(); //borro la primera celda de cada uno (de totales)
         });
     }
-    matrix.columns = matrix.columns.filter(function (col) {
-        return (col.titles[0] !== null && col.titles[1] !== null);
-    });
+
     return matrix;
 }
 
