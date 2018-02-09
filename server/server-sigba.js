@@ -69,12 +69,12 @@ class AppSIGBA extends backend.AppBackend{
     // FALTA IMPLEMENTAR ESTO
     nombreDelHome(client){
         return Promise.resolve([]).then(function(){return 'principal';});
-        return  client.query(
-            'SELECT nombre_home FROM parametros;'
-        ).fetchOneRowIfExists().then(function(result){
-            //var nombreHome=(result.row && result.row.nombre_home)||'principal';
-            return 'principal';
-        });
+        // return  client.query(
+        //     'SELECT nombre_home FROM parametros;'
+        // ).fetchOneRowIfExists().then(function(result){
+        //     //var nombreHome=(result.row && result.row.nombre_home)||'principal';
+        //     return 'principal';
+        // });
     }
     
     reporteBonito(client, defTables, annios, where,color,controles) {
@@ -436,7 +436,8 @@ class AppSIGBA extends backend.AppBackend{
             { type: 'js', module: 'file-saver' },
             { type: 'js', module: 'js-to-html' },
             { type: 'js', module: 'tabulator', path:'tabulator'},
-            { type: 'css', module: 'c3' }
+            { type: 'css', module: 'c3' },
+            { type: 'css', module: 'graphicator' }
         ];
     }
 
@@ -707,6 +708,7 @@ class AppSIGBA extends backend.AppBackend{
                                                     ]),
                                                     ((fila.habilitado) || esAdmin)?html.div({
                                                         id:'tabulado-html',
+                                                        class: tabuladoDescripcionMatriz.descripcionTabulado.cuadro? '': 'hide-tabulado-cuadro',
                                                         'para-graficador':JSON.stringify(matrix),
                                                         'info-tabulado':JSON.stringify(descripcion)
                                                     },[tabuladoHtml]):null,
@@ -787,7 +789,7 @@ class AppSIGBA extends backend.AppBackend{
                         html.div({id:'total-layout', 'menu-type':'hidden'},[
                             be.encabezado(skinUrl,true,req),
                             html.div({id:'div-encabezado-titulo-tabulado',class:'titulo-tabulados'},[
-                                html.a({class:'encabezado-titulo-tabulado',href:''+absolutePath+''+'principal'},[
+                                html.a({class:'encabezado-titulo-tabulado',href:''+absolutePath+'principal'},[
                                 //html.div({class:'encabezado-interno'},[
                                     html.div({id:'indicadores-titulo',class:'titulo-tabulados'},'Indicadores'),
                                     html.div({id:'titulo-signos_convencionales',class:'titulo-tabulados'},[html.a({id:'signos_convencionales-link',href:''+absolutePath+'principal-signos_convencionales'},'Signos convencionales')]),
@@ -975,7 +977,7 @@ class AppSIGBA extends backend.AppBackend{
     encabezado(skinUrl,esPrincipal,req){
         var be = this;
         return html.div({id:'id-encabezado'},[
-            html.a({class:'encabezado',id:'barra-superior',href:''+absolutePath+''+'principal'},[
+            html.a({class:'encabezado',id:'barra-superior',href:''+absolutePath+'principal'},[
                 html.div({class:'encabezado-interno'},[
                     html.img({class:'encabezado',id:'bs-izq',src:skinUrl+'img/logo-ciudad.png'}),
                     html.img({class:'encabezado',id:'bs-der',src:skinUrl+'img/logo-BA.png'})
@@ -983,12 +985,12 @@ class AppSIGBA extends backend.AppBackend{
             ]),
             html.div({class:'encabezado',id:'barra-inferior'},
                 [].concat([
-                    html.a({class:'a-principal',href:''+absolutePath+''+'principal'},[html.img({class:'encabezado',id:'img-logo',src:skinUrl+'img/img-logo.png'})])
+                    html.a({class:'a-principal',href:''+absolutePath+'principal'},[html.img({class:'encabezado',id:'img-logo',src:skinUrl+'img/img-logo.png'})])
                 ]).concat(be.config['client-setup'].logos.map(function(logoName){
-                        return html.a({class:'a-principal',href:''+absolutePath+''+'principal'},[html.img({class:'encabezado',id:'logo-'+logoName,src:skinUrl+'img/img-logo-'+logoName+'.png'})]);
+                        return html.a({class:'a-principal',href:''+absolutePath+'principal'},[html.img({class:'encabezado',id:'logo-'+logoName,src:skinUrl+'img/img-logo-'+logoName+'.png'})]);
                 }).concat([be.config['client-setup'].conTextoPrincipal?html.div({class:'encabezado',id:'texto-encabezado-grande'}):null]).concat(
                     esPrincipal?html.div({class:'contiene-autonomias'},['auto0','auto1','auto2','auto3','auto5'].map(function(logo){
-                        var href=''+absolutePath+''+'principal'+'#'+logo;
+                        var href=''+absolutePath+'principal#'+logo;
                         var src=skinUrl+'img/'+logo+'.png';
                         return html.a({class:'autonomia-a',href:href},[html.img({class:'autonomia-img',src:src})])
                     })):null
