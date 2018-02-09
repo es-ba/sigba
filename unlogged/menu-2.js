@@ -45,11 +45,11 @@ function curarMatrix(matrix) {
 //TODO: si graficar totales depende de tabulado o indicador -> ponerle un campo en tabulado o indicador donde lo especifiquen, si depende del tipo de gráfico -> hacerlo en graphicator
 //no se grafican los totales actualmente
 function borrarTotales(matrix) {
-    if (matrix.lines[0].titles[0] == null && matrix.lines.length > 1) {
+    if (matrix.lines.length > 1 && matrix.lines[0].titles[0] == null) {
         matrix.lines.shift(); // borro linea totales
     }
 
-    if (matrix.columns[0].titles[0] == null && matrix.columns.length > 1) {
+    if (matrix.columns.length > 1 && matrix.columns[0].titles[0] == null) {
         matrix.columns.shift();
         matrix.lines.forEach(function (line) {
             line.cells.shift(); //borro la primera celda de cada uno (de totales)
@@ -61,27 +61,28 @@ function borrarTotales(matrix) {
 
 function showChart() {
     var tabulatorMatrix = getTabulatorMatrix();
-    var indexChart = 0;
+    var tabuladoInfo = getTabuladoInfo();
     var charts = [];
 
-    if (tabulatorMatrix.z.length > 10){
-        throw new Error('El máximo de gráficos a mostrar es 10, si la variable "z" es el año puede filtrar por año y ver el gráfico correspondiente');
+    if (!tabuladoInfo.grafico){
+        throw new Error('gráfico deshabilitado en tabla tabulados campo mostrar_grafico');
     }
 
     generateChartContainer(tabulatorMatrix.caption);
-    tabulatorMatrix.z.forEach(matrix => {
+    //se muestran solo los primeros 10 gráficos
+    tabulatorMatrix.z.slice(0,10).forEach((matrix, indexChart) => {
         matrix = curarMatrix(matrix);
 
         var generalConfig = {
             matrix: matrix,
-            tipo: getTabuladoInfo().tipo_grafico,
+            tipo: tabuladoInfo.tipo_grafico,
             idElemParaBindear: generateChartElementId(matrix, indexChart),
-            apilado: getTabuladoInfo().apilado,
-            um: getTabuladoInfo().um_denominacion || '',
+            apilado: tabuladoInfo.apilado,
+            um: tabuladoInfo.um_denominacion || '',
             c3Config: {
                 size: { width: window.innerWidth - document.getElementById("div-pantalla-izquierda").offsetWidth - 32 },
                 axis: {
-                    rotated: getTabuladoInfo().orientacion == 'vertical' ? true : false,
+                    rotated: tabuladoInfo.orientacion == 'vertical' ? true : false,
                 }
             }
         };
@@ -245,7 +246,11 @@ window.addEventListener('load', function () {
         } catch (error) {
             console.error('No es posible graficar el tabulado. ' + error);
         }
-        insertNewButton(buildExportExcelButton());
+        
+        if (getTabuladoInfo().cuadro){
+            insertNewButton(buildExportExcelButton());
+        }        
+        
         insertCopyUrlButton();
     }
 
