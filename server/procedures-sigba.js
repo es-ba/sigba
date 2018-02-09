@@ -72,7 +72,7 @@ ProceduresExamples = [
         coreFunction:function(context, parameters){
             var updateString="UPDATE tabulados set habilitado="+parameters.habilitar+
                 ' where indicador=$1 and cortantes=$2';
-            return context.client.query(inlineLog(updateString),[parameters.indicador,parameters.cortantes]
+            return context.client.query(updateString,[parameters.indicador,parameters.cortantes]
             ).fetchOneRowIfExists().then(function(result){
                 return result.rowCount;
             });
