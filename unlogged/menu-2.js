@@ -62,7 +62,7 @@ function renderChart() {
     var tabuladoInfo = getTabuladoInfo();
     var charts = [];
 
-    if (!tabuladoInfo.grafico) {
+    if (!tabuladoInfo.grafico && tabuladoInfo.tipo_grafico != 'piramide') {
         throw new Error('gráfico deshabilitado en tabla tabulados campo mostrar_grafico');
     }
 
@@ -79,6 +79,7 @@ function renderChart() {
     zMatrices.forEach(function (matrix, indexChart) {
         matrix = curarMatrix(matrix);
 
+        // ver interfaz graph-configuration.d.ts en graphicator
         var generalConfig = {
             matrix: matrix,
             tipo: tabuladoInfo.tipo_grafico,
@@ -94,7 +95,7 @@ function renderChart() {
         };
 
         // TODO: pensar cual es la mejor estrategia
-        var specificConfig = {}; // ver interfaz graph-configuration.d.ts en graphicator
+        var specificConfig = {}; 
         if (tabuladoInfo.tipo_grafico == 'piramide') {
             specificConfig = {
                 c3Config: {
