@@ -99,6 +99,7 @@ function showChart() {
         if (tabuladoInfo.tipo_grafico == 'piramide') {
             specificConfig = {
                 c3Config: {
+                    size: { width: 650},
                     axis: {
                         y: {
                             min: -maxZYValue,
