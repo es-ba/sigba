@@ -118,3 +118,66 @@ update tabulados t
   b.tipo_grafico is distinct from t.tipo_grafico or 
   b.orientacion is distinct from t.orientacion  
   );
+
+alter table "indicadores" add constraint  "indicadores fte REL " foreign key ("fte") references "fte" ("fte")  on update cascade;
+alter table "indicadores" add constraint  "indicadores um REL " foreign key ("um") references "um" ("um")  on update cascade;
+
+select 'tabulados' as table_name, enance_table('tabulados','indicador,cortantes') as result 
+ UNION select 'tabulados_variables' as table_name, enance_table('tabulados_variables','indicador,cortantes,variable') as result;
+ 
+--18/01/26 modificaciones en tabulados_variables
+alter table tabulados_variables
+drop column "orden_grafico",
+add column  "ubicacion_tabulado_serie" text, 
+add column "orden_tabulado_serie" integer, 
+add column "ubicacion_grafico_serie" text;
+
+
+
+---------------------01/02/2018
+set role to sigba_owner;
+set search_path=sigba;
+ALTER TABLE tabulados_variables drop constraint "valor invalido en ubicacion_tabulado";
+alter table "tabulados_variables" add constraint "valor invalido en ubicacion_tabulado" check (ubicacion_tabulado in ('fil', 'col'));
+alter table "tabulados_variables" add constraint "valor invalido en ubicacion_grafico_serie" check (ubicacion_grafico_serie in ('fil', 'col','z'));-- FKs
+alter table "tabulados_variables" add constraint "valor invalido en ubicacion_tabulado_serie" check (ubicacion_tabulado_serie in ('fil', 'col'));
+
+ALTER TABLE indicadores ADD COLUMN  grafico_principal boolean DEFAULT false
+
+
+create table "parametros" (
+  "unique_row" boolean NOT NULL, 
+  "nombre_principal" text, 
+  "cortante_principal" text NOT NULL
+, primary key ("unique_row")
+);
+grant select, update on "parametros" to "sigba_user";
+
+select 'parametros' as table_name, enance_table('parametros','unique_row') as result;
+insert into parametros (unique_row,nombre_principal,cortante_principal) values (true,'principal','sexo');
+
+alter table tabulados add column tabulado_principal boolean default false;
+alter table tabulados add column denominacion text; 
+alter table tabulados add column nota_pie text; 
+
+-------------------------------------------
+--02/02/2018--Corrí esto en producción
+
+SET role to sigba_owner;
+set search_path=sigba;
+
+alter table cortes add column signo_piramide integer default '1';
+alter table "cortes" add constraint "valor invalido en signo_piramide" check (signo_piramide in (1, -1));
+
+-------------- 07/02/2018 corrido en producción
+SET role to sigba_owner;
+set search_path=sigba;
+
+alter table indicadores add column a_principal boolean default false;
+alter table indicadores add column especial_principal  boolean default false; 
+alter table indicadores add column denominacion_principal text;
+alter table indicadores add column corte_principal text;
+alter table indicadores add column valor_principal text;
+
+
+ ---------------------------------------------------------------------
