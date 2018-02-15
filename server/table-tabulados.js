@@ -14,7 +14,7 @@ module.exports = function(context){
             {name:'cortantes'         , label:'Cortantes'       , typeName:'jsonb'    , allow:{ update:false}},
             {name:'habilitado'        , label:'Habilitado'      , typeName:'boolean'  , defaultValue:true},
             {name:'invalido'          , label:'Inválido'        , typeName:'boolean'  , defaultValue:false},
-            {name:'mostrar_cuadro'    , label:'Mostrar Cuadro'  , typeName:'boolean'  , defaultValue:true},
+            {name:'mostrar_cuadro'    , label:'Mostrar Cuadro'  , typeName:'boolean'  , defaultValue:true, visible:false},
             {name:'mostrar_grafico'   , label:'Mostrar Gráfico' , typeName:'boolean'  , defaultValue:true},
             {name:'tipo_grafico'      , label:'Tipo Gráfico'    , typeName:'text'     , defaultValue:'linea', },
             {name:'orientacion'       , label:'Orientación'     , typeName:'text'     , defaultValue:'horizontal'},
