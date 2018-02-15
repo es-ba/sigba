@@ -64,13 +64,21 @@ function showChart() {
     var tabuladoInfo = getTabuladoInfo();
     var charts = [];
 
-    if (!tabuladoInfo.grafico){
+    if (!tabuladoInfo.grafico) {
         throw new Error('gráfico deshabilitado en tabla tabulados campo mostrar_grafico');
     }
 
     generateChartContainer(tabulatorMatrix.caption);
     //se muestran solo los primeros 10 gráficos
-    tabulatorMatrix.z.slice(0,10).forEach((matrix, indexChart) => {
+    var zMatrices = tabulatorMatrix.z.slice(0, 10);
+    var minZYValue = Number.MAX_VALUE;
+    var maxZYValue = Number.MIN_VALUE;
+    zMatrices.forEach(function (zMatrix) {
+        let minMax = Graphicator.calcularMinMax(zMatrix);
+        maxZYValue = Math.max(minMax.max, maxZYValue);
+    });
+
+    zMatrices.forEach(function (matrix, indexChart) {
         matrix = curarMatrix(matrix);
 
         var generalConfig = {
@@ -88,6 +96,18 @@ function showChart() {
         };
 
         var specificConfig = {}; // ver interfaz graph-configuration.d.ts en graphicator
+        if (tabuladoInfo.tipo_grafico == 'piramide') {
+            specificConfig = {
+                c3Config: {
+                    axis: {
+                        y: {
+                            min: -maxZYValue,
+                            max: maxZYValue
+                        }
+                    }
+                }
+            }
+        }
         charts.push(Graphicator.render(changing(generalConfig, specificConfig)));
         indexChart++;
     });
@@ -96,23 +116,26 @@ function showChart() {
 function generateChartElementId(matrix, indexChart) {
     var chartElementId = 'chartElement' + indexChart;
     var chartElement = document.createElement('div');
+    chartElement.className = 'chartElement ' + getTabuladoInfo().tipo_grafico;
     chartElement.setAttribute('id', chartElementId);
 
-    if (matrix.caption){
+    if (matrix.caption) {
         var chartTitle = document.createElement('h3');
         chartTitle.innerText = matrix.caption;
         chartTitle.style.textAlign = 'center';
+        chartTitle.className = 'titulo-grafico-z';
         chartContainer().appendChild(chartTitle);
     }
     chartContainer().appendChild(chartElement);
-    
+
     return chartElementId
 }
 
-function generateChartContainer(caption) {
+function generateChartContainer(titleText) {
     var chartTitle = document.createElement('h3');
-    chartTitle.innerText = caption;
+    chartTitle.innerText = titleText;
     chartTitle.style.textAlign = 'center';
+    chartTitle.className = 'titulo-contenedor-graficos';
 
     var chartContainer = document.createElement('div');
     chartContainer.setAttribute('id', 'chartContainer');
@@ -246,11 +269,7 @@ window.addEventListener('load', function () {
         } catch (error) {
             console.error('No es posible graficar el tabulado. ' + error);
         }
-        
-        if (getTabuladoInfo().cuadro){
-            insertNewButton(buildExportExcelButton());
-        }        
-        
+        insertNewButton(buildExportExcelButton());
         insertCopyUrlButton();
     }
 

@@ -708,7 +708,6 @@ class AppSIGBA extends backend.AppBackend{
                                                     ]),
                                                     ((fila.habilitado) || esAdmin)?html.div({
                                                         id:'tabulado-html',
-                                                        class: tabuladoDescripcionMatriz.descripcionTabulado.cuadro? '': 'hide-tabulado-cuadro',
                                                         'para-graficador':JSON.stringify(matrix),
                                                         'info-tabulado':JSON.stringify(descripcion)
                                                     },[tabuladoHtml]):null,
