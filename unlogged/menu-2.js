@@ -48,18 +48,16 @@ function borrarTotales(matrix) {
     if (matrix.lines.length > 1 && matrix.lines[0].titles[0] == null) {
         matrix.lines.shift(); // borro linea totales
     }
-
     if (matrix.columns.length > 1 && matrix.columns[0].titles[0] == null) {
         matrix.columns.shift();
         matrix.lines.forEach(function (line) {
             line.cells.shift(); //borro la primera celda de cada uno (de totales)
         });
     }
-
     return matrix;
 }
 
-function showChart() {
+function renderChart() {
     var tabulatorMatrix = getTabulatorMatrix();
     var tabuladoInfo = getTabuladoInfo();
     var charts = [];
@@ -95,6 +93,7 @@ function showChart() {
             }
         };
 
+        // TODO: pensar cual es la mejor estrategia
         var specificConfig = {}; // ver interfaz graph-configuration.d.ts en graphicator
         if (tabuladoInfo.tipo_grafico == 'piramide') {
             specificConfig = {
@@ -162,10 +161,26 @@ function tabuladoElement() {
 
 function toggleChartTabuladoDisplay() {
     //changing url accordingly without reolading page
-    var newUrl = window.location.search.includes(displayChartParamName) ? location.href.replace(displayChartParamName, '') : location.href + displayChartParamName;
-    window.history.pushState("Cambiar visualización entre gráfico y tabulado", "Visualización", newUrl);
-
+    if(window.location.search.includes(displayChartParamName)){
+        toggleToChart();
+    }else{
+        toggleToTabulado();
+    }
     updateVisualization();
+}
+
+function toggleToTabulado(){
+    var newUrl = window.location.search.includes(displayChartParamName) ? location.href.replace(displayChartParamName, '') : location.href;
+    updateUrlState(newUrl);
+}
+
+function toggleToChart(){
+    var newUrl = window.location.search.includes(displayChartParamName) ? location.href : location.href + displayChartParamName;
+    updateUrlState(newUrl);
+}
+
+function updateUrlState(newUrl){
+    window.history.pushState("Cambiar visualización entre gráfico y tabulado", "Visualización", newUrl);
 }
 
 // when browser back or next button are used
@@ -263,8 +278,12 @@ function insertCopyUrlButton() {
 window.addEventListener('load', function () {
     if (tabuladoElement()) {
         try {
-            showChart();
-            insertNewButton(buildToggleButton());
+            renderChart();
+            if (getTabuladoInfo().tipo_grafico == 'piramide') {
+                toggleToChart();
+            } else {
+                insertNewButton(buildToggleButton());
+            }
             updateVisualization();
         } catch (error) {
             console.error('No es posible graficar el tabulado. ' + error);

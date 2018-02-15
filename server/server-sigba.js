@@ -476,7 +476,7 @@ class AppSIGBA extends backend.AppBackend{
                 var query = req.url.slice(req.path.length);
                 res.redirect(301, req.path.slice(0, -1) + query);
             } else {
-                next();
+                return next();
             }
         });
         var be = this;
@@ -707,7 +707,8 @@ class AppSIGBA extends backend.AppBackend{
                                                         html.div({class:'botones-tabulado-descripcion'})
                                                     ]),
                                                     ((fila.habilitado) || esAdmin)?html.div({
-                                                        id:'tabulado-html',
+                                                        id:'tabulado-html',     
+                                                        class: tabuladoDescripcionMatriz.descripcionTabulado.tipo_grafico == 'piramide' ? '': 'hide-tabulado-cuadro',
                                                         'para-graficador':JSON.stringify(matrix),
                                                         'info-tabulado':JSON.stringify(descripcion)
                                                     },[tabuladoHtml]):null,
@@ -1075,7 +1076,9 @@ class AppSIGBA extends backend.AppBackend{
 process.on('uncaughtException', function(err){
   console.log("Caught exception:",err);
   console.log(err.stack);
+  /*eslint-disable no-process-exit */
   process.exit(1);
+  /*eslint-enable no-process-exit */
 });
 
 process.on('unhandledRejection', function(err){
