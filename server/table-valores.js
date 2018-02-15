@@ -47,7 +47,7 @@ module.exports = function(context){
             {name:'t_prest'        ,isSlicer:true, label:'Tipo de prestación'                    , typeName:'text'},
             {name:'fte_ingr'       ,isSlicer:true, label:'Fuente de ingreso'                     , typeName:'text'},
             {name:'g_g_activ'      ,isSlicer:true, label:'Grandes grupos de actividad'           , typeName:'text'},
-            {name:'cortes'         ,isSlicer:true, label:'Cortes'  , typeName:'jsonb', allow:{select: true,insert:false, update:false}},
+            {name:'cortes'         ,isSlicer:true, label:'Cortes'  , typeName:'jsonb', nullable:true, allow:{select: true,insert:false, update:false}},
             {name:'cortantes'      ,isSlicer:true, label:'Cortantes'                             , typeName:'jsonb', allow:{select: true,insert:false, update:false}},
             {name:'usu_validacion'                                                               , typeName:'text' , allow:{select: true,insert:false, update:false}},
             {name:'fecha_validacion'                                                             , typeName:'timestamp', allow:{select: true,insert:false, update:false}},
