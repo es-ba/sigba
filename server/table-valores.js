@@ -41,6 +41,7 @@ module.exports = function(context){
             {name:'quin_ingr_fliar',isSlicer:true, label:'Quintil de ingreso per cápita familiar', typeName:'text'},
             {name:'l_nac'          ,isSlicer:true, label:'Lugar de nacimiento'                   , typeName:'text'},
             {name:'sexo_nac'       ,isSlicer:true, label:'Sexo por Lugar de nacimiento'          , typeName:'text'},
+            {name:'sexo_asis'      ,isSlicer:true, label:'Sexo por asistencia'                   , typeName:'text'},
             {name:'t_cob_sal'      ,isSlicer:true, label:'Tipo de cobertura de salud'            , typeName:'text'},
             {name:'c_activ'        ,isSlicer:true, label:'Condición de actividad'                , typeName:'text'},
             {name:'t_activ'        ,isSlicer:true, label:'Tipo de actividad'                     , typeName:'text'},
