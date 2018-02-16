@@ -247,9 +247,6 @@ class AppSIGBA extends backend.AppBackend{
                                                 cortantePrincipalEspecial=' cortes->>'+'\''+registro.corte_principal+'\''+' = '+'\''+registro.valor_principal+'\'';
                                             }
                                             sqlPrincipal=sqlPrincipal+cortantePrincipalSql+' and '+cortantePrincipalEspecial+' order by cortes ';
-                                            if(registro.indicador=='est_pob'){
-                                                console.log("3333333333333333333333",sqlPrincipal)
-                                            }
                                             return client.query(sqlPrincipal
                                             //`select * from celdas where indicador=$1 and cortantes in ('{"annio":true}','{"annio":true,"sexo":true}') 
                                             //    and cortes->>'annio' = $2 order by cortes`
@@ -311,11 +308,19 @@ class AppSIGBA extends backend.AppBackend{
                                                     }
                                                     return be.traerInfoTabulado(client,registro.indicador, annioPrincipal,tabulado).then(function(tabulado){
                                                         return be.armaMatrices(client, tabulado, annioPrincipal, registro.indicador)
-                                                    }).then(function(matrices){
-                                                        controles.filasEnDimension[registro.dimension][
-                                                         Math.max(0, controles.filasEnDimension[registro.dimension].length-6)
-                                                        ].content.push(html.td({rowspan:6, class:'box-grafico-principal','para-graficador':JSON.stringify(matrices.matrixGraf)},html.img({src:skinUrl+"img/grafico-ejemplo.png"})));
-                                                        return matrices.matrixGraf;
+                                                    }).then(function(matrix){
+                                                        var matrixGrafico=matrix.matrixGraf
+                                                        return be.traeInfoMatrix(client,registro.indicador).then(function(infoMatrixGraf){
+                                                            controles.filasEnDimension[registro.dimension][
+                                                                Math.max(0, controles.filasEnDimension[registro.dimension].length-6)
+                                                            ].content.push(html.td({
+                                                                rowspan:6, 
+                                                                class:'box-grafico-principal',
+                                                                'para-graficador':JSON.stringify(matrixGrafico),
+                                                                'info-tabulado':JSON.stringify(infoMatrixGraf)
+                                                            },html.img({src:skinUrl+"img/grafico-ejemplo.png"})));
+                                                            return matrixGrafico;
+                                                        })
                                                     });
                                                 }
                                             })
@@ -437,6 +442,34 @@ class AppSIGBA extends backend.AppBackend{
             })
         })
     }
+    
+    
+    
+    
+    traeInfoMatrix(client,indicador){
+        return client.query(
+            "SELECT i.denominacion as i_denom ,i.con_nota_pie con_nota, f.denominacion as f_denom, u.denominacion as u_denom,u.um as um,u.nota_pie nota_pie, i.decimales FROM indicadores i " 
+                +"\n LEFT JOIN fte f ON f.fte=i.fte " 
+                +"\n LEFT JOIN um u ON u.um=i.um "
+                +"\n WHERE indicador=$1",
+            [indicador]
+        ).fetchOneRowIfExists().then(function(result){
+            var infoIndicador=result.row;
+            return {
+                i_denom:infoIndicador.i_denom,
+                con_nota:infoIndicador.con_nota,
+                f_denom:infoIndicador.f_denom,
+                u_denom:infoIndicador.u_denom,
+                um:infoIndicador.um,
+                nota_pie:infoIndicador.nota_pie,
+                decimales:infoIndicador.decimales
+            }
+        })
+    }
+    
+    
+    
+    
     anniosCortantes(client,annios,anniosA,indicador){
         var sql = "SELECT distinct valor_corte annio FROM cortes_celdas "+
             "WHERE variable = 'annio'"+ (indicador?" and indicador = $1": "")+
@@ -607,8 +640,7 @@ class AppSIGBA extends backend.AppBackend{
                     
                     return tabulado;
                 
-                }).then(function(){    
-                    
+                }).then(function(){
                     return client.query(
                         "SELECT habilitado,mostrar_cuadro cuadro,mostrar_grafico grafico, tipo_grafico,orientacion,apilado "+
                         "FROM tabulados WHERE indicador=$1 AND cortantes=$2"
@@ -669,13 +701,7 @@ class AppSIGBA extends backend.AppBackend{
                             return JSON.stringify(tabulado.cortantes) == cortante; 
                         })[0];
                         return be.armaMatrices(client, fila, annio, indicador).then(function(matrices){
-                            return client.query(
-                                "SELECT i.denominacion as i_denom ,i.con_nota_pie con_nota, f.denominacion as f_denom, u.denominacion as u_denom,u.um as um,u.nota_pie nota_pie, i.decimales FROM indicadores i " 
-                                    +"\n LEFT JOIN fte f ON f.fte=i.fte " 
-                                    +"\n LEFT JOIN um u ON u.um=i.um "
-                                    +"\n WHERE indicador=$1",
-                                [indicador]
-                            ).fetchOneRowIfExists().then(function(result){
+                            return be.traeInfoMatrix(client,indicador).then(function(infoParaTabulado){
                                 var descripcionTabulado={};
                                 descripcionTabulado={
                                     indicador:indicador,
@@ -687,15 +713,15 @@ class AppSIGBA extends backend.AppBackend{
                                     tipo_grafico:fila.tipo_grafico,
                                     orientacion:fila.orientacion,
                                     apilado:fila.apilado,
-                                    indicador_denom:result.row.i_denom,
-                                    nota_pie:result.row.con_nota?result.row.nota_pie:null,
-                                    fuente:result.row.f_denom,
-                                    um_denominacion:result.row.u_denom,
-                                    um:result.row.um,
-                                    decimales:result.row.decimales
+                                    indicador_denom:infoParaTabulado.i_denom,
+                                    nota_pie:infoParaTabulado.con_nota?infoParaTabulado.nota_pie:null,
+                                    fuente:infoParaTabulado.f_denom,
+                                    um_denominacion:infoParaTabulado.u_denom,
+                                    um:infoParaTabulado.um,
+                                    decimales:infoParaTabulado.decimales
                                 };
-                                matrices.matrixTab.caption=result.row.i_denom;
-                                matrices.matrixGraf.caption=result.row.i_denom;
+                                matrices.matrixTab.caption=infoParaTabulado.i_denom;
+                                matrices.matrixGraf.caption=infoParaTabulado.i_denom;
                                 return {matrices,descripcionTabulado};
                             }).then(function(matricesYDescripcion){
                                 var matrices=matricesYDescripcion.matrices;
