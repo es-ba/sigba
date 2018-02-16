@@ -255,13 +255,14 @@ class AppSIGBA extends backend.AppBackend{
                                             }).then(function(matrix){
                                                 var matrixGrafico=matrix.matrixGraf
                                                 return be.traeInfoMatrix(client,registro.indicador).then(function(infoMatrixGraf){
+                                                    tabulado=changing(tabulado,infoMatrixGraf);
                                                     controles.filasEnDimension[registro.dimension][
                                                         Math.max(0, controles.filasEnDimension[registro.dimension].length-6)
                                                     ].content.push(html.td({
                                                         rowspan:6, 
                                                         class:'box-grafico-principal',
                                                         'para-graficador':JSON.stringify(matrixGrafico),
-                                                        'info-tabulado':JSON.stringify(infoMatrixGraf)
+                                                        'info-tabulado':JSON.stringify(tabulado)
                                                     },html.img({src:skinUrl+"img/grafico-ejemplo.png"})));
                                                     return matrixGrafico;
                                                 })
