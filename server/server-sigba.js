@@ -275,8 +275,9 @@ class AppSIGBA extends backend.AppBackend{
                                             return valCeldasPrincipal;
                                         }).then(function(valoresPrincipal){
                                             valoresPrincipal.forEach(function(valorPrincipal){
-                                                listaTdValores.push(html.td({class:'td-valores'},be.decimalesYComa(valorPrincipal.valor,registro.decimales,',')));
-                                                //listaTdValores.push(html.td({class:'td-valores'},valorPrincipal.valor));
+                                                var indicadorAnnio
+                                                var valorReporteBonito=(valorPrincipal.valor==null)?'///':be.puntosEnMiles(be.decimalesYComa(valorPrincipal.valor,registro.decimales,','));
+                                                listaTdValores.push(html.td({class:'td-valores'},valorReporteBonito));
                                             })
                                             controles.filasEnDimension[registro.dimension]=controles.filasEnDimension[registro.dimension]||[];
                                             if(!controles.elegidoEnDimension[registro.dimension] && registro.grafico_principal){
