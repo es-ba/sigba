@@ -192,9 +192,8 @@ class AppSIGBA extends backend.AppBackend{
                            });
                         }
                         return obtenerValores.then(function(valores){
-                            var listaTdValores=[];
                             return Promise.all(valores.map(function(rowValor){
-                                return Promise.resolve().then(function(){
+                                /*return Promise.resolve().then(function(){
                                     var valorRow=rowValor.valor;
                                     var annioRow=rowValor.annio;
                                     var indicadorAnnio=rowValor.indicador;
@@ -203,41 +202,7 @@ class AppSIGBA extends backend.AppBackend{
                                     var aAtribute={class:'link-cortantes',href:''+absolutePath+''+urlYClasesTabulados+'-indicador?annio='+annioRow+'&indicador='+(registro.indicador||'')};
                                     var divAttribute={class:'cortante-no-dato'};
                                     var tdAttribute={class:'td-valores'};
-                                    var divDespliegueEspecial=null;
                                     return Promise.resolve().then(function(){
-                                        if(despliegueEspecial){
-                                            var var_despliegueEspecial=rowValor.var_despliegue_especial;
-                                            return client.query(
-                                                "SELECT i.indicador indicador, i.denominacion denominacion_indicador,i.decimales, valor,i.var_despliegue_especial variable,z.cortes, c.denominacion categoria "+
-                                                    "FROM celdas z "+
-                                                    "LEFT JOIN indicadores i ON z.indicador=i.indicador "+
-                                                    "LEFT JOIN cortes_celdas cc on cc.indicador=z.indicador AND cc.cortes=z.cortes AND cc.variable=$3"+
-                                                    "LEFT JOIN cortes_celdas ca on ca.indicador=z.indicador AND ca.cortes=z.cortes AND ca.variable='annio'"+
-                                                    "LEFT JOIN cortes c on c.variable=$3 AND cc.valor_corte=c.valor_corte "+
-                                                    "WHERE i.indicador=$1 AND ca.valor_corte=$2 AND "+
-                                                        "ARRAY['annio',i.var_despliegue_especial]=ARRAY(SELECT jsonb_object_keys(z.cortantes))"+
-                                                        "ORDER BY c.orden",
-                                                [registro.indicador,rowValor.annio, var_despliegueEspecial]
-                                            )
-                                            .fetchAll().then(function(datos){
-                                                return datos 
-                                            }).then(function(datos){
-                                                datos.rows.forEach(function(row){
-                                                    row.valor=be.puntosEnMiles(be.decimalesYComa(row.valor,row.decimales,','));
-                                                })
-                                                tdAttribute['despliegue-especial']=true;
-                                                divDespliegueEspecial=html.div({
-                                                    id:registro.indicador+'_'+rowValor.annio,
-                                                    'div-despliegue-especial':true,
-                                                    'especial-info':registro.indicador+'_'+rowValor.annio,
-                                                    'valores-especiales':JSON.stringify(datos.rows)
-                                                });
-                                                return divDespliegueEspecial
-                                            });
-                                        }else{
-                                            return divDespliegueEspecial;
-                                        }
-                                    }).then(function(){
                                         var valorReporteBonito;
                                         valorReporteBonito=(valorRow==null)?(!indicadorAnnio?'///':'...'):be.puntosEnMiles(valorFormateado);
                                         var aAttributes={class:'link-cortantes',href:''+absolutePath+''+urlYClasesTabulados+'-indicador?annio='+annioRow+'&indicador='+(registro.indicador||'')}
@@ -250,7 +215,7 @@ class AppSIGBA extends backend.AppBackend{
                                             html.a(aAttributes,valorReporteBonito):
                                             html.div(divAttributes,valorReporteBonito);
                                     });
-                                });
+                                });*/
                             })).then(function(){
                                 if(defTables[0].color){
                                     color=registro.agrupacion_principal;
@@ -277,10 +242,14 @@ class AppSIGBA extends backend.AppBackend{
                                             var cortantePrincipalSql='\''+'{"annio":true,"sexo":true}'+'\')';
                                             var cortantePrincipalEspecial='true';
                                             if(registro.especial_principal){
-                                                cortantePrincipalSql='\''+'{"annio":true,'+'"'+registro.corte_principal+'":true}'+'\')';
+                                                cortantePrincipalSql='\''+'{"annio":true,'+'"'+registro.corte_principal+'":true}\''+
+                                                ' ,\'{"annio":true,'+'"'+registro.corte_principal+'":true,"sexo":true}'+'\')';
                                                 cortantePrincipalEspecial=' cortes->>'+'\''+registro.corte_principal+'\''+' = '+'\''+registro.valor_principal+'\'';
                                             }
                                             sqlPrincipal=sqlPrincipal+cortantePrincipalSql+' and '+cortantePrincipalEspecial+' order by cortes ';
+                                            if(registro.indicador=='est_pob'){
+                                                console.log("3333333333333333333333",sqlPrincipal)
+                                            }
                                             return client.query(sqlPrincipal
                                             //`select * from celdas where indicador=$1 and cortantes in ('{"annio":true}','{"annio":true,"sexo":true}') 
                                             //    and cortes->>'annio' = $2 order by cortes`
