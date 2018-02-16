@@ -156,7 +156,7 @@ class AppSIGBA extends backend.AppBackend{
                             return html.td(attributes,[
                                     htmlIcono,
                                     html.span({id:id, class:'ancla'},"\u00a0"),
-                                    html.a(htmlA,registro[nombreCampo]),
+                                    html.a(htmlA,registro.denominacion_principal?registro.denominacion_principal:registro[nombreCampo]),
                                     registro.indicador?informacionIndicador:null,
                                     registro.agrupacion_principal?informacionAgrupacionPrincipal:null
                                 ]);
@@ -306,7 +306,8 @@ class AppSIGBA extends backend.AppBackend{
                                             return valCeldasPrincipal;
                                         }).then(function(valoresPrincipal){
                                             valoresPrincipal.forEach(function(valorPrincipal){
-                                                listaTdValores.push(html.td({class:'td-valores'},valorPrincipal.valor));
+                                                listaTdValores.push(html.td({class:'td-valores'},be.decimalesYComa(valorPrincipal.valor,registro.decimales,',')));
+                                                //listaTdValores.push(html.td({class:'td-valores'},valorPrincipal.valor));
                                             })
                                             controles.filasEnDimension[registro.dimension]=controles.filasEnDimension[registro.dimension]||[];
                                             if(!controles.elegidoEnDimension[registro.dimension] && registro.grafico_principal){
