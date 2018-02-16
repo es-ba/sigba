@@ -162,176 +162,118 @@ class AppSIGBA extends backend.AppBackend{
                                 ]);
                             })
                         );
-                        return listaTd;
-                    }).then(function(listaTd){
-                        var obtenerValores=Promise.resolve([]);
-                        if(defTables[0].mostrarIndicadoresYLinks){
-                            var decimales=registro.decimales||'';
-                            obtenerValores=client.query(
-                                `with 
-                                annios as (
-                                    SELECT valor_corte annio from cortes where variable = 'annio'                                    
-                                    ),
-                                data as (
-                                    SELECT cc.valor_corte annio, v.valor , ct.cant_cortantes, i.despliegue_especial,i.var_despliegue_especial
-                                        FROM sigba.celdas v
-                                         LEFT JOIN cortes_celdas cc ON cc.indicador=v.indicador and cc.cortes=v.cortes
-                                         LEFT JOIN indicadores i ON i.indicador=v.indicador, LATERAL 
-                                            (SELECT ccc.valor_corte ,count(distinct cortantes) cant_cortantes FROM sigba.celdas vv
-                                            LEFT JOIN cortes_celdas ccc ON ccc.indicador=vv.indicador and ccc.cortes=vv.cortes
-                                            WHERE ccc.valor_corte=cc.valor_corte and vv.indicador=$1 group by ccc.valor_corte ) ct
-                                        WHERE v.indicador=$1 AND cortantes = '{"annio":true}'::jsonb order by annio
-                                    ),
-                                indic_annio as (select indicador,annio from indicador_annio where indicador=$1 )
-                                SELECT a.annio, d.valor, d.cant_cortantes,d.despliegue_especial,d.var_despliegue_especial,indic_annio.indicador
-                                from annios a left join data d on a.annio=d.annio left join indic_annio on a.annio=indic_annio.annio
-                                order by a.annio desc                                   ;`,
-                               [registro.indicador||'']
-                           ).fetchAll().then(function(result){
-                               return result.rows;
-                           });
+                    }).then(function(){
+                        if(defTables[0].color){
+                            color=registro.agrupacion_principal;
                         }
-                        return obtenerValores.then(function(valores){
-                            return Promise.all(valores.map(function(rowValor){
-                                /*return Promise.resolve().then(function(){
-                                    var valorRow=rowValor.valor;
-                                    var annioRow=rowValor.annio;
-                                    var indicadorAnnio=rowValor.indicador;
-                                    var despliegueEspecial=rowValor.despliegue_especial;
-                                    var valorFormateado=be.decimalesYComa(valorRow,decimales,',');
-                                    var aAtribute={class:'link-cortantes',href:''+absolutePath+''+urlYClasesTabulados+'-indicador?annio='+annioRow+'&indicador='+(registro.indicador||'')};
-                                    var divAttribute={class:'cortante-no-dato'};
-                                    var tdAttribute={class:'td-valores'};
-                                    return Promise.resolve().then(function(){
-                                        var valorReporteBonito;
-                                        valorReporteBonito=(valorRow==null)?(!indicadorAnnio?'///':'...'):be.puntosEnMiles(valorFormateado);
-                                        var aAttributes={class:'link-cortantes',href:''+absolutePath+''+urlYClasesTabulados+'-indicador?annio='+annioRow+'&indicador='+(registro.indicador||'')}
-                                        var divAttributes={class:'cortante-no-dato'};
-                                        if(despliegueEspecial){
-                                            aAttributes['a-despliegue-especial']=true;
-                                            divAttributes['div-externo-despliegue-especial']=true;
-                                        }
-                                        var aODiv=(rowValor.cant_cortantes>1)?
-                                            html.a(aAttributes,valorReporteBonito):
-                                            html.div(divAttributes,valorReporteBonito);
-                                    });
-                                });*/
-                            })).then(function(){
-                                if(defTables[0].color){
-                                    color=registro.agrupacion_principal;
-                                }
-                                if(listaTrHijos.length==0 && defTables.length==3){
-                                    listaTrHijos=[html.tr({class:'renglon-vacio'},[
-                                        html.td({colspan:5,class:'renglon-vacio'}),
-                                        html.td({colspan:likeAr(annios).array().length,class:'renglon-vacio'})])];
-                                }
-                                var recienElegido;
-                                var obtenerValoresPrincipal=Promise.resolve([]);
-                                var annioPrincipal;
-                                if(table==='indicadores'){
-                                    var listaTdValores=[];
-                                    var ultimoAnnioDisponible;
-                                    var obtenerValoresPrincipal=client.query(
-                                        `select max(cortes->>'annio') annio from celdas where indicador=$1`,[registro.indicador]
-                                        ).fetchOneRowIfExists().then(function(result){
-                                            ultimoAnnioDisponible=result.row.annio;
-                                        }).then(function(){
-                                            var sqlPrincipal="SELECT * FROM celdas WHERE indicador=$1 AND cortes->>'annio' = $2 and "+
-                                            "cortantes in ('{\"annio\":true}',";
-                                            var condicionPrincipal;
-                                            var cortantePrincipalSql='\''+'{"annio":true,"sexo":true}'+'\')';
-                                            var cortantePrincipalEspecial='true';
-                                            if(registro.especial_principal){
-                                                cortantePrincipalSql='\''+'{"annio":true,'+'"'+registro.corte_principal+'":true}\''+
-                                                ' ,\'{"annio":true,'+'"'+registro.corte_principal+'":true,"sexo":true}'+'\')';
-                                                cortantePrincipalEspecial=' cortes->>'+'\''+registro.corte_principal+'\''+' = '+'\''+registro.valor_principal+'\'';
-                                            }
-                                            sqlPrincipal=sqlPrincipal+cortantePrincipalSql+' and '+cortantePrincipalEspecial+' order by cortes ';
-                                            return client.query(sqlPrincipal
-                                            //`select * from celdas where indicador=$1 and cortantes in ('{"annio":true}','{"annio":true,"sexo":true}') 
-                                            //    and cortes->>'annio' = $2 order by cortes`
-                                            ,[registro.indicador,ultimoAnnioDisponible]
-                                        ).fetchAll().then(function(result){
-                                            var filasValoresAPrincipal=result.rows;
-                                            var valCeldasPrincipal=[];
-                                            var indiceCeldasPrincipal={'null': 0};
-                                            valCeldasPrincipal[indiceCeldasPrincipal['null']]={valor:null};
-                                            be.cortantesEnPrincipal.categoriasPrincipalArr.forEach(function(categoria,i){
-                                                indiceCeldasPrincipal[categoria.valor]=i+1; 
-                                                valCeldasPrincipal[i+1]={valor:null};
-                                            });
-                                            filasValoresAPrincipal.forEach(function(filaAPrincipal){
-                                                if(!(be.cortantesEnPrincipal.cortantePrincipal in filaAPrincipal.cortes)){
-                                                    valCeldasPrincipal[indiceCeldasPrincipal['null']]=filaAPrincipal;
-                                                }else{
-                                                    valCeldasPrincipal[indiceCeldasPrincipal[filaAPrincipal.cortes[be.cortantesEnPrincipal.cortantePrincipal]]]=filaAPrincipal;
-                                                }
-                                            });
-                                            annioPrincipal=ultimoAnnioDisponible;
-                                            listaTdValores.push(html.td({class:'td-valores'},annioPrincipal));
-                                            return valCeldasPrincipal;
-                                        }).then(function(valoresPrincipal){
-                                            valoresPrincipal.forEach(function(valorPrincipal){
-                                                var indicadorAnnio
-                                                var valorReporteBonito=(valorPrincipal.valor==null)?'///':be.puntosEnMiles(be.decimalesYComa(valorPrincipal.valor,registro.decimales,','));
-                                                listaTdValores.push(html.td({class:'td-valores'},valorReporteBonito));
-                                            })
-                                            controles.filasEnDimension[registro.dimension]=controles.filasEnDimension[registro.dimension]||[];
-                                            if(!controles.elegidoEnDimension[registro.dimension] && registro.grafico_principal){
-                                                listaTdValores.push(html.td({class:'sennial-indicador-elegido-grafico'}));
-                                                controles.elegidoEnDimension[registro.dimension]=true;
-                                                recienElegido=true;
-                                            }else{ 
-                                                listaTdValores.push(html.td({class:'sin-sennial-indicador-elegido-grafico'}));
-                                            }
-                                            return listaTdValores;
-                                        })
-                                    })
-                                }
-                                return obtenerValoresPrincipal.then(function(listaDeseada){
-                                    var estaFila=html.tr({class:'nivel-titulo',"nivel-titulo": defTables.length, "color-agrupacion_principal":color||'otro'},listaTd.concat(listaDeseada))
-                                    var obtenerTabuladoPrincipal=Promise.resolve([]);
-                                    if(table==='indicadores'){
-                                        controles.filasEnDimension[registro.dimension].push(estaFila);
-                                        if(recienElegido){
-                                            obtenerTabuladoPrincipal=client.query(
-                                                `SELECT * from tabulados WHERE indicador=$1 AND tabulado_principal IS TRUE`,
-                                                [registro.indicador]
-                                            ).fetchOneRowIfExists().then(function(result){
-                                                if(result.row){
-                                                    var cortantes=result.row.cortantes;
-                                                    var cantidad_cortantes=Object.keys(cortantes).length;
-                                                    var tabulado={
-                                                        indicador:registro.indicador,
-                                                        cortantes:cortantes,
-                                                        cantidad_cortantes:cantidad_cortantes
-                                                    }
-                                                    return be.traerInfoTabulado(client,registro.indicador, annioPrincipal,tabulado).then(function(tabulado){
-                                                        return be.armaMatrices(client, tabulado, annioPrincipal, registro.indicador)
-                                                    }).then(function(matrix){
-                                                        var matrixGrafico=matrix.matrixGraf
-                                                        return be.traeInfoMatrix(client,registro.indicador).then(function(infoMatrixGraf){
-                                                            controles.filasEnDimension[registro.dimension][
-                                                                Math.max(0, controles.filasEnDimension[registro.dimension].length-6)
-                                                            ].content.push(html.td({
-                                                                rowspan:6, 
-                                                                class:'box-grafico-principal',
-                                                                'para-graficador':JSON.stringify(matrixGrafico),
-                                                                'info-tabulado':JSON.stringify(infoMatrixGraf)
-                                                            },html.img({src:skinUrl+"img/grafico-ejemplo.png"})));
-                                                            return matrixGrafico;
-                                                        })
-                                                    });
-                                                }
-                                            })
-                                        }
+                        if(listaTrHijos.length==0 && defTables.length==3){
+                            listaTrHijos=[html.tr({class:'renglon-vacio'},[
+                                html.td({colspan:5,class:'renglon-vacio'}),
+                                html.td({colspan:likeAr(annios).array().length,class:'renglon-vacio'})])];
+                        }
+                        var recienElegido;
+                        var obtenerValoresPrincipal=Promise.resolve([]);
+                        var annioPrincipal;
+                        if(table==='indicadores'){
+                            var listaTdValores=[];
+                            var ultimoAnnioDisponible;
+                            var obtenerValoresPrincipal=client.query(
+                                `select max(cortes->>'annio') annio from celdas where indicador=$1`,[registro.indicador]
+                                ).fetchOneRowIfExists().then(function(result){
+                                    ultimoAnnioDisponible=result.row.annio;
+                                }).then(function(){
+                                    var sqlPrincipal="SELECT * FROM celdas WHERE indicador=$1 AND cortes->>'annio' = $2 and "+
+                                    "cortantes in ('{\"annio\":true}',";
+                                    var condicionPrincipal;
+                                    var cortantePrincipalSql='\''+'{"annio":true,"sexo":true}'+'\')';
+                                    var cortantePrincipalEspecial='true';
+                                    if(registro.especial_principal){
+                                        cortantePrincipalSql='\''+'{"annio":true,'+'"'+registro.corte_principal+'":true}\''+
+                                        ' ,\'{"annio":true,'+'"'+registro.corte_principal+'":true,"sexo":true}'+'\')';
+                                        cortantePrincipalEspecial=' cortes->>'+'\''+registro.corte_principal+'\''+' = '+'\''+registro.valor_principal+'\'';
                                     }
-                                    return obtenerTabuladoPrincipal.then(function(){
-                                        return [estaFila].concat(listaTrHijos);
+                                    sqlPrincipal=sqlPrincipal+cortantePrincipalSql+' and '+cortantePrincipalEspecial+' order by cortes ';
+                                    return client.query(sqlPrincipal
+                                    ,[registro.indicador,ultimoAnnioDisponible]
+                                ).fetchAll().then(function(result){
+                                    var filasValoresAPrincipal=result.rows;
+                                    var valCeldasPrincipal=[];
+                                    var indiceCeldasPrincipal={'null': 0};
+                                    valCeldasPrincipal[indiceCeldasPrincipal['null']]={valor:null};
+                                    be.cortantesEnPrincipal.categoriasPrincipalArr.forEach(function(categoria,i){
+                                        indiceCeldasPrincipal[categoria.valor]=i+1; 
+                                        valCeldasPrincipal[i+1]={valor:null};
+                                    });
+                                    filasValoresAPrincipal.forEach(function(filaAPrincipal){
+                                        if(!(be.cortantesEnPrincipal.cortantePrincipal in filaAPrincipal.cortes)){
+                                            valCeldasPrincipal[indiceCeldasPrincipal['null']]=filaAPrincipal;
+                                        }else{
+                                            valCeldasPrincipal[indiceCeldasPrincipal[filaAPrincipal.cortes[be.cortantesEnPrincipal.cortantePrincipal]]]=filaAPrincipal;
+                                        }
+                                    });
+                                    annioPrincipal=ultimoAnnioDisponible;
+                                    listaTdValores.push(html.td({class:'td-valores'},annioPrincipal));
+                                    return valCeldasPrincipal;
+                                }).then(function(valoresPrincipal){
+                                    valoresPrincipal.forEach(function(valorPrincipal){
+                                        var indicadorAnnio
+                                        var valorReporteBonito=(valorPrincipal.valor==null)?'///':be.puntosEnMiles(be.decimalesYComa(valorPrincipal.valor,registro.decimales,','));
+                                        listaTdValores.push(html.td({class:'td-valores'},valorReporteBonito));
                                     })
+                                    controles.filasEnDimension[registro.dimension]=controles.filasEnDimension[registro.dimension]||[];
+                                    if(!controles.elegidoEnDimension[registro.dimension] && registro.grafico_principal){
+                                        listaTdValores.push(html.td({class:'sennial-indicador-elegido-grafico'}));
+                                        controles.elegidoEnDimension[registro.dimension]=true;
+                                        recienElegido=true;
+                                    }else{ 
+                                        listaTdValores.push(html.td({class:'sin-sennial-indicador-elegido-grafico'}));
+                                    }
+                                    return listaTdValores;
                                 })
-                            });
-                        });
+                            })
+                        }
+                        return obtenerValoresPrincipal.then(function(listaDeseada){
+                            var estaFila=html.tr({class:'nivel-titulo',"nivel-titulo": defTables.length, "color-agrupacion_principal":color||'otro'},listaTd.concat(listaDeseada))
+                            var obtenerTabuladoPrincipal=Promise.resolve([]);
+                            if(table==='indicadores'){
+                                controles.filasEnDimension[registro.dimension].push(estaFila);
+                                if(recienElegido){
+                                    obtenerTabuladoPrincipal=client.query(
+                                        `SELECT * from tabulados WHERE indicador=$1 AND tabulado_principal IS TRUE`,
+                                        [registro.indicador]
+                                    ).fetchOneRowIfExists().then(function(result){
+                                        if(result.row){
+                                            var cortantes=result.row.cortantes;
+                                            var cantidad_cortantes=Object.keys(cortantes).length;
+                                            var tabulado={
+                                                indicador:registro.indicador,
+                                                cortantes:cortantes,
+                                                cantidad_cortantes:cantidad_cortantes
+                                            }
+                                            return be.traerInfoTabulado(client,registro.indicador, annioPrincipal,tabulado).then(function(tabulado){
+                                                return be.armaMatrices(client, tabulado, annioPrincipal, registro.indicador)
+                                            }).then(function(matrix){
+                                                var matrixGrafico=matrix.matrixGraf
+                                                return be.traeInfoMatrix(client,registro.indicador).then(function(infoMatrixGraf){
+                                                    controles.filasEnDimension[registro.dimension][
+                                                        Math.max(0, controles.filasEnDimension[registro.dimension].length-6)
+                                                    ].content.push(html.td({
+                                                        rowspan:6, 
+                                                        class:'box-grafico-principal',
+                                                        'para-graficador':JSON.stringify(matrixGrafico),
+                                                        'info-tabulado':JSON.stringify(infoMatrixGraf)
+                                                    },html.img({src:skinUrl+"img/grafico-ejemplo.png"})));
+                                                    return matrixGrafico;
+                                                })
+                                            });
+                                        }
+                                    })
+                                }
+                            }
+                            return obtenerTabuladoPrincipal.then(function(){
+                                return [estaFila].concat(listaTrHijos);
+                            })
+                        })
                     })
                 });
             })).then(function(listaDeListaTr){
