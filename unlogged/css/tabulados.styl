@@ -187,8 +187,15 @@ border-table()
 table
   font-family helvetica
   border-table()
-  background #fafafa
+  background #fff
+  
+.tabla-inicio 
+  width 100%
 
+.box-grafico-principal
+  min-width 725px
+  background-color #fff
+  
 .tabla-inicio th
   background-color #385678
   color #79a0bd
@@ -202,7 +209,6 @@ table
   
 td
   nowrap()
-  padding 5px 
 
 tr td x
   background-color #d0d2da
@@ -225,7 +231,12 @@ thead th, #caption-signos_convencionales
   width 250px
   min-width 250px
   padding 5px
+  padding-right 10px
+  border-bottom solid 1px #fff
 
+.td-principal-renglones
+  border-bottom solid 1px #fff
+  
 .campo_denominacion a:link
   color #695e78
 
@@ -233,6 +244,9 @@ thead th, #caption-signos_convencionales
   background-color #eeeeee
   text-align center
   min-width 60px
+  padding 20px
+  font-weight bold
+  color #5d6c7c
   border-bottom 1px solid #fafafa
   border-top    0px solid #fafafa
   border-left   1px solid #fafafa
@@ -704,17 +718,21 @@ h2
   float right
   margin-top -45px
   margin-right 300px
-  
+
+.sin-sennial-indicador-elegido-grafico
+  background-image url('../confort/img/sin-sennial.png')
+  background-position-y center
+  border-bottom solid 3px #fff
+
 [nivel-titulo="3"]
   font-size 110%
-  background-color #9cb6b4
-  color #FFF
 
 [nivel-titulo="2"]
   font-size 90%
   background-color #c9bfd7
   color #264c68
   font-weight bold
+  line-height 30px
   border-right 1px solid #fafafa
   border-bottom 1px solid #fafafa
   border-top 1px solid #fafafa 
@@ -724,47 +742,61 @@ h2
   font-size 80%
   color #767777
 
+[color-agrupacion_principal="auto0"][nivel-titulo="1"] .sennial-indicador-elegido-grafico
+  background-image url('../confort/img/indicador-elegido-naranja.png')
+  width 16px
+  
 [color-agrupacion_principal="auto0"][nivel-titulo="3"]
-  background-color #EF9D1B
+  background-color #f09d1b
 
+[color-agrupacion_principal="auto0"][nivel-titulo="3"] a, a:visited
+  color #fff
+  
 [color-agrupacion_principal="auto0"][nivel-titulo="2"]
-  background-color #dad9d9
-  color #a6912d
+  background-color #fff
+  color #f09d1b
 
-[color-agrupacion_principal="auto0"][nivel-titulo="2"] td
-  border-bottom 1px solid #bbb4aa  
-
+[color-agrupacion_principal="auto0"][nivel-titulo="2"] a, a:visited
+  color #f09d1b
+  
 [color-agrupacion_principal="auto0"][nivel-titulo="1"]
   background-color #eeeeee
   color #5c5c5c
   border-top 1px solid #c9c2b9 
-
+ 
 [color-agrupacion_principal="auto0"][nivel-titulo="1"] a, a:visited
-  color #5c5c5c
+  color #5a6878
 
 [color-agrupacion_principal="auto0"][nivel-titulo="1"] .es-link:hover
   color #bfa422
 
 [color-agrupacion_principal="auto0"][nivel-titulo="1"] .td-valores a:hover
   color #e3ab00
-
+  
+[color-agrupacion_principal="auto1"][nivel-titulo="1"] .sennial-indicador-elegido-grafico
+  background-image url('../confort/img/indicador-elegido-verde.png')
+  width 16px
+  
 [color-agrupacion_principal="auto1"][nivel-titulo="3"]
   background-color #1FAE92
+  
+[color-agrupacion_principal="auto1"][nivel-titulo="3"] a, a:visited
+  color #FFF
 
 [color-agrupacion_principal="auto1"][nivel-titulo="2"]
-  background-color #dad9d9
+  background-color #fff
   color #198d76
 
-[color-agrupacion_principal="auto1"][nivel-titulo="2"] td
-  border-bottom 1px solid #bbb4aa  
-
+[color-agrupacion_principal="auto1"][nivel-titulo="2"] a, a:visited
+  color #1FAE92
+  
 [color-agrupacion_principal="auto1"][nivel-titulo="1"]
   background-color #eeeeee
   color #5c5c5c
   border-top 1px solid #c9c2b9 
 
 [color-agrupacion_principal="auto1"][nivel-titulo="1"] a, a:visited
-  color #5c5c5c
+  color #5a6878
 
 [color-agrupacion_principal="auto1"][nivel-titulo="1"] .es-link:hover
   color #4f9533
@@ -774,24 +806,32 @@ h2
 
 [color-agrupacion_principal="auto1"][nivel-titulo="1"] .td-valores a:hover
   color #4f9533
+  
+[color-agrupacion_principal="auto2"][nivel-titulo="1"] .sennial-indicador-elegido-grafico
+  background-image url('../confort/img/indicador-elegido-violeta.png')
+  width 16px
+  
+[color-agrupacion_principal="auto2"][nivel-titulo="3"] a, a:visited
+  color #fff
 
 [color-agrupacion_principal="auto2"][nivel-titulo="3"]
   background-color #A05B9F
-
+  
 [color-agrupacion_principal="auto2"][nivel-titulo="2"]
-  background-color #dad9d9
-  color #614d7d
+  background-color #fff
+  font-size 88%
 
-[color-agrupacion_principal="auto2"][nivel-titulo="2"] td
-  border-bottom 1px solid #bbb4aa  
-
+[color-agrupacion_principal="auto2"][nivel-titulo="2"] a, a:visited
+  color #A05B9F
+  
 [color-agrupacion_principal="auto2"][nivel-titulo="1"]
   background-color #eeeeee
   color #5c5c5c
-  border-top 1px solid #c9c2b9 
+  border-top 1px solid #c9c2b9
+  padding 5px
 
 [color-agrupacion_principal="auto2"][nivel-titulo="1"] a, a:visited
-  color #5c5c5c
+  color #5a6878
 
 [color-agrupacion_principal="auto2"][nivel-titulo="1"] .es-link:hover
   color #7664a2
@@ -799,23 +839,30 @@ h2
 [color-agrupacion_principal="auto2"][nivel-titulo="1"] .td-valores a:hover
   color #7664a2
 
+[color-agrupacion_principal="auto3"][nivel-titulo="1"] .sennial-indicador-elegido-grafico
+  background-image url('../confort/img/indicador-elegido-rojo.png')
+  width 16px
+  
 [color-agrupacion_principal="auto3"][nivel-titulo="3"]
   background-color #EA5C1D
 
+[color-agrupacion_principal="auto3"][nivel-titulo="3"] a, a:visited
+  color #fff
+  
 [color-agrupacion_principal="auto3"][nivel-titulo="2"]
-  background-color #dad9d9
-  color #c64c16
+  background-color #fff
 
-[color-agrupacion_principal="auto3"][nivel-titulo="2"] td
-  border-bottom 1px solid #bbb4aa 
+[color-agrupacion_principal="auto3"][nivel-titulo="2"] a, a:visited
+  color #EA5C1D
 
 [color-agrupacion_principal="auto3"][nivel-titulo="1"]
   background-color #eeeeee
   color #5c5c5c
   border-top 1px solid #c9c2b9 
-
+  padding 5px
+    
 [color-agrupacion_principal="auto3"][nivel-titulo="1"] a, a:visited
-  color #5c5c5c
+  color #5a6878
 
 [color-agrupacion_principal="auto3"][nivel-titulo="1"]  .es-link:hover
   color #e45515
@@ -826,21 +873,28 @@ h2
 
 [color-agrupacion_principal="auto5"][nivel-titulo="3"]
   background-color #0C7DC1
+  
+[color-agrupacion_principal="auto5"][nivel-titulo="3"] a, a:visited
+  color #fff
 
 [color-agrupacion_principal="auto5"][nivel-titulo="2"]
-  background-color #dad9d9
-  color #216ca4
+  background-color #fff
 
-[color-agrupacion_principal="auto5"][nivel-titulo="2"] td
-  border-bottom 1px solid #bbb4aa  
-
+[color-agrupacion_principal="auto5"][nivel-titulo="2"] a, a:visited
+  color #0C7DC1
+  
 [color-agrupacion_principal="auto5"][nivel-titulo="1"]
   background-color #eeeeee
   color #5c5c5c
   border-top 1px solid #c9c2b9 
-
+  padding 5px
+    
+[color-agrupacion_principal="auto5"][nivel-titulo="1"] .sennial-indicador-elegido-grafico
+  background-image url('../confort/img/indicador-elegido-azul.png')
+  width 16px
+  
 [color-agrupacion_principal="auto5"][nivel-titulo="1"] a, a:visited
-  color #5c5c5c
+  color #5a6878
 
 [color-agrupacion_principal="auto5"][nivel-titulo="1"] .es-link:hover
   color #247aba
@@ -852,7 +906,7 @@ h2
   background-color #e18900
 
 [color-agrupacion_principal="auto6"][nivel-titulo="2"]
-  background-color #dad9d9
+  background-color #fff
   color #d58200
 
 [color-agrupacion_principal="auto6"][nivel-titulo="2"] td
@@ -862,9 +916,10 @@ h2
   background-color #eeeeee
   color #5c5c5c
   border-top 1px solid #c9c2b9 
-
+  padding 5px
+  
 [color-agrupacion_principal="auto6"][nivel-titulo="1"] a, a:visited
-  color #737373  
+  color #5a6878  
 
 [color-agrupacion_principal="auto6"][nivel-titulo="1"] .es-link:hover
   color #e18900  
@@ -886,9 +941,10 @@ h2
   background-color #eeeeee
   color #5c5c5c
   border-top 1px solid #c9c2b9 
+  padding 5px
 
 [color-agrupacion_principal="auto4"][nivel-titulo="1"] a, a:visited
-  color #5c5c5c
+  color #5a6878
 
 [color-agrupacion_principal="auto4"][nivel-titulo="1"] .es-link:hover
   color #4f9533
@@ -1130,14 +1186,7 @@ h2
 .ancla
   position relative
   top -32px
-  
-.box-grafico-principal
-  border 1px solid #ccc
-  
-.sennial-indicador-elegido-grafico
-  width 2px
-  background-color orange
-  
+
 .chartElement.piramide 
   text-align center
   margin-right 110
