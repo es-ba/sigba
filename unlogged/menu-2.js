@@ -164,9 +164,9 @@ function tabuladoElement() {
 function toggleChartTabuladoDisplay() {
     //changing url accordingly without reolading page
     if(window.location.search.includes(displayChartParamName)){
-        toggleToChart();
-    }else{
         toggleToTabulado();
+    }else{
+        toggleToChart();
     }
     updateVisualization();
 }
