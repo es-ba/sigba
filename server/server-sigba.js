@@ -124,7 +124,7 @@ class AppSIGBA extends backend.AppBackend{
                         listaTd=[html.td({class:'td-'+urlYClasesTabulados+'-renglones',colspan:4-defTables.length},[html.div({class:'espacio-reserva'},'-')])].concat(
                             defTables[0].camposAMostrar.map(function(nombreCampo,i){
                                 var id=registro[defTables[0].campoId];
-                                var attributes={colspan:i?1:defTables.length+1,class:'campo_'+nombreCampo};
+                                var attributes={colspan:i?1:defTables.length+1+(defTables[0].tabla=='indicadores'?0:6),class:'campo_'+nombreCampo};
                                 if(registro.indicador ){
                                     attributes.id=id;
                                     if(registro.def_con){
@@ -841,12 +841,15 @@ class AppSIGBA extends backend.AppBackend{
                                         html.th({class:'head-inicio',style:"text-align:left" },"Indicador"),
                                         html.th({class:'head-inicio',style:"text-align:right"},""),
                                         html.th('Año'),
-                                        html.th('Total'),
+                                        html.th('Total')
                                     ].concat(
                                         categoriasPrincipalLista.map(function(categoria){
                                             return html.th(categoria.denominacion)
                                         })
-                                    ))
+                                    ).concat([
+                                        html.th({class:'th-vacio',}),
+                                        html.th({class:'th-vacio',})
+                                    ]))
                                 ]),
                                 html.tbody(listaDeTr)
                             ]),
