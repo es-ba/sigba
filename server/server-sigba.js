@@ -731,7 +731,7 @@ class AppSIGBA extends backend.AppBackend{
                                 var denominaciones=cortanteAElegir.denom_tab.split('|');
                                 var href=''+absolutePath+''+urlYClasesTabulados+'-indicador?'+(annio?'annio='+annio+'&':'')+'indicador='+indicador+'&cortante='+JSON.stringify(cortanteAElegir.cortantes)
                                 return html.tr({class:'tr-cortante-posible','esta-habilitado':cortanteAElegir.habilitado?'si':'no'},[
-                                    html.td({class:'td-cortante-posible', 'menu-item-selected':cortanteAElegir.variables==cortante},[
+                                    html.td({class:'td-cortante-posible', 'menu-item-selected':JSON.stringify(cortanteAElegir.cortantes)==cortante},[
                                         html.a({class:'a-cortante-posible',href:href},denominaciones.join('-'))
                                     ])
                                 ]);
