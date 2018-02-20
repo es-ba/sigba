@@ -69,10 +69,13 @@ function generateChart(elementWithMatrix, svgWidth) {
     var chartContainer = generateChartContainer(elementWithMatrix, tabuladoInfo);
     //se muestran solo los primeros 10 gráficos
     var zMatrices = tabulatorMatrix.z.slice(0, 10);
-    // var minZYValue = Number.MAX_VALUE;
+    var minZYValue = Number.MAX_VALUE;
     var maxZYValue = Number.MIN_VALUE;
     zMatrices.forEach(function (zMatrix) {
-        let minMax = Graphicator.calcularMinMax(zMatrix);
+        //si es apilado dejo la matrix con los totales para calcular el max, sino curo la matrix
+        var mtx = (tabuladoInfo.apilado || tabuladoInfo.tipo_grafico == 'piramide')? zMatrix : curarMatrix(zMatrix);
+        let minMax = Graphicator.calcularMinMax(mtx);
+        minZYValue = Math.min(minMax.min, minZYValue);
         maxZYValue = Math.max(minMax.max, maxZYValue);
     });
 
@@ -90,16 +93,34 @@ function generateChart(elementWithMatrix, svgWidth) {
                 size: { width: svgWidth },
                 axis: {
                     rotated: tabuladoInfo.orientacion == 'vertical' ? true : false,
+                    y:{
+                        //siempre la misma escala para distintos graficos de variable z
+                        min: minZYValue,
+                        max: maxZYValue
+                    }
                 }
             }
         };
 
         // TODO: pensar cual es la mejor estrategia
         var specificConfig = {};
+        if (tabuladoInfo.tipo_grafico == 'barra') {
+            specificConfig = {
+                c3Config: {
+                    axis: {
+                        y:{
+                            // si es porcentaje min = 0
+                            min: maxZYValue==100? 0: Math.trunc(minZYValue),
+                            max: maxZYValue
+                        }
+                    }
+                }
+            }
+        }
         if (tabuladoInfo.tipo_grafico == 'piramide') {
             specificConfig = {
                 c3Config: {
-                    size: { width: 650 },
+                    size: { width: 650 },//Emilio pidió un ancho menor al automático para que no se vean tan anchas las pirámides
                     axis: {
                         y: {
                             //esto es para que las piramides con variables en ubicación z tengan la misma escala
