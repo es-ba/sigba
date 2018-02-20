@@ -177,24 +177,53 @@ class AppSIGBA extends backend.AppBackend{
                         if(table==='indicadores'){
                             var listaTdValores=[];
                             var ultimoAnnioDisponible;
+                            var cortantesEnPrincipalObj;
                             var obtenerValoresPrincipal=client.query(
                                 `select max(cortes->>'annio') annio from celdas where indicador=$1`,[registro.indicador]
                                 ).fetchOneRowIfExists().then(function(result){
                                     ultimoAnnioDisponible=result.row.annio;
-                                }).then(function(){
-                                    var sqlPrincipal="SELECT * FROM celdas WHERE indicador=$1 AND cortes->>'annio' = $2 and "+
-                                    "cortantes in ('{\"annio\":true}',";
-                                    var condicionPrincipal;
-                                    var cortantePrincipalSql='\''+'{"annio":true,"sexo":true}'+'\')';
-                                    var cortantePrincipalEspecial='true';
-                                    if(registro.especial_principal){
-                                        cortantePrincipalSql='\''+'{"annio":true,'+'"'+registro.corte_principal+'":true}\''+
-                                        ' ,\'{"annio":true,'+'"'+registro.corte_principal+'":true,"sexo":true}'+'\')';
-                                        cortantePrincipalEspecial=' cortes->>'+'\''+registro.corte_principal+'\''+' = '+'\''+registro.valor_principal+'\'';
+                                    cortantesEnPrincipalObj={
+                                        variablesPrincipal:[{"annio":true}],
+                                        cortes:[{"annio":ultimoAnnioDisponible}]
+                                    };
+                                    be.cortantesEnPrincipal.cortantesPrincipalesArr.forEach(function(variable){
+                                        var variablePrincipal={"annio":true};
+                                        variablePrincipal[variable.variable_principal]=true;
+                                        cortantesEnPrincipalObj.variablesPrincipal.push(variablePrincipal);
+                                    })
+                                    if(registro.indicador && registro.corte_principal){
+                                        var test={}
+                                        test[registro.corte_principal]=registro.valor_principal;
+                                        cortantesEnPrincipalObj.cortes.push(test)
+                                        cortantesEnPrincipalObj.variablesPrincipal=cortantesEnPrincipalObj.variablesPrincipal.map(function(cortPrinc){
+                                            cortPrinc[registro.corte_principal]=true;
+                                            return cortPrinc;
+                                        })
                                     }
-                                    sqlPrincipal=sqlPrincipal+cortantePrincipalSql+' and '+cortantePrincipalEspecial+' order by cortes ';
-                                    return client.query(sqlPrincipal
-                                    ,[registro.indicador,ultimoAnnioDisponible]
+                                    
+                                }).then(function(){
+                                    var sqlPrincipalTest="SELECT * FROM celdas WHERE indicador=$1 AND cortantes in ( "+
+                                    cortantesEnPrincipalObj.variablesPrincipal.map(function(crt){
+                                        return "\'"+JSON.stringify(crt)+"\'";
+                                    }).join(',')+") AND "+cortantesEnPrincipalObj.cortes.map(function(crt,i){
+                                        for(var key in crt){
+                                            return "cortes->> "+"\'"+key+"\'"+" = "+"\'"+crt[key]+"\'";
+                                        }
+                                    }).join(' AND ');
+                                    //var sqlPrincipal="SELECT * FROM celdas WHERE indicador=$1 AND cortes->>'annio' = $2 and "+
+                                    //"cortantes in ('{\"annio\":true}',";
+                                    //var condicionPrincipal;
+                                    //var cortantePrincipalSql='\''+'{"annio":true,"sexo":true}'+'\')';
+                                    //var cortantePrincipalEspecial='true';
+                                    //if(registro.especial_principal){
+                                    //    cortantePrincipalSql='\''+'{"annio":true,'+'"'+registro.corte_principal+'":true}\''+ //annio:true
+                                    //    ' ,\'{"annio":true,'+'"'+registro.corte_principal+'":true,"sexo":true}'+'\')';//annio:true,sexo:true
+                                    //    cortantePrincipalEspecial=' cortes->>'+'\''+registro.corte_principal+'\''+' = '+'\''+registro.valor_principal+'\''; 
+                                    //}
+                                    //sqlPrincipal=sqlPrincipal+cortantePrincipalSql+' and '+cortantePrincipalEspecial+' order by cortes ';
+                                    //return client.query(sqlPrincipal
+                                    return client.query(sqlPrincipalTest
+                                    ,[registro.indicador]
                                 ).fetchAll().then(function(result){
                                     var filasValoresAPrincipal=result.rows;
                                     var valCeldasPrincipal=[];
@@ -204,12 +233,21 @@ class AppSIGBA extends backend.AppBackend{
                                         indiceCeldasPrincipal[categoria.valor]=i+1; 
                                         valCeldasPrincipal[i+1]={valor:null};
                                     });
+                                    var crtPrincArr=be.cortantesEnPrincipal.cortantesPrincipalesArr.map(function(crt){
+                                            return crt.variable_principal;
+                                    });
                                     filasValoresAPrincipal.forEach(function(filaAPrincipal){
-                                        if(!(be.cortantesEnPrincipal.cortantePrincipal in filaAPrincipal.cortes)){
-                                            valCeldasPrincipal[indiceCeldasPrincipal['null']]=filaAPrincipal;
-                                        }else{
-                                            valCeldasPrincipal[indiceCeldasPrincipal[filaAPrincipal.cortes[be.cortantesEnPrincipal.cortantePrincipal]]]=filaAPrincipal;
-                                        }
+                                        var test=Object.keys(filaAPrincipal.cortes).some(function(element){
+                                            return crtPrincArr.indexOf(element)>=0
+                                        });
+                                        be.cortantesEnPrincipal.cortantesPrincipalesArr.forEach(function(variable){
+                                            if(!test){
+                                            //if(!(variable.variable_principal in filaAPrincipal.cortes)){
+                                                valCeldasPrincipal[indiceCeldasPrincipal['null']]=filaAPrincipal;
+                                            }else{
+                                                valCeldasPrincipal[indiceCeldasPrincipal[filaAPrincipal.cortes[variable.variable_principal]]]=filaAPrincipal;
+                                            }
+                                        });
                                     });
                                     annioPrincipal=ultimoAnnioDisponible;
                                     listaTdValores.push(html.td({class:'td-valores'},annioPrincipal));
@@ -399,7 +437,7 @@ class AppSIGBA extends backend.AppBackend{
         ).fetchOneRowIfExists().then(function(result){
             var infoIndicador=result.row;
             return {
-                i_denom:infoIndicador.i_denom,
+                indicador_denom:infoIndicador.i_denom,
                 con_nota:infoIndicador.con_nota,
                 f_denom:infoIndicador.f_denom,
                 u_denom:infoIndicador.u_denom,
@@ -425,18 +463,19 @@ class AppSIGBA extends backend.AppBackend{
         });
     }
     cortantesPrincipal(client){
-        var sql = "SELECT cortante_principal FROM parametros ";
-        return client.query(sql).fetchOneRowIfExists().then(function(result){
-            return result.row.cortante_principal;
-        }).then(function(cortantePrincipal){
+        var sql = "SELECT variable_principal FROM variables_principales ORDER BY orden";
+        return client.query(sql).fetchAll().then(function(result){
+            var cortantesPrincipalesArr=result.rows;
+            return cortantesPrincipalesArr;
+        }).then(function(cortantesPrincipalesArr){
             return client.query(
                 "select valor_corte,denominacion,orden from cortes where variable=$1 order by orden",
-                [cortantePrincipal]
+                [cortantesPrincipalesArr[0].variable_principal]
             ).fetchAll().then(function(result){
                 var categoriasPrincipalArr=result.rows.map(function(categorias){
                     return {valor:categorias.valor_corte,denominacion:categorias.denominacion}
                 })
-                return {cortantePrincipal,categoriasPrincipalArr}
+                return {cortantesPrincipalesArr,categoriasPrincipalArr}
             })
         });
     }
@@ -1084,6 +1123,7 @@ class AppSIGBA extends backend.AppBackend{
             ]},
             {menuType:'menu'     , name:'configuración'                 , menuContent:[
                 {menuType:'table'    , name:'signos_convencionales', label:'signos convencionales'},
+                {menuType:'table'    , name:'variables_principales', label:'Variables Principales del sistema'},
                 //{menuType:'table'    , name:'parametros'           , label:'Parámetros del home'},
                 {menuType:'table'    , name:'usuarios'},
             ]},
@@ -1092,6 +1132,7 @@ class AppSIGBA extends backend.AppBackend{
     getTables(){
         return super.getTables().concat([
             'parametros',
+            'variables_principales',
             'usuarios',
             'fte',
             'um',
