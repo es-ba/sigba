@@ -181,3 +181,18 @@ alter table indicadores add column valor_principal text;
 
 
  ---------------------------------------------------------------------
+-- 19/02/2018
+
+create table "variables_principales" (
+  "variable_principal" text, 
+  "orden" integer
+, primary key ("variable_principal")
+);
+grant select, insert, update, delete on "variables_principales" to "sigba_user";
+
+alter table "variables_principales" add constraint  "variables_principales variables REL " foreign key ("variable_principal") references "variables" ("variable")  on update cascade;
+select 'variables_principales' as table_name, enance_table('variables_principales','variable_principal')
+
+INSERT INTO variables_principales (variable_principal,orden) values
+    ('sexo',1),
+    ('s_jefe',2);
