@@ -57,22 +57,25 @@ function borrarTotales(matrix) {
     return matrix;
 }
 
-function renderChart() {
-    var tabulatorMatrix = getTabulatorMatrix();
-    var tabuladoInfo = getTabuladoInfo();
-    var charts = [];
+function generateChart(elementWithMatrix, svgWidth) {
+    var tabulatorMatrix = getMatrix(elementWithMatrix);
+    var tabuladoInfo = getTabuladoInfo(elementWithMatrix);
+    var charts = []; //after render we can change charts changing its c3 config and reloading with chart[i].load
 
     if (!tabuladoInfo.grafico && tabuladoInfo.tipo_grafico != 'piramide') {
         throw new Error('gráfico deshabilitado en tabla tabulados campo mostrar_grafico');
     }
 
-    generateChartContainer(tabulatorMatrix.caption);
+    var chartContainer = generateChartContainer(elementWithMatrix, tabuladoInfo);
     //se muestran solo los primeros 10 gráficos
     var zMatrices = tabulatorMatrix.z.slice(0, 10);
     var minZYValue = Number.MAX_VALUE;
     var maxZYValue = Number.MIN_VALUE;
     zMatrices.forEach(function (zMatrix) {
-        let minMax = Graphicator.calcularMinMax(zMatrix);
+        //si es apilado dejo la matrix con los totales para calcular el max, sino curo la matrix
+        var mtx = (tabuladoInfo.apilado || tabuladoInfo.tipo_grafico == 'piramide')? zMatrix : curarMatrix(zMatrix);
+        let minMax = Graphicator.calcularMinMax(mtx);
+        minZYValue = Math.min(minMax.min, minZYValue);
         maxZYValue = Math.max(minMax.max, maxZYValue);
     });
 
@@ -83,25 +86,44 @@ function renderChart() {
         var generalConfig = {
             matrix: matrix,
             tipo: tabuladoInfo.tipo_grafico,
-            idElemParaBindear: generateChartElementId(matrix, indexChart),
+            idElemParaBindear: generateChartElementId(matrix, tabuladoInfo, indexChart, chartContainer),
             apilado: tabuladoInfo.apilado,
             um: tabuladoInfo.um_denominacion || '',
             c3Config: {
-                size: { width: window.innerWidth - document.getElementById("div-pantalla-izquierda").offsetWidth - 32 },
+                size: { width: svgWidth },
                 axis: {
                     rotated: tabuladoInfo.orientacion == 'vertical' ? true : false,
+                    y:{
+                        //siempre la misma escala para distintos graficos de variable z
+                        min: minZYValue,
+                        max: maxZYValue
+                    }
                 }
             }
         };
 
         // TODO: pensar cual es la mejor estrategia
-        var specificConfig = {}; 
+        var specificConfig = {};
+        if (tabuladoInfo.tipo_grafico == 'barra') {
+            specificConfig = {
+                c3Config: {
+                    axis: {
+                        y:{
+                            // si es porcentaje min = 0
+                            min: maxZYValue==100? 0: Math.trunc(minZYValue),
+                            max: maxZYValue
+                        }
+                    }
+                }
+            }
+        }
         if (tabuladoInfo.tipo_grafico == 'piramide') {
             specificConfig = {
                 c3Config: {
-                    size: { width: 650},
+                    size: { width: 650 },//Emilio pidió un ancho menor al automático para que no se vean tan anchas las pirámides
                     axis: {
                         y: {
+                            //esto es para que las piramides con variables en ubicación z tengan la misma escala
                             min: -maxZYValue,
                             max: maxZYValue
                         }
@@ -114,10 +136,10 @@ function renderChart() {
     });
 }
 
-function generateChartElementId(matrix, indexChart) {
-    var chartElementId = 'chartElement' + indexChart;
+function generateChartElementId(matrix, tabuladoInfo, indexChart, chartContainer) {
+    var chartElementId = 'chartElement-' + tabuladoInfo.indicador + '-' + indexChart;
     var chartElement = document.createElement('div');
-    chartElement.className = 'chartElement ' + getTabuladoInfo().tipo_grafico;
+    chartElement.className = 'chartElement ' + tabuladoInfo.tipo_grafico;
     chartElement.setAttribute('id', chartElementId);
 
     if (matrix.caption) {
@@ -125,63 +147,64 @@ function generateChartElementId(matrix, indexChart) {
         chartTitle.innerText = matrix.caption;
         chartTitle.style.textAlign = 'center';
         chartTitle.className = 'titulo-grafico-z';
-        chartContainer().appendChild(chartTitle);
+        chartContainer.appendChild(chartTitle);
     }
-    chartContainer().appendChild(chartElement);
+    chartContainer.appendChild(chartElement);
 
     return chartElementId
 }
 
-function generateChartContainer(titleText) {
+function generateChartContainer(elementWithMatrix, tabuladoInfo) {
     var chartTitle = document.createElement('h3');
-    chartTitle.innerText = titleText;
+    chartTitle.innerText = tabuladoInfo.indicador_denom;
     chartTitle.style.textAlign = 'center';
     chartTitle.className = 'titulo-contenedor-graficos';
 
     var chartContainer = document.createElement('div');
-    chartContainer.setAttribute('id', 'chartContainer');
+    chartContainer.setAttribute('id', 'chartContainer-' + tabuladoInfo.indicador);
+    chartContainer.className = 'chartContainer';
     chartContainer.appendChild(chartTitle);
-    chartContainer.style.display = 'none';
-    var tabuladoHtml = tabuladoElement();
-    tabuladoHtml.parentNode.insertBefore(chartContainer, tabuladoHtml.nextElementSibling);
+    // chartContainer.style.display = 'none';
+    elementWithMatrix.parentNode.insertBefore(chartContainer, elementWithMatrix.nextElementSibling);
+    return chartContainer;
 }
 
-function getTabulatorMatrix() {
-    return JSON.parse(tabuladoElement().getAttribute('para-graficador'));
+function getMatrix(element) {
+    return JSON.parse(element.getAttribute('para-graficador'));
 }
 
-function getTabuladoInfo() {
-    return JSON.parse(tabuladoElement().getAttribute('info-tabulado'));
+function getTabuladoInfo(element) {
+    return JSON.parse(element.getAttribute('info-tabulado'));
 }
 
-function chartContainer() {
-    return document.getElementById('chartContainer');
+function getChartContainer(indicador) {
+    return document.getElementById('chartContainer-' + indicador);
 }
-function tabuladoElement() {
+function getTabuladoElement() {
     return document.getElementById('tabulado-html');
 }
 
 function toggleChartTabuladoDisplay() {
     //changing url accordingly without reolading page
-    if(window.location.search.includes(displayChartParamName)){
+    if (window.location.search.includes(displayChartParamName)) {
         toggleToTabulado();
-    }else{
+    } else {
         toggleToChart();
     }
     updateVisualization();
 }
 
-function toggleToTabulado(){
+function toggleToTabulado() {
     var newUrl = window.location.search.includes(displayChartParamName) ? location.href.replace(displayChartParamName, '') : location.href;
     updateUrlState(newUrl);
 }
 
-function toggleToChart(){
+function toggleToChart() {
     var newUrl = window.location.search.includes(displayChartParamName) ? location.href : location.href + displayChartParamName;
     updateUrlState(newUrl);
 }
 
-function updateUrlState(newUrl){
+function updateUrlState(newUrl) {
     window.history.pushState("Cambiar visualización entre gráfico y tabulado", "Visualización", newUrl);
 }
 
@@ -191,14 +214,15 @@ window.onpopstate = function (event) {
 };
 
 function updateVisualization() {
+    var tglBtn = document.getElementById('toogleButton');
     if (window.location.search.includes(displayChartParamName)) {
-        chartContainer().style.display = 'block';
-        tabuladoElement().style.display = 'none';
-        document.getElementById('toogleButton').src = 'img/tabulado.png';
+        document.getElementsByClassName('chartContainer')[0].style.display = 'block';
+        getTabuladoElement().style.display = 'none';
+        if (tglBtn) tglBtn.src = 'img/tabulado.png';
     } else {
-        chartContainer().style.display = 'none';
-        tabuladoElement().style.display = 'block';
-        document.getElementById('toogleButton').src = 'img/grafico.png';
+        document.getElementsByClassName('chartContainer')[0].style.display = 'none';
+        getTabuladoElement().style.display = 'block';
+        if (tglBtn) tglBtn.src = 'img/grafico.png';
     }
 }
 
@@ -252,7 +276,7 @@ function buildHiddenInputUrl() {
 
 function insertNewButton(newButton) {
     // tabuladoElement().parentNode.insertBefore(newButton, tabuladoElement().nextElementSibling);
-    tabuladoElement().parentNode.insertBefore(newButton, tabuladoElement())
+    getTabuladoElement().parentNode.insertBefore(newButton, getTabuladoElement())
 }
 
 function buildExportExcelButton() {
@@ -264,8 +288,8 @@ function buildExportExcelButton() {
     exportButton.width = "40";
     exportButton.onclick = function () {
         var t = new Tabulator();
-        t.toExcel(tabuladoElement(), {
-            filename: getTabulatorMatrix().caption,
+        t.toExcel(getTabuladoElement(), {
+            filename: getMatrix(getTabuladoElement()).caption,
             username: (window.my) ? window.my.config.username : null
         });
     };
@@ -278,10 +302,16 @@ function insertCopyUrlButton() {
 }
 
 window.addEventListener('load', function () {
-    if (tabuladoElement()) {
+
+    getChartBoxes().forEach(box => {
+        generateChart(box);
+    });
+
+    var tabuladoElem = getTabuladoElement();
+    if (tabuladoElem) {
         try {
-            renderChart();
-            if (getTabuladoInfo().tipo_grafico == 'piramide') {
+            generateChart(tabuladoElem, window.innerWidth - document.getElementById("div-pantalla-izquierda").offsetWidth - 32);
+            if (getTabuladoInfo(tabuladoElem).tipo_grafico == 'piramide') {
                 toggleToChart();
             } else {
                 insertNewButton(buildToggleButton());
@@ -290,7 +320,7 @@ window.addEventListener('load', function () {
         } catch (error) {
             console.error('No es posible graficar el tabulado. ' + error);
         }
-        insertNewButton(buildExportExcelButton());
+        insertNewButton(buildExportExcelButton(), tabuladoElem);
         insertCopyUrlButton();
     }
 
@@ -332,3 +362,8 @@ window.addEventListener('load', function () {
         });
     })
 });
+
+function getChartBoxes() {
+    return document.querySelectorAll('.box-grafico-principal [para-graficador]');
+}
+

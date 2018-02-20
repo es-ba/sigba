@@ -299,9 +299,11 @@ class AppSIGBA extends backend.AppBackend{
                                                     ].content.push(html.td({
                                                         rowspan:6, 
                                                         class:'box-grafico-principal',
+                                                    },html.div({
+                                                        class:'tabulado-html',
                                                         'para-graficador':JSON.stringify(matrixGrafico),
                                                         'info-tabulado':JSON.stringify(tabulado)
-                                                    },html.img({src:skinUrl+"img/grafico-ejemplo.png"})));
+                                                    })));
                                                     return matrixGrafico;
                                                 })
                                             });
