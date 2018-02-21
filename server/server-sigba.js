@@ -281,6 +281,7 @@ class AppSIGBA extends backend.AppBackend{
                                         [registro.indicador]
                                     ).fetchOneRowIfExists().then(function(result){
                                         if(result.row){
+                                            var annioPrincipalTabulado=result.row.principal_es_serie?annioPrincipalTabulado:annioPrincipal;
                                             var cortantes=result.row.cortantes;
                                             var cantidad_cortantes=Object.keys(cortantes).length;
                                             var tabulado={
@@ -289,11 +290,16 @@ class AppSIGBA extends backend.AppBackend{
                                                 cantidad_cortantes:cantidad_cortantes
                                             }
                                             return be.traerInfoTabulado(client,registro.indicador, annioPrincipal,tabulado).then(function(tabulado){
-                                                return be.armaMatrices(client, tabulado, annioPrincipal, registro.indicador)
+                                                return be.armaMatrices(client, tabulado,annioPrincipalTabulado, registro.indicador)
                                             }).then(function(matrix){
-                                                var matrixGrafico=matrix.matrixGraf
+                                                var matrixGrafico=matrix.matrixGraf;
                                                 return be.traeInfoMatrix(client,registro.indicador).then(function(infoMatrixGraf){
                                                     tabulado=changing(tabulado,infoMatrixGraf);
+                                                    /*if(registro.dimension=='dim11')(
+                                                       // console.log("················ ",controles.filasEnDimension[registro.dimension].length)
+                                                        console.log("················ ",controles.filasEnDimension[registro.dimension][0].content)
+                                                        //console.log("················ ",controles.filasEnDimension[registro.dimension][0].content)
+                                                    )*/
                                                     controles.filasEnDimension[registro.dimension][
                                                         Math.max(0, controles.filasEnDimension[registro.dimension].length-6)
                                                     ].content.push(html.td({
