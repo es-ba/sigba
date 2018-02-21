@@ -439,7 +439,7 @@ class AppSIGBA extends backend.AppBackend{
         ).fetchOneRowIfExists().then(function(result){
             var infoIndicador=result.row;
             return {
-                indicador_denom:infoIndicador.i_denom,
+                i_denom:infoIndicador.i_denom,
                 con_nota:infoIndicador.con_nota,
                 f_denom:infoIndicador.f_denom,
                 u_denom:infoIndicador.u_denom,
@@ -697,7 +697,7 @@ class AppSIGBA extends backend.AppBackend{
                                     tipo_grafico:fila.tipo_grafico,
                                     orientacion:fila.orientacion,
                                     apilado:fila.apilado,
-                                    indicador_denom:infoParaTabulado.i_denom,
+                                    i_denom:infoParaTabulado.i_denom,
                                     nota_pie:infoParaTabulado.con_nota?infoParaTabulado.nota_pie:null,
                                     fuente:infoParaTabulado.f_denom,
                                     um_denominacion:infoParaTabulado.u_denom,

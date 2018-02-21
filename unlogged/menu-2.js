@@ -110,7 +110,7 @@ function generateChart(elementWithMatrix, svgWidth) {
                     axis: {
                         y:{
                             // si es porcentaje min = 0
-                            min: maxZYValue==100? 0: Math.trunc(minZYValue),
+                            min: 0,//maxZYValue==100? 0: Math.trunc(minZYValue),
                             max: maxZYValue
                         }
                     }
@@ -156,7 +156,7 @@ function generateChartElementId(matrix, tabuladoInfo, indexChart, chartContainer
 
 function generateChartContainer(elementWithMatrix, tabuladoInfo) {
     var chartTitle = document.createElement('h3');
-    chartTitle.innerText = tabuladoInfo.indicador_denom;
+    chartTitle.innerText = tabuladoInfo.i_denom;
     chartTitle.style.textAlign = 'center';
     chartTitle.className = 'titulo-contenedor-graficos';
 
