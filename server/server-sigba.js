@@ -262,6 +262,7 @@ class AppSIGBA extends backend.AppBackend{
                                     if(!controles.elegidoEnDimension[registro.dimension] && registro.grafico_principal){
                                         listaTdValores.push(html.td({class:'sennial-indicador-elegido-grafico'}));
                                         controles.elegidoEnDimension[registro.dimension]=true;
+                                        controles.posicionEnDimension[registro.dimension]=controles.filasEnDimension[registro.dimension].length;
                                         recienElegido=true;
                                     }else{ 
                                         listaTdValores.push(html.td({class:'sin-sennial-indicador-elegido-grafico'}));
@@ -295,13 +296,9 @@ class AppSIGBA extends backend.AppBackend{
                                                 var matrixGrafico=matrix.matrixGraf;
                                                 return be.traeInfoMatrix(client,registro.indicador).then(function(infoMatrixGraf){
                                                     tabulado=changing(tabulado,infoMatrixGraf);
-                                                    /*if(registro.dimension=='dim11')(
-                                                       // console.log("················ ",controles.filasEnDimension[registro.dimension].length)
-                                                        console.log("················ ",controles.filasEnDimension[registro.dimension][0].content)
-                                                        //console.log("················ ",controles.filasEnDimension[registro.dimension][0].content)
-                                                    )*/
                                                     controles.filasEnDimension[registro.dimension][
-                                                        Math.max(0, controles.filasEnDimension[registro.dimension].length-6)
+                                                        Math.max(0, controles.posicionEnDimension[registro.dimension]-5)
+                                                        //Math.max(0, controles.filasEnDimension[registro.dimension].length-6)
                                                     ].content.push(html.td({
                                                         rowspan:6, 
                                                         class:'box-grafico-principal',
@@ -841,7 +838,8 @@ class AppSIGBA extends backend.AppBackend{
                     cortantePrincipal=cortanteEnPrincipal;
                     var controles={
                         elegidoEnDimension:{},
-                        filasEnDimension:{}
+                        filasEnDimension:{},
+                        posicionEnDimension:{}
                     };
                     return be.reporteBonito(client,[{
                         tabla:"agrupacion_principal",
