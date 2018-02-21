@@ -769,7 +769,8 @@ class AppSIGBA extends backend.AppBackend{
                                     be.encabezado(skinUrl,false,req),
                                     html.div({class:'annios-links-container',id:'annios-links'},[
                                         html.div({id:'barra-annios'},anniosLinks),
-                                        html.div({id:'link-signos-convencionales'},[html.a({id:'signos_convencionales-link',href:''+absolutePath+'principal-signos_convencionales'},'Signos convencionales')])
+                                        html.div({id:'link-signos-convencionales'},[html.a({id:'signos_convencionales-link',href:''+absolutePath+'principal-signos_convencionales'},'Signos convencionales')]),
+                                        html.div({class:'float-clear'})
                                     ]),
                                     html.table({class:'tabla-links-tabulado-grafico'},[
                                         html.tr({class:'tr-links-tabulado-grafico'},[
