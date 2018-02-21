@@ -8,7 +8,7 @@ body
   padding 0px
 
 #total-layout
-  min-width 960px
+  min-width 1024px
     
 .tabla inicio
   background-color #fff
@@ -43,7 +43,7 @@ body
 
 [esta-habilitado="si"] .a-cortante-posible:hover
   color #FFF  
-
+  
 .annio-cortante-posible[menu-item-selected=true]
   background-color #1d4263
   color #ceeced
@@ -137,7 +137,7 @@ body
   font-size 100%
   line-height 30px
   padding 4px
-  width: 99%
+  width: -webkit-fill-available
   font-weight bold
   line-height 30px
   display inline-block
@@ -193,7 +193,7 @@ table
   width 100%
 
 .box-grafico-principal
-  min-width 725px
+  min-width 600px
   background-color #fff
   
 .tabla-inicio th
@@ -226,6 +226,7 @@ thead th, #caption-signos_convencionales
   color #1D4263
   position sticky
   top 0 /* required */
+  z-index 1100
   
 .campo_denominacion
   width 250px
@@ -473,7 +474,7 @@ h2
   font-size 100%
   line-height 30px
   padding 4px
-  width: 99%
+  width: 100%
   font-weight bold
   line-height 30px
   display inline-block
@@ -556,12 +557,12 @@ h2
   text-align center
   
 .contiene-autonomias
-  display inline-block
   magin 0 auto
   margin-top 15px
 
 .autonomia-img
-  padding 10px
+  width 90px
+  padding-top 10px
   -webkit-transform perspective(1px) translateZ(0)
   transform perspective(1px) translateZ(0)
   box-shadow 0 0 1px transparent
@@ -744,7 +745,7 @@ h2
 
 [color-agrupacion_principal="auto0"][nivel-titulo="1"] .sennial-indicador-elegido-grafico
   background-image url('../confort/img/indicador-elegido-naranja.png')
-  width 16px
+  min-width 16px
   
 [color-agrupacion_principal="auto0"][nivel-titulo="3"]
   background-color #f09d1b
@@ -768,7 +769,7 @@ h2
   color #5a6878
 
 [color-agrupacion_principal="auto0"][nivel-titulo="1"] .es-link:hover
-  color #bfa422
+  color #f09d1b
 
 [color-agrupacion_principal="auto0"][nivel-titulo="1"] .td-valores a:hover
   color #e3ab00
@@ -799,13 +800,13 @@ h2
   color #5a6878
 
 [color-agrupacion_principal="auto1"][nivel-titulo="1"] .es-link:hover
-  color #4f9533
+  color #1fae92
 
 [color-agrupacion_principal="auto1"][nivel-titulo="1"] .td-valores a:hover
-  color #4f9533
+  color #1fae92
 
 [color-agrupacion_principal="auto1"][nivel-titulo="1"] .td-valores a:hover
-  color #4f9533
+  color #1fae92
   
 [color-agrupacion_principal="auto2"][nivel-titulo="1"] .sennial-indicador-elegido-grafico
   background-image url('../confort/img/indicador-elegido-violeta.png')
@@ -928,7 +929,7 @@ h2
   color #d58200
 
 [color-agrupacion_principal="auto4"][nivel-titulo="3"]
-  background-color #4f9533
+  background-color #1fae92
 
 [color-agrupacion_principal="auto4"][nivel-titulo="2"]
   background-color #dad9d9
@@ -947,10 +948,10 @@ h2
   color #5a6878
 
 [color-agrupacion_principal="auto4"][nivel-titulo="1"] .es-link:hover
-  color #4f9533
+  color #1fae92
 
 [color-agrupacion_principal="auto4"][nivel-titulo="1"] .td-valores a:hover
-  color #4f9533
+  color #1fae92
 
   @-webkit-keyframes animatezoom {
     from {-webkit-transform: scale(0.5)}

@@ -120,7 +120,7 @@ function generateChart(elementWithMatrix, svgWidth) {
         if (tabuladoInfo.tipo_grafico == 'piramide') {
             specificConfig = {
                 c3Config: {
-                    size: { width: 650 },//Emilio pidió un ancho menor al automático para que no se vean tan anchas las pirámides
+                    size: { width: 620 },//Emilio pidió un ancho menor al automático para que no se vean tan anchas las pirámides
                     axis: {
                         y: {
                             //esto es para que las piramides con variables en ubicación z tengan la misma escala
