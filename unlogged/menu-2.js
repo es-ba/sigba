@@ -60,6 +60,7 @@ function borrarTotales(matrix) {
 function generateChart(elementWithMatrix, svgWidth) {
     var tabulatorMatrix = getMatrix(elementWithMatrix);
     var tabuladoInfo = getTabuladoInfo(elementWithMatrix);
+    console.log(tabuladoInfo.um_denominacion)
     var charts = []; //after render we can change charts changing its c3 config and reloading with chart[i].load
 
     if (!tabuladoInfo.grafico && tabuladoInfo.tipo_grafico != 'piramide') {
@@ -81,7 +82,6 @@ function generateChart(elementWithMatrix, svgWidth) {
 
     zMatrices.forEach(function (matrix, indexChart) {
         matrix = curarMatrix(matrix);
-
         // ver interfaz graph-configuration.d.ts en graphicator
         var generalConfig = {
             matrix: matrix,
