@@ -296,9 +296,6 @@ class AppSIGBA extends backend.AppBackend{
                                                 var matrixGrafico=matrix.matrixGraf;
                                                 return be.traeInfoMatrix(client,registro.indicador).then(function(infoMatrixGraf){
                                                     tabulado=changing(tabulado,infoMatrixGraf);
-                                                    if(registro.indicador=='porc_jefas_hog'){
-                                                        console.log(tabulado)
-                                                    }
                                                     controles.filasEnDimension[registro.dimension][
                                                         Math.max(0, controles.posicionEnDimension[registro.dimension]-5)
                                                         //Math.max(0, controles.filasEnDimension[registro.dimension].length-6)
