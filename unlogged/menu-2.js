@@ -69,7 +69,7 @@ function generateChart(elementWithMatrix, svgWidth) {
 
     var chartContainer = generateChartContainer(elementWithMatrix, tabuladoInfo);
     //se muestran solo los primeros 10 gráficos
-    var zMatrices = tabulatorMatrix.z.slice(0, 15);
+    var zMatrices = tabulatorMatrix.z.slice(0, 10);
     var minZYValue = Number.MAX_VALUE;
     var maxZYValue = Number.MIN_VALUE;
     zMatrices.forEach(function (zMatrix) {
@@ -98,22 +98,31 @@ function generateChart(elementWithMatrix, svgWidth) {
                         min: minZYValue,
                         max: maxZYValue
                     },
-                    // x: {
-                    //     tick: {
-                    //         culling: {
-                    //             max: 25 // cant de ticks que se muestran
-                    //         },
-                    //         rotate: 45, // rota el label del tick
-                    //         multiline: false
-                    //     },
-                    //     height: 60 // el tamaño que deja para el label del axis y las legendas
-                    // }
                 }
             }
         };
 
         // TODO: pensar cual es la mejor estrategia
         var specificConfig = {};
+        // para lineas de años pongo los ticks de costado
+        if (tabuladoInfo.tipo_grafico == 'linea' && matrix.columnVariables[0] == 'annio') {
+            specificConfig = {
+                c3Config: {
+                    axis: {
+                        x: {
+                            tick: {
+                                rotate: -50, // rota el label del tick
+                                multiline: false,
+                                culling: {
+                                    max: 25 // cant de ticks que se muestran
+                                }
+                            },
+                            height: 50 // el tamaño que deja para el label del axis y las legendas
+                        }
+                    }
+                }
+            }
+        }
         if (tabuladoInfo.tipo_grafico == 'barra') {
             specificConfig = {
                 c3Config: {
