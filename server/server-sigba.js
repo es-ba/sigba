@@ -446,7 +446,7 @@ class AppSIGBA extends backend.AppBackend{
                 con_nota:infoIndicador.con_nota,
                 f_denom:infoIndicador.f_denom,
                 u_denom:infoIndicador.u_denom,
-                um_denominacion:infoIndicador.um,
+                um:infoIndicador.um,
                 nota_pie:infoIndicador.nota_pie,
                 decimales:infoIndicador.decimales
             }
