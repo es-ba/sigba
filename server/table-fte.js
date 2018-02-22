@@ -6,9 +6,10 @@ module.exports = function(context){
         name:'fte',
         editable: puedeEditar,
         fields: [
-            {name: 'fte'          ,typeName:'text'          ,nullable:false},
-            {name: 'denominacion' ,typeName:'text'          },
-            {name: 'descripcion'  ,typeName:'text'          },
+            {name: 'fte'             ,typeName:'text'          ,nullable:false},
+            {name: 'denominacion'    ,typeName:'text'          },
+            {name: 'descripcion'     ,typeName:'text'          },
+            {name: 'graf_ult_annios' ,typeName:'boolean'       },
         ],
         primaryKey:['fte'],
         detailTables:[

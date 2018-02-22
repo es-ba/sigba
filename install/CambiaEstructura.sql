@@ -181,7 +181,7 @@ alter table indicadores add column valor_principal text;
 
 
  ---------------------------------------------------------------------
--- 19/02/2018
+-- 19/02/2018  CORRIDO EN PRODUCCIÓN
 
 create table "variables_principales" (
   "variable_principal" text, 
@@ -196,3 +196,10 @@ select 'variables_principales' as table_name, enance_table('variables_principale
 INSERT INTO variables_principales (variable_principal,orden) values
     ('sexo',1),
     ('s_jefe',2);
+    
+-------------------------------------------------------
+--22/02/2018 
+set role sigba_owner;
+set search_path=sigba;
+
+alter table fte add column graf_ult_annios boolean default false;

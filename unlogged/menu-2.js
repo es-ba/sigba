@@ -60,16 +60,20 @@ function borrarTotales(matrix) {
 function generateChart(elementWithMatrix, svgWidth) {
     var tabulatorMatrix = getMatrix(elementWithMatrix);
     var tabuladoInfo = getTabuladoInfo(elementWithMatrix);
-    console.log(tabuladoInfo.um_denominacion)
     var charts = []; //after render we can change charts changing its c3 config and reloading with chart[i].load
-
     if (!tabuladoInfo.grafico && tabuladoInfo.tipo_grafico != 'piramide') {
         throw new Error('gráfico deshabilitado en tabla tabulados campo mostrar_grafico');
     }
-
     var chartContainer = generateChartContainer(elementWithMatrix, tabuladoInfo);
     //se muestran solo los primeros 10 gráficos
-    var zMatrices = tabulatorMatrix.z.slice(0, 10);
+    var zMatrices=tabulatorMatrix.z.slice(0, 10);
+    //if(tabulatorMatrix.z.length>15 && tabuladoInfo.graf_ult_annios){
+    //    zMatrices = tabulatorMatrix.z.slice(0, 10)
+    //}else{
+    //    console.log("tabulatorMatrix.z.length",tabulatorMatrix.z.length)
+    //    console.log("graf_ult_annios",tabuladoInfo.graf_ult_annios)
+    //    zMatrices = tabulatorMatrix.z.slice(0, 10);
+    //}
     var minZYValue = Number.MAX_VALUE;
     var maxZYValue = Number.MIN_VALUE;
     zMatrices.forEach(function (zMatrix) {
