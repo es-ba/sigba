@@ -785,7 +785,7 @@ class AppSIGBA extends backend.AppBackend{
                                             ]),
                                             html.td({class:'td-tabulado-grafico'},[
                                                 html.div({class:'div-pantallas',id:'div-pantalla-derecha'},[
-                                                    html.h2({class:'tabulado-descripcion'},[
+                                                    html.h2({class:'tabulado-descripcion',id:'para-botones'},[
                                                         html.div({class:'tabulado-descripcion-annio'},annio),
                                                         html.div({class:'botones-tabulado-descripcion'})
                                                     ]),

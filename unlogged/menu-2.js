@@ -297,9 +297,15 @@ function buildHiddenInputUrl() {
     return inputUrl;
 }
 
-function insertNewButton(newButton) {
+function insertNewButton(newButton,inElement) {
     // tabuladoElement().parentNode.insertBefore(newButton, tabuladoElement().nextElementSibling);
-    getTabuladoElement().parentNode.insertBefore(newButton, getTabuladoElement())
+    //
+    if(inElement){
+    inElement.appendChild(newButton)
+    }else{
+        getTabuladoElement().parentNode.insertBefore(newButton, getTabuladoElement())
+    }
+
 }
 
 function buildExportExcelButton() {
@@ -320,8 +326,9 @@ function buildExportExcelButton() {
 }
 
 function insertCopyUrlButton() {
-    insertNewButton(buildHiddenInputUrl());
-    insertNewButton(buildCopyUrlButton());
+    var inElement=document.getElementById('para-botones');
+    insertNewButton(buildHiddenInputUrl(),inElement);
+    insertNewButton(buildCopyUrlButton(),inElement);
 }
 
 window.addEventListener('load', function () {
@@ -332,18 +339,21 @@ window.addEventListener('load', function () {
 
     var tabuladoElem = getTabuladoElement();
     if (tabuladoElem) {
+        var inElement=document.getElementById('para-botones');
         try {
             generateChart(tabuladoElem, window.innerWidth - document.getElementById("div-pantalla-izquierda").offsetWidth - 32);
             if (getTabuladoInfo(tabuladoElem).tipo_grafico == 'piramide') {
                 toggleToChart();
             } else {
-                insertNewButton(buildToggleButton());
+                insertNewButton(buildToggleButton(),inElement);
             }
             updateVisualization();
         } catch (error) {
             console.error('No es posible graficar el tabulado. ' + error);
         }
-        insertNewButton(buildExportExcelButton(), tabuladoElem);
+        
+        insertNewButton(buildExportExcelButton(),inElement);
+//        insertNewButton(buildExportExcelButton(), tabuladoElem);
         insertCopyUrlButton();
     }
 
