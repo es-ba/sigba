@@ -78,7 +78,7 @@ function generateChart(elementWithMatrix, svgWidth) {
     var maxZYValue = Number.MIN_VALUE;
     zMatrices.forEach(function (zMatrix) {
         //si es apilado dejo la matrix con los totales para calcular el max, sino curo la matrix
-        var mtx = (tabuladoInfo.apilado || tabuladoInfo.tipo_grafico == 'piramide')? zMatrix : curarMatrix(zMatrix);
+        var mtx = (tabuladoInfo.apilado || tabuladoInfo.tipo_grafico == 'piramide') ? zMatrix : curarMatrix(zMatrix);
         let minMax = Graphicator.calcularMinMax(mtx);
         minZYValue = Math.min(minMax.min, minZYValue);
         maxZYValue = Math.max(minMax.max, maxZYValue);
@@ -97,22 +97,41 @@ function generateChart(elementWithMatrix, svgWidth) {
                 size: { width: svgWidth },
                 axis: {
                     rotated: tabuladoInfo.orientacion == 'vertical' ? true : false,
-                    y:{
+                    y: {
                         //siempre la misma escala para distintos graficos de variable z
                         min: minZYValue,
                         max: maxZYValue
-                    }
+                    },
                 }
             }
         };
 
         // TODO: pensar cual es la mejor estrategia
         var specificConfig = {};
+        // para lineas de años pongo los ticks de costado
+        if (tabuladoInfo.tipo_grafico == 'linea' && matrix.columnVariables[0] == 'annio') {
+            specificConfig = {
+                c3Config: {
+                    axis: {
+                        x: {
+                            tick: {
+                                rotate: -50, // rota el label del tick
+                                multiline: false,
+                                culling: {
+                                    max: 25 // cant de ticks que se muestran
+                                }
+                            },
+                            height: 50 // el tamaño que deja para el label del axis y las legendas
+                        }
+                    }
+                }
+            }
+        }
         if (tabuladoInfo.tipo_grafico == 'barra') {
             specificConfig = {
                 c3Config: {
                     axis: {
-                        y:{
+                        y: {
                             // si es porcentaje min = 0
                             min: 0,//maxZYValue==100? 0: Math.trunc(minZYValue),
                             max: maxZYValue
