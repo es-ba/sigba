@@ -68,12 +68,12 @@ function generateChart(elementWithMatrix, svgWidth) {
 
     var chartContainer = generateChartContainer(elementWithMatrix, tabuladoInfo);
     //se muestran solo los primeros 10 gráficos
-    var zMatrices = tabulatorMatrix.z.slice(0, 10);
+    var zMatrices = tabulatorMatrix.z.slice(0, 15);
     var minZYValue = Number.MAX_VALUE;
     var maxZYValue = Number.MIN_VALUE;
     zMatrices.forEach(function (zMatrix) {
         //si es apilado dejo la matrix con los totales para calcular el max, sino curo la matrix
-        var mtx = (tabuladoInfo.apilado || tabuladoInfo.tipo_grafico == 'piramide')? zMatrix : curarMatrix(zMatrix);
+        var mtx = (tabuladoInfo.apilado || tabuladoInfo.tipo_grafico == 'piramide') ? zMatrix : curarMatrix(zMatrix);
         let minMax = Graphicator.calcularMinMax(mtx);
         minZYValue = Math.min(minMax.min, minZYValue);
         maxZYValue = Math.max(minMax.max, maxZYValue);
@@ -93,11 +93,21 @@ function generateChart(elementWithMatrix, svgWidth) {
                 size: { width: svgWidth },
                 axis: {
                     rotated: tabuladoInfo.orientacion == 'vertical' ? true : false,
-                    y:{
+                    y: {
                         //siempre la misma escala para distintos graficos de variable z
                         min: minZYValue,
                         max: maxZYValue
-                    }
+                    },
+                    // x: {
+                    //     tick: {
+                    //         culling: {
+                    //             max: 25 // cant de ticks que se muestran
+                    //         },
+                    //         rotate: 45, // rota el label del tick
+                    //         multiline: false
+                    //     },
+                    //     height: 60 // el tamaño que deja para el label del axis y las legendas
+                    // }
                 }
             }
         };
@@ -108,7 +118,7 @@ function generateChart(elementWithMatrix, svgWidth) {
             specificConfig = {
                 c3Config: {
                     axis: {
-                        y:{
+                        y: {
                             // si es porcentaje min = 0
                             min: 0,//maxZYValue==100? 0: Math.trunc(minZYValue),
                             max: maxZYValue
