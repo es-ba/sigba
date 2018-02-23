@@ -152,7 +152,11 @@ class AppSIGBA extends backend.AppBackend{
                                 var sufijoTab=defTables[0].tabla||'';
                                 var htmlIcono= html.span({class:'span-img-icono'+sufijoTab},
                                     registro.icono?html.img({class:'img-icono-'+sufijoTab,src:skinUrl+'img/'+registro.icono}):null);
-                                var htmlA={href:''+absolutePath+''+urlYClasesTabulados+'-indicador?indicador='+(registro.indicador||''),class:'es-link' ,'cant-cortantes':result.row.cant_cortantes};
+                                    var htmlA={class:'es-link'};
+                                    if(registro.indicador){
+                                        htmlA.href=''+absolutePath+''+urlYClasesTabulados+'-indicador?indicador='+(registro.indicador||'');
+                                        htmlA['cant-cortantes']=result.row.cant_cortantes;
+                                    }
                             return html.td(attributes,[
                                     htmlIcono,
                                     html.span({id:id, class:'ancla'},"\u00a0"),
