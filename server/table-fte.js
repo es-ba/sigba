@@ -10,6 +10,7 @@ module.exports = function(context){
             {name: 'denominacion'    ,typeName:'text'          },
             {name: 'descripcion'     ,typeName:'text'          },
             {name: 'graf_ult_annios' ,typeName:'boolean'       },
+            {name: 'graf_cada_cinco' ,typeName:'boolean'       },
         ],
         primaryKey:['fte'],
         detailTables:[

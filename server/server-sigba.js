@@ -435,6 +435,7 @@ class AppSIGBA extends backend.AppBackend{
     traeInfoMatrix(client,indicador){
         return client.query(
             "SELECT i.denominacion as i_denom ,i.con_nota_pie con_nota,f.fte as fte, f.denominacion as f_denom,f.graf_ult_annios as graf_ult_annios, "
+                +"f.graf_cada_cinco as graf_cada_cinco, "
                 +"u.denominacion as u_denom,u.um as um,u.nota_pie nota_pie, i.decimales FROM indicadores i " 
                 +"\n LEFT JOIN fte f ON f.fte=i.fte " 
                 +"\n LEFT JOIN um u ON u.um=i.um "
@@ -452,7 +453,8 @@ class AppSIGBA extends backend.AppBackend{
                 nota_pie:infoIndicador.nota_pie,
                 decimales:infoIndicador.decimales,
                 fte:infoIndicador.fte,
-                graf_ult_annios:infoIndicador.graf_ult_annios
+                graf_ult_annios:infoIndicador.graf_ult_annios,
+                graf_cada_cinco:infoIndicador.graf_cada_cinco
             }
         })
     }
@@ -712,6 +714,7 @@ class AppSIGBA extends backend.AppBackend{
                                     decimales:infoParaTabulado.decimales,
                                     fte:infoParaTabulado.fte,
                                     graf_ult_annios:infoParaTabulado.graf_ult_annios,
+                                    graf_cada_cinco:infoParaTabulado.graf_cada_cinco,
                                 };
                                 matrices.matrixTab.caption=infoParaTabulado.i_denom;
                                 matrices.matrixGraf.caption=infoParaTabulado.i_denom;

@@ -198,8 +198,16 @@ INSERT INTO variables_principales (variable_principal,orden) values
     ('s_jefe',2);
     
 -------------------------------------------------------
---22/02/2018 
+--22/02/2018 -- CORRIDO EN PRODUCCIÓN
 set role sigba_owner;
 set search_path=sigba;
 
 alter table fte add column graf_ult_annios boolean default false;
+
+--------------------------------------------------------
+--23/02/2018 -- CORRIDO EN PRODUCCIÓN
+
+set role sigba_owner;
+set search_path=sigba;
+
+alter table fte add column graf_cada_cinco boolean default false;

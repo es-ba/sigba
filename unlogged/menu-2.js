@@ -66,14 +66,27 @@ function generateChart(elementWithMatrix, svgWidth) {
     }
     var chartContainer = generateChartContainer(elementWithMatrix, tabuladoInfo);
     //se muestran solo los primeros 10 gráficos
-    var zMatrices=tabulatorMatrix.z.slice(0, 10);
-    //if(tabulatorMatrix.z.length>15 && tabuladoInfo.graf_ult_annios){
-    //    zMatrices = tabulatorMatrix.z.slice(0, 10)
-    //}else{
-    //    console.log("tabulatorMatrix.z.length",tabulatorMatrix.z.length)
-    //    console.log("graf_ult_annios",tabuladoInfo.graf_ult_annios)
-    //    zMatrices = tabulatorMatrix.z.slice(0, 10);
-    //}
+    var zMatrices=tabulatorMatrix.z;
+    console.log("longitud",tabulatorMatrix.z.length,tabuladoInfo.graf_cada_cinco)
+    if(tabulatorMatrix.z.length>10 && tabuladoInfo.graf_ult_annios){
+        zMatrices = tabulatorMatrix.z.slice(0, 10)
+    }
+    if(tabulatorMatrix.z.length>10 && tabuladoInfo.graf_cada_cinco){
+        if(Number(tabulatorMatrix.z[0].caption) && (Number(tabulatorMatrix.z[0].caption)%5!=0)){
+            zMatrices=[tabulatorMatrix.z[0]]
+        }
+        tabulatorMatrix.z.forEach(function(matrixElegida){
+            console.log("matrixElegida.caption",matrixElegida.caption)
+            console.log("Number(matrixElegida.caption)",Number(matrixElegida.caption))
+            console.log("(Number(matrixElegida.caption)%5==0)",(Number(matrixElegida.caption)%5==0))
+            if(matrixElegida.caption && Number(matrixElegida.caption) && (Number(matrixElegida.caption)%5==0)){
+                zMatrices.push(matrixElegida)
+            }
+        });
+        if(Number(tabulatorMatrix.z[tabulatorMatrix.z.length-1].caption) && (Number(tabulatorMatrix.z[tabulatorMatrix.z.length-1].caption)%5!=0)){
+            zMatrices.push(tabulatorMatrix.z[tabulatorMatrix.z.length-1])
+        }
+    }
     var minZYValue = Number.MAX_VALUE;
     var maxZYValue = Number.MIN_VALUE;
     zMatrices.forEach(function (zMatrix) {
