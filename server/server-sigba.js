@@ -301,10 +301,10 @@ class AppSIGBA extends backend.AppBackend{
                                                 return be.traeInfoMatrix(client,registro.indicador).then(function(infoMatrixGraf){
                                                     tabulado=changing(tabulado,infoMatrixGraf);
                                                     controles.filasEnDimension[registro.dimension][
-                                                        Math.max(0, controles.posicionEnDimension[registro.dimension]-5)
+                                                        Math.max(0, controles.posicionEnDimension[registro.dimension]-7)
                                                         //Math.max(0, controles.filasEnDimension[registro.dimension].length-6)
                                                     ].content.push(html.td({
-                                                        rowspan:6, 
+                                                        rowspan:7, 
                                                         class:'box-grafico-principal',
                                                     },html.div({
                                                         class:'tabulado-html',

@@ -67,7 +67,6 @@ function generateChart(elementWithMatrix, svgWidth) {
     var chartContainer = generateChartContainer(elementWithMatrix, tabuladoInfo);
     //se muestran solo los primeros 10 gráficos
     var zMatrices=tabulatorMatrix.z;
-    console.log("longitud",tabulatorMatrix.z.length,tabuladoInfo.graf_cada_cinco)
     if(tabulatorMatrix.z.length>10 && tabuladoInfo.graf_ult_annios){
         zMatrices = tabulatorMatrix.z.slice(0, 10)
     }
@@ -233,16 +232,16 @@ function toggleChartTabuladoDisplay() {
 
 function toggleToTabulado() {
     var newUrl = window.location.search.includes(displayChartParamName) ? location.href.replace(displayChartParamName, '') : location.href;
-    updateUrlState(newUrl);
+    updateUrlState(newUrl,"pushState");
 }
 
 function toggleToChart() {
     var newUrl = window.location.search.includes(displayChartParamName) ? location.href : location.href + displayChartParamName;
-    updateUrlState(newUrl);
+    updateUrlState(newUrl,"replaceState");
 }
 
-function updateUrlState(newUrl) {
-    window.history.pushState("Cambiar visualización entre gráfico y tabulado", "Visualización", newUrl);
+function updateUrlState(newUrl, method) {
+    window.history[method]("Cambiar visualización entre gráfico y tabulado", "Visualización", newUrl);
 }
 
 // when browser back or next button are used
