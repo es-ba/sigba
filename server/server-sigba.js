@@ -825,7 +825,7 @@ class AppSIGBA extends backend.AppBackend{
                                     ])
                                 ]);
                                 var pagina=html.html([
-                                    be.headSigba(false,req,descripcion.indicador),
+                                    be.headSigba(false,req,descripcion.i_denom),
                                     html.body([pantalla,be.foot(skinUrl)])
                                 ]);
                                 res.send(pagina.toHtmlText({pretty:true}));
