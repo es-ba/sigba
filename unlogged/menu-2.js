@@ -127,6 +127,7 @@ function generateChart(elementWithMatrix, svgWidth) {
                 c3Config: {
                     axis: {
                         x: {
+                            type: 'indexed',
                             tick: {
                                 rotate: -50, // rota el label del tick
                                 multiline: false,
