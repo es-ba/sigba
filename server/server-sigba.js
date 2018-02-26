@@ -301,10 +301,10 @@ class AppSIGBA extends backend.AppBackend{
                                                 return be.traeInfoMatrix(client,registro.indicador).then(function(infoMatrixGraf){
                                                     tabulado=changing(tabulado,infoMatrixGraf);
                                                     controles.filasEnDimension[registro.dimension][
-                                                        Math.max(0, controles.posicionEnDimension[registro.dimension]-5)
+                                                        Math.max(0, controles.posicionEnDimension[registro.dimension]-7)
                                                         //Math.max(0, controles.filasEnDimension[registro.dimension].length-6)
                                                     ].content.push(html.td({
-                                                        rowspan:6, 
+                                                        rowspan:7, 
                                                         class:'box-grafico-principal',
                                                     },html.div({
                                                         class:'tabulado-html',
@@ -545,6 +545,7 @@ class AppSIGBA extends backend.AppBackend{
         }
         var listaCSS = be.csss(hideBEPlusInclusions);
         return html.head([
+            html.meta({name:'viewport', content:'initial-scale=1.0'}),
             html.title(title),
            // html.title(esPrincipal?'Tabulados':'Tabulado'),
             html.link({rel:"stylesheet", type:"text/css", href:"css/tabulados.css"}),
@@ -824,7 +825,7 @@ class AppSIGBA extends backend.AppBackend{
                                     ])
                                 ]);
                                 var pagina=html.html([
-                                    be.headSigba(false,req,descripcion.indicador),
+                                    be.headSigba(false,req,descripcion.i_denom),
                                     html.body([pantalla,be.foot(skinUrl)])
                                 ]);
                                 res.send(pagina.toHtmlText({pretty:true}));
