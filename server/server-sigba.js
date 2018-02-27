@@ -761,7 +761,7 @@ class AppSIGBA extends backend.AppBackend{
                             descripcion.cortante_orig=fila.cortante_orig;
                             var validationButton=html.button({id:'validacion-tabulado',type:'button','more-info':JSON.stringify(descripcion)},'Validar tabulado')
                             var habilitationButton=html.button({id:'habilitacion-tabulado',type:'button','more-info':JSON.stringify(descripcion)}/*,bb*/);
-                            be.anniosCortantes(client,annios,anniosA,indicador).then(function(){
+                            return be.anniosCortantes(client,annios,anniosA,indicador).then(function(){
                                 anniosLinks=anniosA.map(function(annioAElegir){
                                     var href=''+absolutePath+''+urlYClasesTabulados+'-indicador?annio='+annioAElegir+'&indicador='+indicador+
                                     '&cortante='+cortante;
@@ -776,60 +776,62 @@ class AppSIGBA extends backend.AppBackend{
                             }).then(function(){
                                 var skin=be.config['client-setup'].skin;
                                 var skinUrl=(skin?skin+'/':'');
-                                var pantalla=html.div({id:'total-layout','menu-type':'hidden'},[
-                                    be.encabezado(skinUrl,false,req),
-                                    html.div({class:'annios-links-container',id:'annios-links'},[
-                                        html.div({id:'barra-annios'},anniosLinks),
-                                        html.div({id:'link-signos-convencionales'},[html.a({id:'signos_convencionales-link',href:''+absolutePath+'principal-signos_convencionales'},'Signos convencionales')]),
-                                        html.div({class:'float-clear'})
-                                    ]),
-                                    html.table({class:'tabla-links-tabulado-grafico'},[
-                                        html.tr({class:'tr-links-tabulado-grafico'},[
-                                            html.td({class:'td-links'},[
-                                                html.div({class:'div-pantallas',id:'div-pantalla-izquierda'},[
-                                                    html.h2('Tabulados'),
-                                                    html.table({id:'tabla-izquierda'},trCortantes)
+                                return be.encabezado(skinUrl,false,req,client).then(function(encabezadoHtml){
+                                    var pantalla=html.div({id:'total-layout','menu-type':'hidden'},[
+                                        encabezadoHtml,
+                                        html.div({class:'annios-links-container',id:'annios-links'},[
+                                            html.div({id:'barra-annios'},anniosLinks),
+                                            html.div({id:'link-signos-convencionales'},[html.a({id:'signos_convencionales-link',href:''+absolutePath+'principal-signos_convencionales'},'Signos convencionales')]),
+                                            html.div({class:'float-clear'})
+                                        ]),
+                                        html.table({class:'tabla-links-tabulado-grafico'},[
+                                            html.tr({class:'tr-links-tabulado-grafico'},[
+                                                html.td({class:'td-links'},[
+                                                    html.div({class:'div-pantallas',id:'div-pantalla-izquierda'},[
+                                                        html.h2('Tabulados'),
+                                                        html.table({id:'tabla-izquierda'},trCortantes)
+                                                    ]),
                                                 ]),
-                                            ]),
-                                            html.td({class:'td-tabulado-grafico'},[
-                                                html.div({class:'div-pantallas',id:'div-pantalla-derecha'},[
-                                                    html.h2({class:'tabulado-descripcion',id:'para-botones'},[
-                                                        html.div({class:'tabulado-descripcion-annio'},annio),
-                                                        html.div({class:'botones-tabulado-descripcion'})
-                                                    ]),
-                                                    ((fila.habilitado) || esAdmin)?html.div({
-                                                        id:'tabulado-html',
-                                                        class: tabuladoDescripcionMatriz.descripcionTabulado.tipo_grafico == 'piramide' ? 'hide-tabulado-cuadro': '',
-                                                        'para-graficador':JSON.stringify(matrix),
-                                                        'info-tabulado':JSON.stringify(descripcion)
-                                                    },[tabuladoHtml]):null,
-                                                    esAdmin?html.div([
-                                                        validationButton,
-                                                        habilitationButton
-                                                    ]):null,
-                                                    html.div({class:'tabulado-descripcion',id:'tabulado-descripcion-um'},[
-                                                        (fila.habilitado || esAdmin)?html.span({id:"tabulado-um"},"Unidad de Medida: "):null,
-                                                        (fila.habilitado || esAdmin)?html.span({id:"tabulado-um-descripcion"},descripcion.um_denominacion):null
-                                                    ]),
-                                                    html.div({class:'tabulado-descripcion',id:'tabulado-descripcion-nota'},[
-                                                        ((fila.habilitado || esAdmin)&&descripcion.nota_pie)?html.span({id:"nota-porcentaje-label"},'Nota: '):null,
-                                                        ((fila.habilitado || esAdmin)&&descripcion.nota_pie)?html.span({id:"nota-porcentaje"},descripcion.nota_pie):null,
-                                                    ]),
-                                                    html.div({class:'tabulado-descripcion',id:'tabulado-descripcion-fuente'},[
-                                                        (fila.habilitado || esAdmin)?html.span({id:"tabulado-fuente"},'Fuente: '):null,
-                                                        (fila.habilitado || esAdmin)?html.span({id:"tabulado-fuente-descripcion"},descripcion.fuente):null,
-                                                    ]),
+                                                html.td({class:'td-tabulado-grafico'},[
+                                                    html.div({class:'div-pantallas',id:'div-pantalla-derecha'},[
+                                                        html.h2({class:'tabulado-descripcion',id:'para-botones'},[
+                                                            html.div({class:'tabulado-descripcion-annio'},annio),
+                                                            html.div({class:'botones-tabulado-descripcion'})
+                                                        ]),
+                                                        ((fila.habilitado) || esAdmin)?html.div({
+                                                            id:'tabulado-html',
+                                                            class: tabuladoDescripcionMatriz.descripcionTabulado.tipo_grafico == 'piramide' ? 'hide-tabulado-cuadro': '',
+                                                            'para-graficador':JSON.stringify(matrix),
+                                                            'info-tabulado':JSON.stringify(descripcion)
+                                                        },[tabuladoHtml]):null,
+                                                        esAdmin?html.div([
+                                                            validationButton,
+                                                            habilitationButton
+                                                        ]):null,
+                                                        html.div({class:'tabulado-descripcion',id:'tabulado-descripcion-um'},[
+                                                            (fila.habilitado || esAdmin)?html.span({id:"tabulado-um"},"Unidad de Medida: "):null,
+                                                            (fila.habilitado || esAdmin)?html.span({id:"tabulado-um-descripcion"},descripcion.um_denominacion):null
+                                                        ]),
+                                                        html.div({class:'tabulado-descripcion',id:'tabulado-descripcion-nota'},[
+                                                            ((fila.habilitado || esAdmin)&&descripcion.nota_pie)?html.span({id:"nota-porcentaje-label"},'Nota: '):null,
+                                                            ((fila.habilitado || esAdmin)&&descripcion.nota_pie)?html.span({id:"nota-porcentaje"},descripcion.nota_pie):null,
+                                                        ]),
+                                                        html.div({class:'tabulado-descripcion',id:'tabulado-descripcion-fuente'},[
+                                                            (fila.habilitado || esAdmin)?html.span({id:"tabulado-fuente"},'Fuente: '):null,
+                                                            (fila.habilitado || esAdmin)?html.span({id:"tabulado-fuente-descripcion"},descripcion.fuente):null,
+                                                        ]),
+                                                    ])
                                                 ])
                                             ])
                                         ])
-                                    ])
-                                ]);
-                                var pagina=html.html([
-                                    be.headSigba(false,req,descripcion.i_denom),
-                                    html.body([pantalla,be.foot(skinUrl)])
-                                ]);
-                                res.send(pagina.toHtmlText({pretty:true}));
-                                res.end();
+                                    ]);
+                                    var pagina=html.html([
+                                        be.headSigba(false,req,descripcion.i_denom),
+                                        html.body([pantalla,be.foot(skinUrl)])
+                                    ]);
+                                    res.send(pagina.toHtmlText({pretty:true}));
+                                    res.end();
+                                })
                             })
                         })
                     });
@@ -845,48 +847,54 @@ class AppSIGBA extends backend.AppBackend{
             var client;
             var categoriasPrincipalLista;
             var cortantePrincipal;
+            var encabezado;
+            var skin=be.config['client-setup'].skin;
+            var skinUrl=(skin?skin+'/':'');
+            
             return be.getDbClient(req).then(function(cli){
                 client=cli;
                 return be.cortantesPrincipal(client).then(function(cortanteEnPrincipal){
                     be.cortantesEnPrincipal=cortanteEnPrincipal;
                     categoriasPrincipalLista=cortanteEnPrincipal.categoriasPrincipalArr;
                     cortantePrincipal=cortanteEnPrincipal;
-                    var controles={
-                        elegidoEnDimension:{},
-                        filasEnDimension:{},
-                        posicionEnDimension:{}
-                    };
-                    return be.reporteBonito(client,[{
-                        tabla:"agrupacion_principal",
-                        campoId:"agrupacion_principal",
-                        camposAMostrar:["denominacion"],
-                        joinSiguiente:["agrupacion_principal"],
-                        color:true,
-                        condicion: ['ocultar IS NOT TRUE']
-                    },{
-                        tabla:"dimension",
-                        campoId:"dimension",
-                        camposAMostrar:["denominacion"],
-                        joinSiguiente:["dimension"],
-                        condicion: ['ocultar IS NOT TRUE'],
-                    },{
-                        tabla:"indicadores",
-                        campoId:"indicador",
-                        camposAMostrar:["denominacion"],
-                        mostrarIndicadoresYLinks:true,
-                    }], annios,'ocultar IS NOT TRUE',null,controles);
+                
+                }).then(function(){
+                    return be.encabezado(skinUrl,true,req,client).then(function(encabezadoHtml){
+                        encabezado=encabezadoHtml;
+                        var controles={
+                            elegidoEnDimension:{},
+                            filasEnDimension:{},
+                            posicionEnDimension:{}
+                        };
+                        return be.reporteBonito(client,[{
+                            tabla:"agrupacion_principal",
+                            campoId:"agrupacion_principal",
+                            camposAMostrar:["denominacion"],
+                            joinSiguiente:["agrupacion_principal"],
+                            color:true,
+                            condicion: ['ocultar IS NOT TRUE']
+                        },{
+                            tabla:"dimension",
+                            campoId:"dimension",
+                            camposAMostrar:["denominacion"],
+                            joinSiguiente:["dimension"],
+                            condicion: ['ocultar IS NOT TRUE'],
+                        },{
+                            tabla:"indicadores",
+                            campoId:"indicador",
+                            camposAMostrar:["denominacion"],
+                            mostrarIndicadoresYLinks:true,
+                        }], annios,'ocultar IS NOT TRUE',null,controles);
+                    })
                 });
             }).then(function(listaDeTr){
-                var skin=be.config['client-setup'].skin;
-                var skinUrl=(skin?skin+'/':'');
                 var htmlTag=html.html([
                     be.headSigba(false,req,'Indicadores'),
                     html.body([
                         html.div({id:'total-layout', 'menu-type':'hidden'},[
-                            be.encabezado(skinUrl,true,req),
+                            encabezado,
                             html.div({id:'div-encabezado-titulo-tabulado',class:'titulo-tabulados'},[
                                 html.a({class:'encabezado-titulo-tabulado',href:''+absolutePath+'principal'},[
-                                //html.div({class:'encabezado-interno'},[
                                     html.div({id:'indicadores-titulo',class:'titulo-tabulados'},'Indicadores'),
                                     html.div({id:'titulo-signos_convencionales',class:'titulo-tabulados'},[html.a({id:'signos_convencionales-link',href:''+absolutePath+'principal-signos_convencionales'},'Signos convencionales')]),
                                     html.div({class:'float-clear'},"")
@@ -992,19 +1000,20 @@ class AppSIGBA extends backend.AppBackend{
                             ])
                         })
                     );
-                    var paginaInfoIndicador=html.html([
-                        be.headSigba(false,req,'Ficha técnica'),
-                        html.body([
-                            html.div({id:'total-layout', 'menu-type':'hidden'},[
-                                be.encabezado(skinUrl,false,req),
-                                tablaFicha
-                            ]),
-                            be.foot(skinUrl)
-                        ])
-                    ]);
-                    res.send(paginaInfoIndicador.toHtmlText({pretty:true}));
-                    res.end();
-                    
+                    return be.encabezado(skinUrl,false,req,client).then(function(encabezadoHtml){
+                        var paginaInfoIndicador=html.html([
+                            be.headSigba(false,req,'Ficha técnica'),
+                            html.body([
+                                html.div({id:'total-layout', 'menu-type':'hidden'},[
+                                    encabezadoHtml,
+                                    tablaFicha
+                                ]),
+                                be.foot(skinUrl)
+                            ])
+                        ]);
+                        res.send(paginaInfoIndicador.toHtmlText({pretty:true}));
+                        res.end();
+                    })
                 }).catch(MiniTools.serveErr(req,res)).then(function(){client.done()});
             })
         });
@@ -1020,7 +1029,7 @@ class AppSIGBA extends backend.AppBackend{
                         be.headSigba(false,req,'Leyes'),
                         html.body([
                             html.div({id:'total-layout','menu-type':'hidden'},[
-                                be.encabezado(skinUrl,false,req),
+                                be.encabezado(skinUrl,false,req,client),
                                 html.h2({id:'agrupacion_principal_'+agrupacion_principal},result.row.denominacion),
                                 html.div({id:'ley_agrupacion_principal_'+agrupacion_principal},
                                     arregloLeyes.map(function(ley){
@@ -1043,61 +1052,80 @@ class AppSIGBA extends backend.AppBackend{
                 var skinUrl=(skin?skin+'/':'');
                 return client.query(`SELECT signo,denominacion,orden FROM signos_convencionales ORDER BY orden`).fetchAll().then(function(result){
                     var filasSignos=result.rows;
-                    var pantalla=html.html([
-                        be.headSigba(false,req,'Signos convencionales'),
-                        html.body([
-                            be.encabezado(skinUrl,false,req),
-                            html.div({id:'total-layout','menu-type':'hidden'},[
-                                html.table({id:'tabla-signos_convencionales',class:'signos-convencionales-encabezado'},[
-                                    html.caption({id:'caption-signos_convencionales',class:'signos-convencionales-encabezado'},'SIGNOS CONVENCIONALES'),
-                                    html.thead({id:'thead-signos_convencionales',class:'signos-convencionales-encabezado'},[
-                                        html.tr({id:'thead-tr-signos_convencionales',class:'signos-convencionales-encabezado'},[
-                                            html.th({id:'th-signo',class:'signos_convencionales-encabezado'},'Signo'),
-                                            html.th({id:'th-dnominacion',class:'signos_convencionales-encabezado'},'Descripción')
-                                        ])
-                                    ]),
-                                    html.tbody({id:'tbody-signos-convencionales'},
-                                        filasSignos.map(function(filaSigno){
-                                            return html.tr({class:'fila-signos_convencionales'},[
-                                                html.td({class:'td-signos_convencionales'},[filaSigno.signo]),
-                                                html.td({class:'td-signos_convencionales'},[filaSigno.denominacion]),
+                    return be.encabezado(skinUrl,false,req,client).then(function(encabezadoHtml){
+                        var pantalla=html.html([
+                            be.headSigba(false,req,'Signos convencionales'),
+                            html.body([
+                                encabezadoHtml,
+                                html.div({id:'total-layout','menu-type':'hidden'},[
+                                    html.table({id:'tabla-signos_convencionales',class:'signos-convencionales-encabezado'},[
+                                        html.caption({id:'caption-signos_convencionales',class:'signos-convencionales-encabezado'},'SIGNOS CONVENCIONALES'),
+                                        html.thead({id:'thead-signos_convencionales',class:'signos-convencionales-encabezado'},[
+                                            html.tr({id:'thead-tr-signos_convencionales',class:'signos-convencionales-encabezado'},[
+                                                html.th({id:'th-signo',class:'signos_convencionales-encabezado'},'Signo'),
+                                                html.th({id:'th-dnominacion',class:'signos_convencionales-encabezado'},'Descripción')
                                             ])
-                                        })
-                                    )
-                                ]),
-                                be.foot(skinUrl)
+                                        ]),
+                                        html.tbody({id:'tbody-signos-convencionales'},
+                                            filasSignos.map(function(filaSigno){
+                                                return html.tr({class:'fila-signos_convencionales'},[
+                                                    html.td({class:'td-signos_convencionales'},[filaSigno.signo]),
+                                                    html.td({class:'td-signos_convencionales'},[filaSigno.denominacion]),
+                                                ])
+                                            })
+                                        )
+                                    ]),
+                                    be.foot(skinUrl)
+                                ])
                             ])
                         ])
-                    ])
-                    res.send(pantalla.toHtmlText({pretty:true}));
-                    res.end();
+                        res.send(pantalla.toHtmlText({pretty:true}));
+                        res.end();
+                    })
                 }).catch(MiniTools.serveErr(req,res)).then(function(){client.done()});
             })
         })
     }
-    encabezado(skinUrl,esPrincipal,req){
+    
+    obtenerAutonomias(client){
+        return client.query("SELECT * FROM agrupacion_principal WHERE ocultar is not true ORDER BY orden").fetchAll().then(function(result){
+            var autonomiasFilas=result.rows;
+            var autonomias=autonomiasFilas.map(function(fila){
+                return {
+                    codigo:fila.agrupacion_principal,
+                    denominacion:fila.denominacion,
+                    color:fila.color
+                }
+            })
+            return autonomias;
+        })
+    }
+    
+    encabezado(skinUrl,esPrincipal,req,client){
         var be = this;
-        return html.div({id:'id-encabezado'},[
-            html.a({class:'encabezado',id:'barra-superior',href:''+absolutePath+'principal'},[
-                html.div({class:'encabezado-interno'},[
-                    html.img({class:'encabezado',id:'bs-izq',src:skinUrl+'img/logo-ciudad.png'}),
-                    html.img({class:'encabezado',id:'bs-der',src:skinUrl+'img/logo-BA.png'})
+        return be.obtenerAutonomias(client).then(function(autonomias){
+            return html.div({id:'id-encabezado'},[
+                html.a({class:'encabezado',id:'barra-superior',href:''+absolutePath+'principal'},[
+                    html.div({class:'encabezado-interno'},[
+                        html.img({class:'encabezado',id:'bs-izq',src:skinUrl+'img/logo-ciudad.png'}),
+                        html.img({class:'encabezado',id:'bs-der',src:skinUrl+'img/logo-BA.png'})
+                    ]),
                 ]),
-            ]),
-            html.div({class:'encabezado',id:'barra-inferior'},
-                [].concat([
-                    html.a({class:'a-principal',href:''+absolutePath+'principal'},[html.img({class:'encabezado',id:'img-logo',src:skinUrl+'img/img-logo.png'})])
-                ]).concat(be.config['client-setup'].logos.map(function(logoName){
-                        return html.a({class:'a-principal',href:''+absolutePath+'principal'},[html.img({class:'encabezado',id:'logo-'+logoName,src:skinUrl+'img/img-logo-'+logoName+'.png'})]);
-                }).concat([be.config['client-setup'].conTextoPrincipal?html.div({class:'encabezado',id:'texto-encabezado-grande'}):null]).concat(
-                    esPrincipal?html.div({class:'contiene-autonomias'},['auto0','auto1','auto2','auto3','auto5'].map(function(logo){
-                        var href=''+absolutePath+'principal#'+logo;
-                        var src=skinUrl+'img/'+logo+'.png';
-                        return html.a({class:'autonomia-a',href:href},[html.img({class:'autonomia-img',src:src})])
-                    })):null
-                ))
-            )
-        ]);
+                html.div({class:'encabezado',id:'barra-inferior'},
+                    [].concat([
+                        html.a({class:'a-principal',href:''+absolutePath+'principal'},[html.img({class:'encabezado',id:'img-logo',src:skinUrl+'img/img-logo.png'})])
+                    ]).concat(be.config['client-setup'].logos.map(function(logoName){
+                            return html.a({class:'a-principal',href:''+absolutePath+'principal'},[html.img({class:'encabezado',id:'logo-'+logoName,src:skinUrl+'img/img-logo-'+logoName+'.png'})]);
+                    }).concat([be.config['client-setup'].conTextoPrincipal?html.div({class:'encabezado',id:'texto-encabezado-grande'}):null]).concat(
+                        esPrincipal?html.div({class:'contiene-autonomias'},autonomias.map(function(autonomia){
+                            var href=''+absolutePath+'principal#'+autonomia.codigo;
+                            var src=skinUrl+'img/'+autonomia.codigo+'.png';
+                            return html.a({class:'autonomia-a',href:href,title:autonomia.denominacion},[html.img({class:'autonomia-img',src:src})])
+                        })):null
+                    ))
+                )
+            ]);
+        })
     }
     foot(skinUrl){
         return html.div({class:'footer',id:'foot'},[
@@ -1108,6 +1136,7 @@ class AppSIGBA extends backend.AppBackend{
             ])
         ])
     }
+    
     getMenu(context){
         var be = this;
         return {menu:[
