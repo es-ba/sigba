@@ -1,5 +1,8 @@
 "use strict";
-var changing = require('best-globals').changing;
+
+/* jshint browser: true */
+
+var changing = window.bestGlobals.changing;
 function tableCreate(info, data) {
     var rows = JSON.parse(data);
     var tablaId = rows[0].indicador;
@@ -25,8 +28,8 @@ function tableCreate(info, data) {
         td.appendChild(divValor);
         th.appendChild(divCategoria);
         tr.appendChild(td);
-        trThead.appendChild(th)
-    })
+        trThead.appendChild(th);
+    });
     tabla.appendChild(caption);
     thead.appendChild(trThead);
     tabla.appendChild(thead);
@@ -68,19 +71,19 @@ function generateChart(elementWithMatrix, svgWidth) {
     //se muestran como máximo 10 gráficos
     var zMatrices = tabulatorMatrix.z;
     if (tabulatorMatrix.z.length > 10 && tabuladoInfo.graf_ult_annios) {
-        zMatrices = tabulatorMatrix.z.slice(0, 10)
+        zMatrices = tabulatorMatrix.z.slice(0, 10);
     }
     if (tabulatorMatrix.z.length > 10 && tabuladoInfo.graf_cada_cinco) {
         if (Number(tabulatorMatrix.z[0].caption) && (Number(tabulatorMatrix.z[0].caption) % 5 != 0)) {
-            zMatrices = [tabulatorMatrix.z[0]]
+            zMatrices = [tabulatorMatrix.z[0]];
         }
         tabulatorMatrix.z.forEach(function (matrixElegida) {
             if (matrixElegida.caption && Number(matrixElegida.caption) && (Number(matrixElegida.caption) % 5 == 0)) {
-                zMatrices.push(matrixElegida)
+                zMatrices.push(matrixElegida);
             }
         });
         if (Number(tabulatorMatrix.z[tabulatorMatrix.z.length - 1].caption) && (Number(tabulatorMatrix.z[tabulatorMatrix.z.length - 1].caption) % 5 != 0)) {
-            zMatrices.push(tabulatorMatrix.z[tabulatorMatrix.z.length - 1])
+            zMatrices.push(tabulatorMatrix.z[tabulatorMatrix.z.length - 1]);
         }
     }
     var minZYValue = Number.MAX_VALUE;
@@ -88,7 +91,7 @@ function generateChart(elementWithMatrix, svgWidth) {
     zMatrices.forEach(function (zMatrix) {
         //si es apilado dejo la matrix con los totales para calcular el max, sino curo la matrix
         var mtx = (tabuladoInfo.apilado || tabuladoInfo.tipo_grafico == 'piramide') ? zMatrix : curarMatrix(zMatrix);
-        let minMax = Graphicator.calcularMinMax(mtx);
+        var minMax = window.Graphicator.calcularMinMax(mtx);
         minZYValue = Math.min(minMax.min, minZYValue);
         maxZYValue = Math.max(minMax.max, maxZYValue);
     });
@@ -136,7 +139,7 @@ function generateChart(elementWithMatrix, svgWidth) {
                         }
                     }
                 }
-            }
+            };
         }
         if (tabuladoInfo.tipo_grafico == 'barra') {
             specificConfig = {
@@ -149,7 +152,7 @@ function generateChart(elementWithMatrix, svgWidth) {
                         }
                     }
                 }
-            }
+            };
         }
         if (tabuladoInfo.tipo_grafico == 'piramide') {
             specificConfig = {
@@ -163,9 +166,9 @@ function generateChart(elementWithMatrix, svgWidth) {
                         }
                     }
                 }
-            }
+            };
         }
-        charts.push(Graphicator.render(changing(generalConfig, specificConfig)));
+        charts.push(window.Graphicator.render(changing(generalConfig, specificConfig)));
         indexChart++;
     });
     chartContainer.style.display = 'block';
@@ -186,7 +189,7 @@ function generateChartElementId(matrix, tabuladoInfo, indexChart, chartContainer
     }
     chartContainer.appendChild(chartElement);
 
-    return chartElementId
+    return chartElementId;
 }
 
 function generateChartContainer(elementWithMatrix, tabuladoInfo) {
@@ -222,7 +225,7 @@ function getTabuladoElement() {
 
 function toggleChartTabuladoDisplay() {
     //changing url accordingly without reolading page
-    if (window.location.search.includes(displayChartParamName)) {
+    if (window.location.search.includes(window.displayChartParamName)) {
         toggleToTabulado();
     } else {
         toggleToChart();
@@ -231,12 +234,12 @@ function toggleChartTabuladoDisplay() {
 }
 
 function toggleToTabulado() {
-    var newUrl = window.location.search.includes(displayChartParamName) ? location.href.replace(displayChartParamName, '') : location.href;
+    var newUrl = window.location.search.includes(window.displayChartParamName) ? location.href.replace(window.displayChartParamName, '') : location.href;
     updateUrlState(newUrl, "pushState");
 }
 
 function toggleToChart() {
-    var newUrl = window.location.search.includes(displayChartParamName) ? location.href : location.href + displayChartParamName;
+    var newUrl = window.location.search.includes(window.displayChartParamName) ? location.href : location.href + window.displayChartParamName;
     updateUrlState(newUrl, "replaceState");
 }
 
@@ -251,14 +254,14 @@ window.onpopstate = function (event) {
 
 function updateVisualization() {
     var tglBtn = document.getElementById('toogleButton');
-    if (window.location.search.includes(displayChartParamName)) {
+    if (window.location.search.includes(window.displayChartParamName)) {
         document.getElementsByClassName('chartContainer')[0].style.display = 'block';
         getTabuladoElement().style.display = 'none';
-        if (tglBtn) tglBtn.src = 'img/tabulado.png';
+        if (tglBtn) {tglBtn.src = 'img/tabulado.png';}
     } else {
         document.getElementsByClassName('chartContainer')[0].style.display = 'none';
         getTabuladoElement().style.display = 'block';
-        if (tglBtn) tglBtn.src = 'img/grafico.png';
+        if (tglBtn) {tglBtn.src = 'img/grafico.png';}
     }
 }
 
@@ -273,7 +276,7 @@ function buildToggleButton() {
     toggleButton.style.margin = '5';
     toggleButton.onclick = function () {
         toggleChartTabuladoDisplay();
-    }
+    };
     return toggleButton;
 }
 
@@ -312,9 +315,9 @@ function buildHiddenInputUrl() {
 
 function insertNewButton(newButton, inElement) {
     if (inElement) {
-        inElement.appendChild(newButton)
+        inElement.appendChild(newButton);
     } else {
-        getTabuladoElement().parentNode.insertBefore(newButton, getTabuladoElement())
+        getTabuladoElement().parentNode.insertBefore(newButton, getTabuladoElement());
     }
 }
 
@@ -326,13 +329,13 @@ function buildExportExcelButton() {
     exportButton.style.margin = '5';
     exportButton.width = "40";
     exportButton.onclick = function () {
-        var t = new Tabulator();
+        var t = new window.Tabulator();
         t.toExcel(getTabuladoElement(), {
             filename: getMatrix(getTabuladoElement()).caption,
             username: (window.my) ? window.my.config.username : null
         });
     };
-    return exportButton
+    return exportButton;
 }
 
 function insertCopyUrlButton() {
@@ -343,7 +346,7 @@ function insertCopyUrlButton() {
 
 window.addEventListener('load', function () {
 
-    getChartBoxes().forEach(box => {
+    getChartBoxes().forEach(function(box){
         generateChart(box);
     });
 
@@ -360,12 +363,10 @@ window.addEventListener('load', function () {
             }
             updateVisualization();
         } catch (error) {
-
-            console.error('No es posible graficar el tabulado. ' + error);
+            window.console.error('No es posible graficar el tabulado. ' + error);
         }
 
         insertNewButton(buildExportExcelButton(), inElement);
-        //        insertNewButton(buildExportExcelButton(), tabuladoElem);
         insertCopyUrlButton();
     }
 
@@ -413,12 +414,9 @@ window.addEventListener('load', function () {
                 if (div.offsetLeft > window.scrollX) {
                     div.style.left = window.scrollX + 'px';
                 } else if (
-                    // div.offsetLeft+div.offsetWidth<window.innerWidth+window.scrollX
                     div.offsetLeft + div.clientWidth < window.innerWidth + window.scrollX
                 ) {
                     div.style.position = 'relative';
-                    console.log(div.style.left, div.offsetLeft, div.offsetWidth, div.clientWidth);
-                    // div.style.left = window.innerWidth+window.scrollX-div.clientWidth + 'px';
                     div.style.left = window.innerWidth + window.scrollX - div.offsetWidth + 'px';
                 }
                 if (div.offsetLeft > window.scrollX) {
@@ -436,7 +434,6 @@ function getChartBoxes() {
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/includes
 if (!String.prototype.includes) {
     String.prototype.includes = function (search, start) {
-        'use strict';
         if (typeof start !== 'number') {
             start = 0;
         }

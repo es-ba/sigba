@@ -182,7 +182,7 @@ class AppSIGBA extends backend.AppBackend{
                             var listaTdValores=[];
                             var ultimoAnnioDisponible;
                             var cortantesEnPrincipalObj;
-                            var obtenerValoresPrincipal=client.query(
+                            obtenerValoresPrincipal=client.query(
                                 `select max(cortes->>'annio') annio from celdas where indicador=$1`,[registro.indicador]
                                 ).fetchOneRowIfExists().then(function(result){
                                     ultimoAnnioDisponible=result.row.annio;
