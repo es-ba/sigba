@@ -64,26 +64,23 @@ function generateChart(elementWithMatrix, svgWidth) {
     if (!tabuladoInfo.grafico && tabuladoInfo.tipo_grafico != 'piramide') {
         throw new Error('gráfico deshabilitado en tabla tabulados campo mostrar_grafico');
     }
-    var chartContainer = generateChartContainer(elementWithMatrix, tabuladoInfo);
-    //se muestran solo los primeros 10 gráficos
-    var zMatrices=tabulatorMatrix.z;
-    if(tabulatorMatrix.z.length>10 && tabuladoInfo.graf_ult_annios){
+
+    //se muestran como máximo 10 gráficos
+    var zMatrices = tabulatorMatrix.z;
+    if (tabulatorMatrix.z.length > 10 && tabuladoInfo.graf_ult_annios) {
         zMatrices = tabulatorMatrix.z.slice(0, 10)
     }
-    if(tabulatorMatrix.z.length>10 && tabuladoInfo.graf_cada_cinco){
-        if(Number(tabulatorMatrix.z[0].caption) && (Number(tabulatorMatrix.z[0].caption)%5!=0)){
-            zMatrices=[tabulatorMatrix.z[0]]
+    if (tabulatorMatrix.z.length > 10 && tabuladoInfo.graf_cada_cinco) {
+        if (Number(tabulatorMatrix.z[0].caption) && (Number(tabulatorMatrix.z[0].caption) % 5 != 0)) {
+            zMatrices = [tabulatorMatrix.z[0]]
         }
-        tabulatorMatrix.z.forEach(function(matrixElegida){
-            console.log("matrixElegida.caption",matrixElegida.caption)
-            console.log("Number(matrixElegida.caption)",Number(matrixElegida.caption))
-            console.log("(Number(matrixElegida.caption)%5==0)",(Number(matrixElegida.caption)%5==0))
-            if(matrixElegida.caption && Number(matrixElegida.caption) && (Number(matrixElegida.caption)%5==0)){
+        tabulatorMatrix.z.forEach(function (matrixElegida) {
+            if (matrixElegida.caption && Number(matrixElegida.caption) && (Number(matrixElegida.caption) % 5 == 0)) {
                 zMatrices.push(matrixElegida)
             }
         });
-        if(Number(tabulatorMatrix.z[tabulatorMatrix.z.length-1].caption) && (Number(tabulatorMatrix.z[tabulatorMatrix.z.length-1].caption)%5!=0)){
-            zMatrices.push(tabulatorMatrix.z[tabulatorMatrix.z.length-1])
+        if (Number(tabulatorMatrix.z[tabulatorMatrix.z.length - 1].caption) && (Number(tabulatorMatrix.z[tabulatorMatrix.z.length - 1].caption) % 5 != 0)) {
+            zMatrices.push(tabulatorMatrix.z[tabulatorMatrix.z.length - 1])
         }
     }
     var minZYValue = Number.MAX_VALUE;
@@ -96,6 +93,7 @@ function generateChart(elementWithMatrix, svgWidth) {
         maxZYValue = Math.max(minMax.max, maxZYValue);
     });
 
+    var chartContainer = generateChartContainer(elementWithMatrix, tabuladoInfo);
     zMatrices.forEach(function (matrix, indexChart) {
         matrix = curarMatrix(matrix);
         // ver interfaz graph-configuration.d.ts en graphicator
@@ -170,6 +168,7 @@ function generateChart(elementWithMatrix, svgWidth) {
         charts.push(Graphicator.render(changing(generalConfig, specificConfig)));
         indexChart++;
     });
+    chartContainer.style.display = 'block';
 }
 
 function generateChartElementId(matrix, tabuladoInfo, indexChart, chartContainer) {
@@ -200,7 +199,7 @@ function generateChartContainer(elementWithMatrix, tabuladoInfo) {
     chartContainer.setAttribute('id', 'chartContainer-' + tabuladoInfo.indicador);
     chartContainer.className = 'chartContainer';
     chartContainer.appendChild(chartTitle);
-    // chartContainer.style.display = 'none';
+    chartContainer.style.display = 'none';
     elementWithMatrix.parentNode.insertBefore(chartContainer, elementWithMatrix.nextElementSibling);
     return chartContainer;
 }
@@ -216,6 +215,7 @@ function getTabuladoInfo(element) {
 function getChartContainer(indicador) {
     return document.getElementById('chartContainer-' + indicador);
 }
+
 function getTabuladoElement() {
     return document.getElementById('tabulado-html');
 }
@@ -232,12 +232,12 @@ function toggleChartTabuladoDisplay() {
 
 function toggleToTabulado() {
     var newUrl = window.location.search.includes(displayChartParamName) ? location.href.replace(displayChartParamName, '') : location.href;
-    updateUrlState(newUrl,"pushState");
+    updateUrlState(newUrl, "pushState");
 }
 
 function toggleToChart() {
     var newUrl = window.location.search.includes(displayChartParamName) ? location.href : location.href + displayChartParamName;
-    updateUrlState(newUrl,"replaceState");
+    updateUrlState(newUrl, "replaceState");
 }
 
 function updateUrlState(newUrl, method) {
@@ -310,15 +310,12 @@ function buildHiddenInputUrl() {
     return inputUrl;
 }
 
-function insertNewButton(newButton,inElement) {
-    // tabuladoElement().parentNode.insertBefore(newButton, tabuladoElement().nextElementSibling);
-    //
-    if(inElement){
-    inElement.appendChild(newButton)
-    }else{
+function insertNewButton(newButton, inElement) {
+    if (inElement) {
+        inElement.appendChild(newButton)
+    } else {
         getTabuladoElement().parentNode.insertBefore(newButton, getTabuladoElement())
     }
-
 }
 
 function buildExportExcelButton() {
@@ -339,9 +336,9 @@ function buildExportExcelButton() {
 }
 
 function insertCopyUrlButton() {
-    var inElement=document.getElementById('para-botones');
-    insertNewButton(buildHiddenInputUrl(),inElement);
-    insertNewButton(buildCopyUrlButton(),inElement);
+    var inElement = document.getElementById('para-botones');
+    insertNewButton(buildHiddenInputUrl(), inElement);
+    insertNewButton(buildCopyUrlButton(), inElement);
 }
 
 window.addEventListener('load', function () {
@@ -352,21 +349,23 @@ window.addEventListener('load', function () {
 
     var tabuladoElem = getTabuladoElement();
     if (tabuladoElem) {
-        var inElement=document.getElementById('para-botones');
+        var inElement = document.getElementById('para-botones');
+        //TODO: pasar el try catch adentro de 'generateChart' como está ahora el catch también ataja errores que no son del grafico
         try {
             generateChart(tabuladoElem, window.innerWidth - document.getElementById("div-pantalla-izquierda").offsetWidth - 32);
             if (getTabuladoInfo(tabuladoElem).tipo_grafico == 'piramide') {
                 toggleToChart();
             } else {
-                insertNewButton(buildToggleButton(),inElement);
+                insertNewButton(buildToggleButton(), inElement);
             }
             updateVisualization();
         } catch (error) {
+
             console.error('No es posible graficar el tabulado. ' + error);
         }
-        
-        insertNewButton(buildExportExcelButton(),inElement);
-//        insertNewButton(buildExportExcelButton(), tabuladoElem);
+
+        insertNewButton(buildExportExcelButton(), inElement);
+        //        insertNewButton(buildExportExcelButton(), tabuladoElem);
         insertCopyUrlButton();
     }
 
@@ -407,23 +406,23 @@ window.addEventListener('load', function () {
             divPorId.removeChild(tablaEspecial);
         });
     });
-    window.addEventListener('scroll',function(){
-        ["id-encabezado","div-encabezado-titulo-tabulado","foot","annios-links"].forEach(function(id){
-            var div=document.getElementById(id);
-            if(div){
-                if(div.offsetLeft>window.scrollX){
-                    div.style.left=window.scrollX + 'px';
-                }else if(
+    window.addEventListener('scroll', function () {
+        ["id-encabezado", "div-encabezado-titulo-tabulado", "foot", "annios-links"].forEach(function (id) {
+            var div = document.getElementById(id);
+            if (div) {
+                if (div.offsetLeft > window.scrollX) {
+                    div.style.left = window.scrollX + 'px';
+                } else if (
                     // div.offsetLeft+div.offsetWidth<window.innerWidth+window.scrollX
-                    div.offsetLeft+div.clientWidth<window.innerWidth+window.scrollX
-                ){
-                    div.style.position='relative';
+                    div.offsetLeft + div.clientWidth < window.innerWidth + window.scrollX
+                ) {
+                    div.style.position = 'relative';
                     console.log(div.style.left, div.offsetLeft, div.offsetWidth, div.clientWidth);
                     // div.style.left = window.innerWidth+window.scrollX-div.clientWidth + 'px';
-                    div.style.left = window.innerWidth+window.scrollX-div.offsetWidth + 'px';
+                    div.style.left = window.innerWidth + window.scrollX - div.offsetWidth + 'px';
                 }
-                if(div.offsetLeft>window.scrollX){
-                    div.style.left=window.scrollX + 'px';
+                if (div.offsetLeft > window.scrollX) {
+                    div.style.left = window.scrollX + 'px';
                 }
             }
         });
@@ -436,16 +435,16 @@ function getChartBoxes() {
 
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/includes
 if (!String.prototype.includes) {
-  String.prototype.includes = function(search, start) {
-    'use strict';
-    if (typeof start !== 'number') {
-      start = 0;
-    }
-    
-    if (start + search.length > this.length) {
-      return false;
-    } else {
-      return this.indexOf(search, start) !== -1;
-    }
-  };
+    String.prototype.includes = function (search, start) {
+        'use strict';
+        if (typeof start !== 'number') {
+            start = 0;
+        }
+
+        if (start + search.length > this.length) {
+            return false;
+        } else {
+            return this.indexOf(search, start) !== -1;
+        }
+    };
 }
