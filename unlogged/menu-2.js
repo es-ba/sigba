@@ -406,10 +406,46 @@ window.addEventListener('load', function () {
         despliegueEspecialTd[i].addEventListener('mouseleave', function () {
             divPorId.removeChild(tablaEspecial);
         });
-    })
+    });
+    window.addEventListener('scroll',function(){
+        ["id-encabezado","div-encabezado-titulo-tabulado","foot","annios-links"].forEach(function(id){
+            var div=document.getElementById(id);
+            if(div){
+                if(div.offsetLeft>window.scrollX){
+                    div.style.left=window.scrollX + 'px';
+                }else if(
+                    // div.offsetLeft+div.offsetWidth<window.innerWidth+window.scrollX
+                    div.offsetLeft+div.clientWidth<window.innerWidth+window.scrollX
+                ){
+                    div.style.position='relative';
+                    console.log(div.style.left, div.offsetLeft, div.offsetWidth, div.clientWidth);
+                    // div.style.left = window.innerWidth+window.scrollX-div.clientWidth + 'px';
+                    div.style.left = window.innerWidth+window.scrollX-div.offsetWidth + 'px';
+                }
+                if(div.offsetLeft>window.scrollX){
+                    div.style.left=window.scrollX + 'px';
+                }
+            }
+        });
+    });
 });
 
 function getChartBoxes() {
     return document.querySelectorAll('.box-grafico-principal [para-graficador]');
 }
 
+// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/includes
+if (!String.prototype.includes) {
+  String.prototype.includes = function(search, start) {
+    'use strict';
+    if (typeof start !== 'number') {
+      start = 0;
+    }
+    
+    if (start + search.length > this.length) {
+      return false;
+    } else {
+      return this.indexOf(search, start) !== -1;
+    }
+  };
+}
