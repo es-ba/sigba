@@ -225,7 +225,7 @@ function getTabuladoElement() {
 
 function toggleChartTabuladoDisplay() {
     //changing url accordingly without reolading page
-    if (window.location.search.includes(window.displayChartParamName)) {
+    if (window.location.search.match(window.displayChartParamName)) {
         toggleToTabulado();
     } else {
         toggleToChart();
@@ -234,12 +234,12 @@ function toggleChartTabuladoDisplay() {
 }
 
 function toggleToTabulado() {
-    var newUrl = window.location.search.includes(window.displayChartParamName) ? location.href.replace(window.displayChartParamName, '') : location.href;
+    var newUrl = window.location.search.match(window.displayChartParamName) ? location.href.replace(window.displayChartParamName, '') : location.href;
     updateUrlState(newUrl, "pushState");
 }
 
 function toggleToChart() {
-    var newUrl = window.location.search.includes(window.displayChartParamName) ? location.href : location.href + window.displayChartParamName;
+    var newUrl = window.location.search.match(window.displayChartParamName) ? location.href : location.href + window.displayChartParamName;
     updateUrlState(newUrl, "replaceState");
 }
 
@@ -254,7 +254,7 @@ window.onpopstate = function (event) {
 
 function updateVisualization() {
     var tglBtn = document.getElementById('toogleButton');
-    if (window.location.search.includes(window.displayChartParamName)) {
+    if (window.location.search.match(window.displayChartParamName)) {
         document.getElementsByClassName('chartContainer')[0].style.display = 'block';
         getTabuladoElement().style.display = 'none';
         if (tglBtn) {tglBtn.src = 'img/tabulado.png';}
@@ -429,19 +429,4 @@ window.addEventListener('load', function () {
 
 function getChartBoxes() {
     return document.querySelectorAll('.box-grafico-principal [para-graficador]');
-}
-
-// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/includes
-if (!String.prototype.includes) {
-    String.prototype.includes = function (search, start) {
-        if (typeof start !== 'number') {
-            start = 0;
-        }
-
-        if (start + search.length > this.length) {
-            return false;
-        } else {
-            return this.indexOf(search, start) !== -1;
-        }
-    };
 }
