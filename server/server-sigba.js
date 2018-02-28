@@ -827,7 +827,7 @@ class AppSIGBA extends backend.AppBackend{
                                     ]);
                                     var pagina=html.html([
                                         be.headSigba(false,req,descripcion.i_denom),
-                                        html.body([pantalla,be.foot(skinUrl)])
+                                        html.body({"que-pantalla": 'indicador'},[pantalla,be.foot(skinUrl)])
                                     ]);
                                     res.send(pagina.toHtmlText({pretty:true}));
                                     res.end();
@@ -890,7 +890,7 @@ class AppSIGBA extends backend.AppBackend{
             }).then(function(listaDeTr){
                 var htmlTag=html.html([
                     be.headSigba(false,req,'Indicadores'),
-                    html.body([
+                    html.body({"que-pantalla": 'principal'},[
                         html.div({id:'total-layout', 'menu-type':'hidden'},[
                             encabezado,
                             html.div({id:'div-encabezado-titulo-tabulado',class:'titulo-tabulados'},[
@@ -1003,7 +1003,7 @@ class AppSIGBA extends backend.AppBackend{
                     return be.encabezado(skinUrl,false,req,client).then(function(encabezadoHtml){
                         var paginaInfoIndicador=html.html([
                             be.headSigba(false,req,'Ficha técnica'),
-                            html.body([
+                            html.body({"que-pantalla": 'info-indicador'},[
                                 html.div({id:'total-layout', 'menu-type':'hidden'},[
                                     encabezadoHtml,
                                     tablaFicha
@@ -1027,7 +1027,7 @@ class AppSIGBA extends backend.AppBackend{
                     var arregloLeyes=result.row.leyes.split('; ');
                     var paginaLey=html.html([
                         be.headSigba(false,req,'Leyes'),
-                        html.body([
+                        html.body({"que-pantalla": 'ley'},[
                             html.div({id:'total-layout','menu-type':'hidden'},[
                                 be.encabezado(skinUrl,false,req,client),
                                 html.h2({id:'agrupacion_principal_'+agrupacion_principal},result.row.denominacion),
@@ -1055,7 +1055,7 @@ class AppSIGBA extends backend.AppBackend{
                     return be.encabezado(skinUrl,false,req,client).then(function(encabezadoHtml){
                         var pantalla=html.html([
                             be.headSigba(false,req,'Signos convencionales'),
-                            html.body([
+                            html.body({"que-pantalla": 'signos'},[
                                 encabezadoHtml,
                                 html.div({id:'total-layout','menu-type':'hidden'},[
                                     html.table({id:'tabla-signos_convencionales',class:'signos-convencionales-encabezado'},[
@@ -1217,4 +1217,3 @@ process.on('unhandledRejection', function(err){
 });
 
 new AppSIGBA().start();
-    

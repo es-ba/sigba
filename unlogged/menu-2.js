@@ -247,10 +247,14 @@ function updateUrlState(newUrl, method) {
     window.history[method]("Cambiar visualización entre gráfico y tabulado", "Visualización", newUrl);
 }
 
-// when browser back or next button are used
-window.onpopstate = function (event) {
-    updateVisualization();
-};
+window.addEventListener('load', function(){
+    // when browser back or next button are used
+    if(document.body.getAttribute("que-pantalla")=='indicador'){
+        window.onpopstate = function (event) {
+            updateVisualization();
+        };
+    }
+});
 
 function updateVisualization() {
     var tglBtn = document.getElementById('toogleButton');
