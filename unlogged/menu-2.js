@@ -257,15 +257,17 @@ window.addEventListener('load', function(){
 });
 
 function updateVisualization() {
-    var tglBtn = document.getElementById('toogleButton');
-    if (window.location.search.match(window.displayChartParamName)) {
-        document.getElementsByClassName('chartContainer')[0].style.display = 'block';
-        getTabuladoElement().style.display = 'none';
-        if (tglBtn) {tglBtn.src = 'img/tabulado.png';}
-    } else {
-        document.getElementsByClassName('chartContainer')[0].style.display = 'none';
-        getTabuladoElement().style.display = 'block';
-        if (tglBtn) {tglBtn.src = 'img/grafico.png';}
+    if (getTabuladoElement()){
+        var tglBtn = document.getElementById('toogleButton');
+        if (window.location.search.match(window.displayChartParamName)) {
+            document.querySelector('.chartContainer').style.display = 'block';
+            getTabuladoElement().style.display = 'none';
+            if (tglBtn) {tglBtn.src = 'img/tabulado.png';}
+        } else {
+            document.querySelector('.chartContainer').style.display = 'none';
+            getTabuladoElement().style.display = 'block';
+            if (tglBtn) {tglBtn.src = 'img/grafico.png';}
+        }
     }
 }
 
@@ -349,8 +351,7 @@ function insertCopyUrlButton() {
 }
 
 window.addEventListener('load', function () {
-
-    getChartBoxes().forEach(function(box){
+    Array.prototype.forEach.call(getChartBoxes(), function(box){
         generateChart(box);
     });
 
@@ -397,7 +398,7 @@ window.addEventListener('load', function () {
     }
     var despliegueEspecialDiv = document.querySelectorAll('[div-despliegue-especial]');
     var despliegueEspecialTd = document.querySelectorAll('[despliegue-especial]');
-    despliegueEspecialDiv.forEach(function (div, i) {
+    Array.prototype.forEach.call(despliegueEspecialDiv, function (div, i) {
         var info = div.getAttribute('especial-info');
         var tablaEspecialData = div.getAttribute('valores-especiales');
         var tablaEspecial = tableCreate(info, tablaEspecialData);

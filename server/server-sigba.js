@@ -545,6 +545,7 @@ class AppSIGBA extends backend.AppBackend{
         }
         var listaCSS = be.csss(hideBEPlusInclusions);
         return html.head([
+            html.meta({name:'viewport', content:'width=device-width'}),
             html.meta({name:'viewport', content:'initial-scale=1.0'}),
             html.title(title),
            // html.title(esPrincipal?'Tabulados':'Tabulado'),
