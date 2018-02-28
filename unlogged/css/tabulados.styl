@@ -309,70 +309,41 @@ thead th, #caption-signos_convencionales
 .tabulator-table
   th
     font-size 80%
-    max-width 120px
     min-width 90px
     height 30px
     white-space normal
     border-right 1px solid #FFF
     border-top 1px solid #FFF
+    padding 5px
+    background-color #eee
+    color #317391
+    max-height 60px
+    &.variable
+      max-width 200px
+  tbody
+    th
+      text-align left
+      max-width 180px
+      &.var_g_edad
+        text-align center
+      &.var_jer_ocup
+        min-width 200px
+      &.var_t_hog
+        min-width 120px
+      &.var_ringr_ctotcaba
+        min-width 240px
+      &.var_r_ten_viv
+        min-width 150px
+      &.var_t_cob_sal
+        min-width 200px
+  thead
+    th
+      max-width 120px
+      text-align center
 
-  .var_t_cob_sal, .var_c_reduci
-    max-width 120px
-    height 85px
-    white-space normal
-    border-left 1px solid #b6b6b6
-  
   .var_c_banio
     max-width 130px
-    height 60px
-    white-space normal
-    border-left 1px solid #b6b6b6
-    font-size 80%
-    color #383838
-    background-color #ffff
-    
-  .var_t_adop
-    background-color #646464
-    color #FFF  
   
-  .var_t_edu_mod  
-    background-color #5c5c5c
-    color #FFF
-    font-size 90%
-  
-  .var_n_ens
-    background-color #646464
-    color #FFF
-    font-size 90%
-    border-right 1px solid #FFF
-  
-  .var_t_est_salud, .var_g_edad, .var_s_gest
-    background-color #9cb6b4
-    color #fff
-    font-size 90%
-    border-right 1px solid #FFF
-    border-top 1px solid #FFF
-  
-  .var_sexo
-    background-color #9cb6b4
-    color #FFF
-    font-size 90%
-    border-right 1px solid #FFF 
-    border-bottom 1px solid #FFF
-  
-  .var_desagr, .var_edad, .var_v_a_nht, .var_n_instruc, .var_genero, .var_sit_conv_dm, .var_quin_ingr_fliar, .var_g_g_activ
-    background-color #9cb6b4
-    color #fff
-    font-size 90%
-    border-right 1px solid #FFF 
-    border-bottom 2px solid #FFF
-    text-align left
-    padding 2px
-    
-  .var_annio
-    color #317391
-
-
 .annio-cortante-posible
   color #FFF
   padding 5px
@@ -765,7 +736,8 @@ h2
   min-width 16px
   background-repeat no-repeat
   background-color fff
-  
+  background-position center 
+
 [color-agrupacion_principal="auto0"][nivel-titulo="3"]
   background-color #f09d1b
 
@@ -798,6 +770,7 @@ h2
   width 16px
   background-repeat no-repeat
   background-color fff
+  background-position center
   
 [color-agrupacion_principal="auto1"][nivel-titulo="3"]
   background-color #1FAE92
@@ -834,6 +807,7 @@ h2
   width 16px
   background-repeat no-repeat
   background-color fff
+  background-position center
   
 [color-agrupacion_principal="auto2"][nivel-titulo="3"] a, a:visited
   color #fff
@@ -868,6 +842,7 @@ h2
   width 16px
   background-repeat no-repeat
   background-color fff
+  background-position center
   
 [color-agrupacion_principal="auto3"][nivel-titulo="3"]
   background-color #EA5C1D
@@ -920,6 +895,7 @@ h2
   width 16px
   background-repeat no-repeat
   background-color fff
+  background-position center
   
 [color-agrupacion_principal="auto5"][nivel-titulo="1"] a, a:visited
   color #5a6878
