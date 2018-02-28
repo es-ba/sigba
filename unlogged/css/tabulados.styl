@@ -87,14 +87,14 @@ body
   transition .3s ease-in-out
 
 .tabulado-descripcion
-  vertical-align top
+  vertical-align middle
   
 .tabulado-descripcion-annio
   display inline-block
   float left
   margin-left 10px
   margin-right 10px
-  
+   
 .botones-tabulado-descripcion
   display inline-block
   margin-top 0px
@@ -306,70 +306,70 @@ thead th, #caption-signos_convencionales
 .espacio-reserva
   display none
 
-.var_t_cob_sal, .var_c_reduci
-  max-width 120px
-  height 85px
-  white-space normal
-  border-left 1px solid #b6b6b6
+.tabulator-table
+  th
+    font-size 80%
+    max-width 120px
+    min-width 90px
+    height 30px
+    white-space normal
+    border-right 1px solid #FFF
+    border-top 1px solid #FFF
 
-.var_c_banio
-  max-width 130px
-  height 60px
-  white-space normal
-  border-left 1px solid #b6b6b6
-  font-size 80%
-  color #383838
-  background-color #9a9a9a
+  .var_t_cob_sal, .var_c_reduci
+    max-width 120px
+    height 85px
+    white-space normal
+    border-left 1px solid #b6b6b6
   
-.var_t_adop
-  background-color #646464
-  color #FFF  
+  .var_c_banio
+    max-width 130px
+    height 60px
+    white-space normal
+    border-left 1px solid #b6b6b6
+    font-size 80%
+    color #383838
+    background-color #ffff
+    
+  .var_t_adop
+    background-color #646464
+    color #FFF  
+  
+  .var_t_edu_mod  
+    background-color #5c5c5c
+    color #FFF
+    font-size 90%
+  
+  .var_n_ens
+    background-color #646464
+    color #FFF
+    font-size 90%
+    border-right 1px solid #FFF
+  
+  .var_t_est_salud, .var_g_edad, .var_s_gest
+    background-color #9cb6b4
+    color #fff
+    font-size 90%
+    border-right 1px solid #FFF
+    border-top 1px solid #FFF
+  
+  .var_sexo
+    background-color #9cb6b4
+    color #FFF
+    font-size 90%
+    border-right 1px solid #FFF 
+    border-bottom 1px solid #FFF
+  
+  .var_desagr, .var_edad, .var_v_a_nht, .var_n_instruc, .var_genero, .var_sit_conv_dm, .var_quin_ingr_fliar, .var_g_g_activ
+    background-color #9cb6b4
+    color #fff
+    font-size 90%
+    border-right 1px solid #FFF 
+    border-bottom 2px solid #FFF
+  
+  .var_annio
+    color #317391
 
-.var_t_vacu, .var_t_viv, .var_c_sit_hac, .var_t_hog, .var_s_jefe, .var_l_nac, .var_sexo_nac, .var_sexo_nac, .var_ringr_ctotcaba, .var_r_ten_viv, .var_calif_ocup, .var_jer_ocup, .var_quin_ingr_fliar, .var_l_residen, .var_l_ocu
-  background-color #9cb6b4
-  color #FFF
-  font-size 80%
-  max-width 120px
-  min-width 90px
-  height 45px
-  white-space normal
-  border-right 1px solid #FFF
-  border-top 1px solid #FFF
-
-.var_t_edu_mod  
-  background-color #5c5c5c
-  color #FFF
-  font-size 90%
-
-.var_n_ens
-  background-color #646464
-  color #FFF
-  font-size 90%
-  border-right 1px solid #FFF
-
-.var_t_est_salud, .var_g_edad, .var_s_gest
-  background-color #9cb6b4
-  color #fff
-  font-size 90%
-  border-right 1px solid #FFF
-  border-top 1px solid #FFF
-
-.var_sexo
-  background-color #9cb6b4
-  color #FFF
-  font-size 90%
-  border-right 1px solid #FFF 
-  border-bottom 1px solid #FFF
-
-.var_desagr, .var_edad, .var_v_a_nht, .var_n_instruc, .var_genero, .var_sit_conv_dm
-  background-color #9cb6b4
-  color #fff
-  font-size 90%
-  border-right 1px solid #FFF 
-  border-bottom 2px solid #FFF
-
-.var_annio
-  color #317391
 
 .annio-cortante-posible
   color #FFF
@@ -713,7 +713,8 @@ h2
   font-size 13px
   line-height 18px
   color #ffffff
-  
+  margin-left 20px
+    
 #foot-texto-2  
   font-family Open Sans,Arial, Helvetica, sans-serif
   font-weight 400
@@ -721,7 +722,8 @@ h2
   font-size 13px
   line-height 18px
   color #999999
-  
+  margin-left 20px
+    
 #foot-img
   margin-top 60px
   margin-left 222px
