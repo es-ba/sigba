@@ -130,13 +130,13 @@ function generateChart(elementWithMatrix, svgWidth) {
                         x: {
                             type: 'indexed',
                             tick: {
-                                rotate: -50, // rota el label del tick
-                                multiline: false,
+                                rotate: -50, // rota el label del tick //sacar
+                                multiline: false, //sacar
                                 culling: {
                                     max: 25 // cant de ticks que se muestran
                                 }
                             },
-                            height: 50 // el tamaño que deja para el label del axis y las legendas
+                            height: 50 // el tamaño que deja para el label del axis y las legendas //sacar
                         }
                     }
                 }
