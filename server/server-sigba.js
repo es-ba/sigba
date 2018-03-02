@@ -810,7 +810,7 @@ class AppSIGBA extends backend.AppBackend{
                                                             habilitationButton
                                                         ]):null,
                                                         html.div({class:'tabulado-descripcion',id:'tabulado-descripcion-um'},[
-                                                            (fila.habilitado || esAdmin)?html.span({id:"tabulado-um"},"Unidad de Medida: "):null,
+                                                            (fila.habilitado || esAdmin)?html.span({id:"tabulado-um"},"Unidad de medida: "):null,
                                                             (fila.habilitado || esAdmin)?html.span({id:"tabulado-um-descripcion"},descripcion.um_denominacion):null
                                                         ]),
                                                         html.div({class:'tabulado-descripcion',id:'tabulado-descripcion-nota'},[
@@ -1088,23 +1088,23 @@ class AppSIGBA extends backend.AppBackend{
         })
     }
     
-    obtenerAutonomias(client){
+    obtenerGruposPrincipales(client){
         return client.query("SELECT * FROM agrupacion_principal WHERE ocultar is not true ORDER BY orden").fetchAll().then(function(result){
-            var autonomiasFilas=result.rows;
-            var autonomias=autonomiasFilas.map(function(fila){
+            var gruposFilas=result.rows;
+            var grupos=gruposFilas.map(function(fila){
                 return {
                     codigo:fila.agrupacion_principal,
                     denominacion:fila.denominacion,
                     color:fila.color
                 }
             })
-            return autonomias;
+            return grupos;
         })
     }
     
     encabezado(skinUrl,esPrincipal,req,client){
         var be = this;
-        return be.obtenerAutonomias(client).then(function(autonomias){
+        return be.obtenerGruposPrincipales(client).then(function(grupos){
             return html.div({id:'id-encabezado'},[
                 html.a({class:'encabezado',id:'barra-superior',href:''+absolutePath+'principal'},[
                     html.div({class:'encabezado-interno'},[
@@ -1118,10 +1118,10 @@ class AppSIGBA extends backend.AppBackend{
                     ]).concat(be.config['client-setup'].logos.map(function(logoName){
                             return html.a({class:'a-principal',href:''+absolutePath+'principal'},[html.img({class:'encabezado',id:'logo-'+logoName,src:skinUrl+'img/img-logo-'+logoName+'.png'})]);
                     }).concat([be.config['client-setup'].conTextoPrincipal?html.div({class:'encabezado',id:'texto-encabezado-grande'}):null]).concat(
-                        esPrincipal?html.div({class:'contiene-autonomias'},autonomias.map(function(autonomia){
-                            var href=''+absolutePath+'principal#'+autonomia.codigo;
-                            var src=skinUrl+'img/'+autonomia.codigo+'.png';
-                            return html.a({class:'autonomia-a',href:href,title:autonomia.denominacion},[html.img({class:'autonomia-img',src:src})])
+                        esPrincipal?html.div({class:'contiene-grupos'},grupos.map(function(grupo){
+                            var href=''+absolutePath+'principal#'+grupo.codigo;
+                            var src=skinUrl+'img/'+grupo.codigo+'.png';
+                            return html.a({class:'grupo-a',href:href,title:grupo.denominacion},[html.img({class:'grupo-img',src:src})])
                         })):null
                     ))
                 )
