@@ -89,9 +89,9 @@ class AppSIGBA extends backend.AppBackend{
         return be.nombreDelHome(client).then(function(homeName){
             urlYClasesTabulados=homeName;
             return client.query(
-                'SELECT * FROM '+be.db.quoteObject(table)+
+                'SELECT * FROM '+be.db.quoteIdent(table)+
                 ' WHERE '+(where||'true')+
-                ' ORDER BY '+(defTables[0].orderBy||["orden", "denominacion"]).map(function(campoOrden){ return be.db.quoteObject(campoOrden); }).join(',')
+                ' ORDER BY '+(defTables[0].orderBy||["orden", "denominacion"]).map(function(campoOrden){ return be.db.quoteIdent(campoOrden); }).join(',')
             ).fetchAll();
         }).then(function(result){
             var tablaHija=(defTables[1]||{}).tabla;
@@ -100,7 +100,7 @@ class AppSIGBA extends backend.AppBackend{
                         color=registro.agrupacion_principal;
                 }
                 var whereHija=(defTables[0].joinSiguiente||[]).map(function(nombreCampo){
-                    return be.db.quoteObject(nombreCampo)+" = "+be.db.quoteText(registro[nombreCampo]);
+                    return be.db.quoteIdent(nombreCampo)+" = "+be.db.quoteText(registro[nombreCampo]);
                 }).join(" and ").concat((defTables[0].condicion)?' and '+defTables[0].condicion:'');
                 return be.reporteBonito(client, defTables.slice(1), annios, whereHija,color,controles).then(function(listaTrHijos){
                     var listaTd;
@@ -184,49 +184,38 @@ class AppSIGBA extends backend.AppBackend{
                             var cortantesEnPrincipalObj;
                             obtenerValoresPrincipal=client.query(
                                 `select max(cortes->>'annio') annio from celdas where indicador=$1`,[registro.indicador]
-                                ).fetchOneRowIfExists().then(function(result){
-                                    ultimoAnnioDisponible=result.row.annio;
-                                    cortantesEnPrincipalObj={
-                                        variablesPrincipal:[{"annio":true}],
-                                        cortes:[{"annio":ultimoAnnioDisponible}]
-                                    };
-                                    be.cortantesEnPrincipal.cortantesPrincipalesArr.forEach(function(variable){
-                                        var variablePrincipal={"annio":true};
-                                        variablePrincipal[variable.variable_principal]=true;
-                                        cortantesEnPrincipalObj.variablesPrincipal.push(variablePrincipal);
+                            ).fetchOneRowIfExists().then(function(result){
+                                ultimoAnnioDisponible=result.row.annio;
+                                cortantesEnPrincipalObj={
+                                    variablesPrincipal:[{"annio":true}],
+                                    cortes:[{"annio":ultimoAnnioDisponible}]
+                                };
+                                be.cortantesEnPrincipal.cortantesPrincipalesArr.forEach(function(variable){
+                                    var variablePrincipal={"annio":true};
+                                    variablePrincipal[variable.variable_principal]=true;
+                                    cortantesEnPrincipalObj.variablesPrincipal.push(variablePrincipal);
+                                })
+                                if(registro.indicador && registro.corte_principal){
+                                    var test={}
+                                    test[registro.corte_principal]=registro.valor_principal;
+                                    cortantesEnPrincipalObj.cortes.push(test)
+                                    cortantesEnPrincipalObj.variablesPrincipal=cortantesEnPrincipalObj.variablesPrincipal.map(function(cortPrinc){
+                                        cortPrinc[registro.corte_principal]=true;
+                                        return cortPrinc;
                                     })
-                                    if(registro.indicador && registro.corte_principal){
-                                        var test={}
-                                        test[registro.corte_principal]=registro.valor_principal;
-                                        cortantesEnPrincipalObj.cortes.push(test)
-                                        cortantesEnPrincipalObj.variablesPrincipal=cortantesEnPrincipalObj.variablesPrincipal.map(function(cortPrinc){
-                                            cortPrinc[registro.corte_principal]=true;
-                                            return cortPrinc;
-                                        })
+                                }
+                                
+                            }).then(function(){
+                                var sqlPrincipalTest="SELECT * FROM celdas WHERE indicador=$1 AND cortantes in ( "+
+                                cortantesEnPrincipalObj.variablesPrincipal.map(function(crt){
+                                    return context.db.quoteLiteral(JSON.stringify(crt));
+                                }).join(',')+") AND "+cortantesEnPrincipalObj.cortes.map(function(crt,i){
+                                    for(var key in crt){
+                                        return "cortes->> "+context.db.quoteLiteral(key)+" = "+context.db.quoteLiteral(crt[key]);
                                     }
-                                    
-                                }).then(function(){
-                                    var sqlPrincipalTest="SELECT * FROM celdas WHERE indicador=$1 AND cortantes in ( "+
-                                    cortantesEnPrincipalObj.variablesPrincipal.map(function(crt){
-                                        return "\'"+JSON.stringify(crt)+"\'";
-                                    }).join(',')+") AND "+cortantesEnPrincipalObj.cortes.map(function(crt,i){
-                                        for(var key in crt){
-                                            return "cortes->> "+"\'"+key+"\'"+" = "+"\'"+crt[key]+"\'";
-                                        }
-                                    }).join(' AND ');
-                                    //var sqlPrincipal="SELECT * FROM celdas WHERE indicador=$1 AND cortes->>'annio' = $2 and "+
-                                    //"cortantes in ('{\"annio\":true}',";
-                                    //var condicionPrincipal;
-                                    //var cortantePrincipalSql='\''+'{"annio":true,"sexo":true}'+'\')';
-                                    //var cortantePrincipalEspecial='true';
-                                    //if(registro.especial_principal){
-                                    //    cortantePrincipalSql='\''+'{"annio":true,'+'"'+registro.corte_principal+'":true}\''+ //annio:true
-                                    //    ' ,\'{"annio":true,'+'"'+registro.corte_principal+'":true,"sexo":true}'+'\')';//annio:true,sexo:true
-                                    //    cortantePrincipalEspecial=' cortes->>'+'\''+registro.corte_principal+'\''+' = '+'\''+registro.valor_principal+'\''; 
-                                    //}
-                                    //sqlPrincipal=sqlPrincipal+cortantePrincipalSql+' and '+cortantePrincipalEspecial+' order by cortes ';
-                                    //return client.query(sqlPrincipal
-                                    return client.query(sqlPrincipalTest
+                                }).join(' AND ');
+                                return client.query(
+                                    sqlPrincipalTest
                                     ,[registro.indicador]
                                 ).fetchAll().then(function(result){
                                     var filasValoresAPrincipal=result.rows;
@@ -359,7 +348,7 @@ class AppSIGBA extends backend.AppBackend{
         return Promise.all(
             datum.vars.map(function(info){
                 return (client.query(
-                    "SELECT * FROM cortes c WHERE c.variable = '" +info.name+ "' ORDER BY orden"
+                    "SELECT * FROM cortes c WHERE c.variable = $1 ORDER BY orden", [info.name]
                 ).fetchAll().then(function(result){
                     var filaValores=result.rows
                     var vValores={};
@@ -377,6 +366,9 @@ class AppSIGBA extends backend.AppBackend{
         }).then(function(){
             return client.query(
                 "SELECT "+ variables.map(function(varInv){
+                    if(! /^\w+$/.test(varInv) ){
+                        throw new Error("invalid varInv");
+                    }
                     return 'cc_'+varInv+'.valor_corte '+varInv;
                 }).join(',') +", valor, cv " + 
                     "\n  FROM celdas v  LEFT JOIN "+ variables.map(function(varInv){
@@ -386,7 +378,6 @@ class AppSIGBA extends backend.AppBackend{
                     }).join('\n    LEFT JOIN ')+
                     "\n  WHERE v.indicador=$1 AND "+be.defs_annio(annio).cortantes+" <@ $2 AND "+be.defs_annio(annio).cond_annio_en_cortante+
                     "\n  ORDER BY " + variables.map(function(varInv){
-                            
                             return ((varInv!='annio')?'corte_'+varInv+'.orden NULLS FIRST':varInv+' desc');
                     }).join(' , '),
                 be.defs_annio(annio).f_param_cortantes_posibles([indicador,fila.cortantes,annio])
@@ -573,7 +564,7 @@ class AppSIGBA extends backend.AppBackend{
                 "count(iv.ubicacion) AS cant_iv  "+
             "from indicadores_variables iv left join variables v on iv.variable=v.variable "+
             "where iv.indicador=$1 "+
-            "and iv.variable in ("+arr_cortantes.map(function(cortante){return "'"+cortante+"'"}).join(',')+")",
+            "and iv.variable in ("+arr_cortantes.map(function(cortante){return context.db.quoteLiteral(cortante)}).join(',')+")",
             [indicador]).fetchOneRowIfExists().then(function(result){
                 var rowInfo=result.row;
                 tabulado.cant_iv=rowInfo.cant_iv;
@@ -585,78 +576,78 @@ class AppSIGBA extends backend.AppBackend{
                 tabulado.var_graf=uso_seteo_iv?rowInfo.var_iv:rowInfo.var_default; 
                 tabulado.ubi_tab=uso_seteo_iv?rowInfo.ubi_iv:'';
             return tabulado;
-            }).then(function(tabulado){
-                return client.query(
-                "SELECT "+
-                "string_agg( tv.variable ,',' ORDER BY tv.ubicacion_tabulado,tv.orden_tabulado, tv.variable) AS var_tab_tv, "+
-                "string_agg(v.denominacion,'|' ORDER BY tv.ubicacion_tabulado,tv.orden_tabulado, tv.variable) as denom_tab_tv, "+
-                "string_agg( tv.ubicacion_tabulado,',' ORDER BY tv.ubicacion_tabulado,tv.orden_tabulado, tv.variable) AS ubi_tab_tv, "+
-                "count(tv.ubicacion_tabulado) AS cant_tab_tv , "+
-                "string_agg( tv.variable ,',' ORDER BY tv.ubicacion_tabulado_serie,tv.orden_tabulado_serie, tv.variable) AS var_tabserie_tv, "+
-                "string_agg(v.denominacion,'|' ORDER BY tv.ubicacion_tabulado_serie,tv.orden_tabulado_serie, tv.variable) as denom_tabserie_tv, "+
-                "string_agg( tv.ubicacion_tabulado_serie,',' ORDER BY tv.ubicacion_tabulado_serie,tv.orden_tabulado_serie, tv.variable) AS ubi_tabserie_tv, "+
-                "count(tv.ubicacion_tabulado_serie) AS cant_tabserie_tv , "+
-                "string_agg( tv.variable ,',' ORDER BY tv.ubicacion_grafico, tv.variable) AS var_graf_tv, "+
-                "string_agg(v.denominacion,'|' ORDER BY tv.ubicacion_grafico, tv.variable) as denom_graf_tv, "+
-                "string_agg( tv.ubicacion_grafico,',' ORDER BY tv.ubicacion_grafico, tv.variable) AS ubi_graf_tv, "+
-                "count(tv.ubicacion_grafico) AS cant_graf_tv , "+
-                "string_agg( tv.variable ,',' ORDER BY tv.ubicacion_grafico_serie, tv.variable) AS var_grafserie_tv, "+
-                "string_agg(v.denominacion,'|' ORDER BY tv.ubicacion_grafico_serie, tv.variable) as denom_grafserie_tv, "+
-                "string_agg( tv.ubicacion_grafico_serie,',' ORDER BY tv.ubicacion_grafico_serie, tv.variable) AS ubi_grafserie_tv, "+
-                "count(tv.ubicacion_grafico_serie) AS cant_grafserie_tv "+
-                "from tabulados_variables tv left join variables v on tv.variable=v.variable "+
-                "where tv.indicador=$1 and tv.cortantes= $2 ",
-                [indicador, tabulado.cortantes] ).fetchOneRowIfExists().then(function(result){
-                    var rowInfoTv=result.row;
-                    tabulado.cant_tab_tv=rowInfoTv.cant_tab_tv;
-                    tabulado.cant_tabserie_tv=rowInfoTv.cant_tabserie_tv;
-                    tabulado.cant_graf_tv=rowInfoTv.cant_graf_tv;
-                    tabulado.cant_grafserie_tv=rowInfoTv.cant_grafserie_tv;
-                    var uso_seteotab_tv=rowInfoTv.cant_tab_tv==tabulado.cantidad_cortantes;
-                    var uso_seteograf_tv=rowInfoTv.cant_graf_tv==tabulado.cantidad_cortantes;
-                    var uso_seteografserie_tv=rowInfoTv.cant_grafserie_tv==tabulado.cantidad_cortantes;
-                    var uso_seteotabserie_tv=rowInfoTv.cant_tabserie_tv==tabulado.cantidad_cortantes;
-                    tabulado.uso_tab_tv =annio?uso_seteotab_tv: uso_seteotabserie_tv;
-                    tabulado.uso_graf_tv=annio?uso_seteograf_tv: uso_seteografserie_tv;
-                    tabulado.denom_tab=uso_seteotab_tv?
-                        (annio && uso_seteotabserie_tv? rowInfoTv.denom_tabserie_tv:rowInfoTv.denom_tab_tv)
-                        :tabulado.denom_tab;
-                    tabulado.denom_graf=uso_seteograf_tv?
-                        (annio && uso_seteografserie_tv? rowInfoTv.denom_grafserie_tv:rowInfoTv.denom_graf_tv)
-                        :tabulado.denom_graf;
-                    tabulado.var_tab=uso_seteotab_tv?
-                        (annio && uso_seteotabserie_tv? rowInfoTv.var_tabserie_tv:rowInfoTv.var_tab_tv)
-                        :tabulado.var_tab; 
-                    tabulado.var_graf=uso_seteograf_tv?
-                        (annio && uso_seteografserie_tv? rowInfoTv.var_grafserie_tv:rowInfoTv.var_graf_tv)
-                        :tabulado.var_graf; 
-                    tabulado.ubi_tab=uso_seteotab_tv?
-                        (annio && uso_seteotabserie_tv? rowInfoTv.ubi_tabserie_tv:rowInfoTv.ubi_tab_tv)
-                        :tabulado.ubi_tab;
-                    tabulado.ubi_graf=uso_seteograf_tv?
-                        (annio && uso_seteografserie_tv? rowInfoTv.ubi_grafserie_tv:rowInfoTv.ubi_graf_tv)
+        }).then(function(tabulado){
+            return client.query(
+            "SELECT "+
+            "string_agg( tv.variable ,',' ORDER BY tv.ubicacion_tabulado,tv.orden_tabulado, tv.variable) AS var_tab_tv, "+
+            "string_agg(v.denominacion,'|' ORDER BY tv.ubicacion_tabulado,tv.orden_tabulado, tv.variable) as denom_tab_tv, "+
+            "string_agg( tv.ubicacion_tabulado,',' ORDER BY tv.ubicacion_tabulado,tv.orden_tabulado, tv.variable) AS ubi_tab_tv, "+
+            "count(tv.ubicacion_tabulado) AS cant_tab_tv , "+
+            "string_agg( tv.variable ,',' ORDER BY tv.ubicacion_tabulado_serie,tv.orden_tabulado_serie, tv.variable) AS var_tabserie_tv, "+
+            "string_agg(v.denominacion,'|' ORDER BY tv.ubicacion_tabulado_serie,tv.orden_tabulado_serie, tv.variable) as denom_tabserie_tv, "+
+            "string_agg( tv.ubicacion_tabulado_serie,',' ORDER BY tv.ubicacion_tabulado_serie,tv.orden_tabulado_serie, tv.variable) AS ubi_tabserie_tv, "+
+            "count(tv.ubicacion_tabulado_serie) AS cant_tabserie_tv , "+
+            "string_agg( tv.variable ,',' ORDER BY tv.ubicacion_grafico, tv.variable) AS var_graf_tv, "+
+            "string_agg(v.denominacion,'|' ORDER BY tv.ubicacion_grafico, tv.variable) as denom_graf_tv, "+
+            "string_agg( tv.ubicacion_grafico,',' ORDER BY tv.ubicacion_grafico, tv.variable) AS ubi_graf_tv, "+
+            "count(tv.ubicacion_grafico) AS cant_graf_tv , "+
+            "string_agg( tv.variable ,',' ORDER BY tv.ubicacion_grafico_serie, tv.variable) AS var_grafserie_tv, "+
+            "string_agg(v.denominacion,'|' ORDER BY tv.ubicacion_grafico_serie, tv.variable) as denom_grafserie_tv, "+
+            "string_agg( tv.ubicacion_grafico_serie,',' ORDER BY tv.ubicacion_grafico_serie, tv.variable) AS ubi_grafserie_tv, "+
+            "count(tv.ubicacion_grafico_serie) AS cant_grafserie_tv "+
+            "from tabulados_variables tv left join variables v on tv.variable=v.variable "+
+            "where tv.indicador=$1 and tv.cortantes= $2 ",
+            [indicador, tabulado.cortantes] ).fetchOneRowIfExists().then(function(result){
+                var rowInfoTv=result.row;
+                tabulado.cant_tab_tv=rowInfoTv.cant_tab_tv;
+                tabulado.cant_tabserie_tv=rowInfoTv.cant_tabserie_tv;
+                tabulado.cant_graf_tv=rowInfoTv.cant_graf_tv;
+                tabulado.cant_grafserie_tv=rowInfoTv.cant_grafserie_tv;
+                var uso_seteotab_tv=rowInfoTv.cant_tab_tv==tabulado.cantidad_cortantes;
+                var uso_seteograf_tv=rowInfoTv.cant_graf_tv==tabulado.cantidad_cortantes;
+                var uso_seteografserie_tv=rowInfoTv.cant_grafserie_tv==tabulado.cantidad_cortantes;
+                var uso_seteotabserie_tv=rowInfoTv.cant_tabserie_tv==tabulado.cantidad_cortantes;
+                tabulado.uso_tab_tv =annio?uso_seteotab_tv: uso_seteotabserie_tv;
+                tabulado.uso_graf_tv=annio?uso_seteograf_tv: uso_seteografserie_tv;
+                tabulado.denom_tab=uso_seteotab_tv?
+                    (annio && uso_seteotabserie_tv? rowInfoTv.denom_tabserie_tv:rowInfoTv.denom_tab_tv)
+                    :tabulado.denom_tab;
+                tabulado.denom_graf=uso_seteograf_tv?
+                    (annio && uso_seteografserie_tv? rowInfoTv.denom_grafserie_tv:rowInfoTv.denom_graf_tv)
+                    :tabulado.denom_graf;
+                tabulado.var_tab=uso_seteotab_tv?
+                    (annio && uso_seteotabserie_tv? rowInfoTv.var_tabserie_tv:rowInfoTv.var_tab_tv)
+                    :tabulado.var_tab; 
+                tabulado.var_graf=uso_seteograf_tv?
+                    (annio && uso_seteografserie_tv? rowInfoTv.var_grafserie_tv:rowInfoTv.var_graf_tv)
+                    :tabulado.var_graf; 
+                tabulado.ubi_tab=uso_seteotab_tv?
+                    (annio && uso_seteotabserie_tv? rowInfoTv.ubi_tabserie_tv:rowInfoTv.ubi_tab_tv)
                     :tabulado.ubi_tab;
-                    
-                    return tabulado;
+                tabulado.ubi_graf=uso_seteograf_tv?
+                    (annio && uso_seteografserie_tv? rowInfoTv.ubi_grafserie_tv:rowInfoTv.ubi_graf_tv)
+                :tabulado.ubi_tab;
                 
-                }).then(function(){
-                    return client.query(
-                        "SELECT habilitado,mostrar_cuadro cuadro,mostrar_grafico grafico, tipo_grafico,orientacion,apilado "+
-                        "FROM tabulados WHERE indicador=$1 AND cortantes=$2"
-                    ,[indicador,tabulado.cortantes]).fetchOneRowIfExists().then(function(result){
-                        var caracteristicasTabulado=result.row;
-                            tabulado.habilitado=caracteristicasTabulado.habilitado;
-                            tabulado.cuadro=caracteristicasTabulado.cuadro;
-                            tabulado.grafico=caracteristicasTabulado.grafico;
-                            tabulado.tipo_grafico=caracteristicasTabulado.tipo_grafico;
-                            tabulado.orientacion=caracteristicasTabulado.orientacion;
-                            tabulado.apilado=caracteristicasTabulado.apilado;
-                    
-                        return tabulado;
-                    })
+                return tabulado;
+            
+            }).then(function(){
+                return client.query(
+                    "SELECT habilitado,mostrar_cuadro cuadro,mostrar_grafico grafico, tipo_grafico,orientacion,apilado "+
+                    "FROM tabulados WHERE indicador=$1 AND cortantes=$2"
+                ,[indicador,tabulado.cortantes]).fetchOneRowIfExists().then(function(result){
+                    var caracteristicasTabulado=result.row;
+                        tabulado.habilitado=caracteristicasTabulado.habilitado;
+                        tabulado.cuadro=caracteristicasTabulado.cuadro;
+                        tabulado.grafico=caracteristicasTabulado.grafico;
+                        tabulado.tipo_grafico=caracteristicasTabulado.tipo_grafico;
+                        tabulado.orientacion=caracteristicasTabulado.orientacion;
+                        tabulado.apilado=caracteristicasTabulado.apilado;
+                
+                    return tabulado;
                 })
-            });
-        }
+            })
+        });
+    }
     
     addSchrödingerServices(mainApp, baseUrl){
         mainApp.use(baseUrl+'/',function(req, res, next) {
@@ -954,7 +945,8 @@ class AppSIGBA extends backend.AppBackend{
                 }).then(function(){
                     if(variablePrincipal){
                         return client.query(
-                            "select denominacion, descripcion from cortes c WHERE c.variable = '"+variablePrincipal+"' ORDER BY orden"
+                            "select denominacion, descripcion from cortes c WHERE c.variable = ORDER BY orden",
+                            [variablePrincipal]
                         ).fetchAll().then(function(result){
                             filasDeVariablesPrincipales=result.rows;
                             return filasDeVariablesPrincipales;
