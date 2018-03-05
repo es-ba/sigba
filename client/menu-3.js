@@ -41,18 +41,18 @@ function activarBoton(id, nombreEvento){
             eventosBotones['estaValidado'](parametros).then(function(result){
                 if(result){
                     elemento.disabled = true;
-                    elemento.innerHTML='tabulado validado';
+                    elemento.textContent='tabulado validado';
                 }else{
                     elemento.addEventListener('click',function(){
                         eventosBotones[nombreEvento](parametros);
                         elemento.disabled = true;
-                        elemento.innerHTML='tabulado validado';
+                        elemento.textContent='tabulado validado';
                     });
                 }
             });
         }
         if(nombreEvento=='habilitar'){
-            elemento.innerHTML= cartelHabilitar(parametros.habilitar); 
+            elemento.textContent= cartelHabilitar(parametros.habilitar); 
             elemento.addEventListener('click',function(){
                  eventosBotones[nombreEvento](parametros);
             })

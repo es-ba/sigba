@@ -15,7 +15,7 @@ function tableCreate(info, data) {
     var trThead = document.createElement('tr');
     var tr = document.createElement('tr');
     var caption = document.createElement('caption');
-    caption.innerHTML = rows[0].denominacion_indicador;
+    caption.textContent = rows[0].denominacion_indicador;
     rows.forEach(function (row) {
         var valor = row.valor;
         var categoria = row.categoria;
@@ -23,8 +23,8 @@ function tableCreate(info, data) {
         var th = document.createElement('th');
         var divValor = document.createElement('div');
         var divCategoria = document.createElement('div');
-        divValor.innerHTML = valor;
-        divCategoria.innerHTML = categoria;
+        divValor.textContent = valor;
+        divCategoria.textContent = categoria;
         td.appendChild(divValor);
         th.appendChild(divCategoria);
         tr.appendChild(td);
@@ -379,7 +379,7 @@ window.addEventListener('load', function () {
     var encabezado = document.getElementById('id-encabezado');
     var textoGrande = document.getElementById('texto-encabezado-grande');
     if (textoGrande) {
-        textoGrande.innerHTML =
+        textoGrande.textContent =
             'En esta página se presenta la totalidad de los indicadores agrupados por dimensión y autonomía, junto con su serie histórica.' +
             ' Los números indican los valores totales para cada indicador. Haciendo clic en el mismo puede verse la desagregación por sexo.';
         textoGrande.style.paddingTop = '40px';
