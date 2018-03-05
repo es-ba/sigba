@@ -60,10 +60,11 @@ function borrarTotales(matrix) {
     return matrix;
 }
 
+window.charts = []; //after render we can change charts changing its c3 config and reloading with chart[i].load
+
 function generateChart(elementWithMatrix, svgWidth) {
     var tabulatorMatrix = getMatrix(elementWithMatrix);
     var tabuladoInfo = getTabuladoInfo(elementWithMatrix);
-    var charts = []; //after render we can change charts changing its c3 config and reloading with chart[i].load
     if (!tabuladoInfo.grafico && tabuladoInfo.tipo_grafico != 'piramide') {
         throw new Error('gráfico deshabilitado en tabla tabulados campo mostrar_grafico');
     }
@@ -129,13 +130,13 @@ function generateChart(elementWithMatrix, svgWidth) {
                         x: {
                             type: 'indexed',
                             tick: {
-                                rotate: -50, // rota el label del tick
-                                multiline: false,
+                                rotate: -50, // rota el label del tick //sacar
+                                multiline: false, //sacar
                                 culling: {
                                     max: 25 // cant de ticks que se muestran
                                 }
                             },
-                            height: 50 // el tamaño que deja para el label del axis y las legendas
+                            height: 50 // el tamaño que deja para el label del axis y las legendas //sacar
                         }
                     }
                 }
@@ -168,7 +169,7 @@ function generateChart(elementWithMatrix, svgWidth) {
                 }
             };
         }
-        charts.push(window.Graphicator.render(changing(generalConfig, specificConfig)));
+        window.charts.push(window.Graphicator.render(changing(generalConfig, specificConfig)));
         indexChart++;
     });
     chartContainer.style.display = 'block';
@@ -231,6 +232,7 @@ function toggleChartTabuladoDisplay() {
         toggleToChart();
     }
     updateVisualization();
+    refreshChartsRender();
 }
 
 function toggleToTabulado() {
@@ -350,11 +352,14 @@ function insertCopyUrlButton() {
     insertNewButton(buildCopyUrlButton(), inElement);
 }
 
-window.addEventListener('load', function () {
-    Array.prototype.forEach.call(getChartBoxes(), function(box){
-        generateChart(box);
+function refreshChartsRender(){
+    window.charts.forEach(function(chart){
+        chart.chartAPI.show();
     });
+}
 
+window.addEventListener('load', function () {
+    renderHomeCharts();
     var tabuladoElem = getTabuladoElement();
     if (tabuladoElem) {
         var inElement = document.getElementById('para-botones');
@@ -370,11 +375,12 @@ window.addEventListener('load', function () {
         } catch (error) {
             window.console.error('No es posible graficar el tabulado. ' + error);
         }
-
         insertNewButton(buildExportExcelButton(), inElement);
         insertCopyUrlButton();
     }
-
+    //le hago un load para que c3 acomode algunas cosas visuales como los labels
+    refreshChartsRender();
+    
     var encabezadoChico = document.getElementById('id-encabezado-chico');
     var encabezado = document.getElementById('id-encabezado');
     var textoGrande = document.getElementById('texto-encabezado-grande');
@@ -431,6 +437,12 @@ window.addEventListener('load', function () {
         });
     });
 });
+
+function renderHomeCharts() {
+    Array.prototype.forEach.call(getChartBoxes(), function (box) {
+        generateChart(box);
+    });
+}
 
 function getChartBoxes() {
     return document.querySelectorAll('.box-grafico-principal [para-graficador]');
