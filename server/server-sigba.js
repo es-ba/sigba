@@ -1,4 +1,4 @@
-"use strict";
+    "use strict";
 
 /*jshint eqnull:true */
 /*jshint node:true */
@@ -208,10 +208,10 @@ class AppSIGBA extends backend.AppBackend{
                             }).then(function(){
                                 var sqlPrincipalTest="SELECT * FROM celdas WHERE indicador=$1 AND cortantes in ( "+
                                 cortantesEnPrincipalObj.variablesPrincipal.map(function(crt){
-                                    return context.db.quoteLiteral(JSON.stringify(crt));
+                                    return be.db.quoteLiteral(JSON.stringify(crt));
                                 }).join(',')+") AND "+cortantesEnPrincipalObj.cortes.map(function(crt,i){
                                     for(var key in crt){
-                                        return "cortes->> "+context.db.quoteLiteral(key)+" = "+context.db.quoteLiteral(crt[key]);
+                                        return "cortes->> "+be.db.quoteLiteral(key)+" = "+be.db.quoteLiteral(crt[key]);
                                     }
                                 }).join(' AND ');
                                 return client.query(
@@ -554,6 +554,7 @@ class AppSIGBA extends backend.AppBackend{
     }
     
     traerInfoTabulado(client,indicador, annio,tabulado){
+        var be=this;
         var arr_cortantes=Object.keys(tabulado.cortantes)
         return client.query(
             "select string_agg(v.denominacion,'|' ORDER BY v.orden, v.variable) as denom_default, "+
@@ -564,7 +565,7 @@ class AppSIGBA extends backend.AppBackend{
                 "count(iv.ubicacion) AS cant_iv  "+
             "from indicadores_variables iv left join variables v on iv.variable=v.variable "+
             "where iv.indicador=$1 "+
-            "and iv.variable in ("+arr_cortantes.map(function(cortante){return context.db.quoteLiteral(cortante)}).join(',')+")",
+            "and iv.variable in ("+arr_cortantes.map(function(cortante){return be.db.quoteLiteral(cortante)}).join(',')+")",
             [indicador]).fetchOneRowIfExists().then(function(result){
                 var rowInfo=result.row;
                 tabulado.cant_iv=rowInfo.cant_iv;
