@@ -3,40 +3,6 @@
 /* jshint browser: true */
 
 var changing = window.bestGlobals.changing;
-function tableCreate(info, data) {
-    var rows = JSON.parse(data);
-    var tablaId = rows[0].indicador;
-    var tabla = document.createElement('table');
-    tabla.setAttribute('id', tablaId);
-    // tabla.style.width = '30%';
-    // tabla.setAttribute('border', '1');
-    var tbdy = document.createElement('tbody');
-    var thead = document.createElement('thead');
-    var trThead = document.createElement('tr');
-    var tr = document.createElement('tr');
-    var caption = document.createElement('caption');
-    caption.textContent = rows[0].denominacion_indicador;
-    rows.forEach(function (row) {
-        var valor = row.valor;
-        var categoria = row.categoria;
-        var td = document.createElement('td');
-        var th = document.createElement('th');
-        var divValor = document.createElement('div');
-        var divCategoria = document.createElement('div');
-        divValor.textContent = valor;
-        divCategoria.textContent = categoria;
-        td.appendChild(divValor);
-        th.appendChild(divCategoria);
-        tr.appendChild(td);
-        trThead.appendChild(th);
-    });
-    tabla.appendChild(caption);
-    thead.appendChild(trThead);
-    tabla.appendChild(thead);
-    tbdy.appendChild(tr);
-    tabla.appendChild(tbdy);
-    return tabla;
-}
 
 //Curados y validaciones particulares a sigba/sistema de indicadores 
 function curarMatrix(matrix) {
@@ -380,20 +346,6 @@ window.addEventListener('load', function () {
     }
     //le hago un load para que c3 acomode algunas cosas visuales como los labels
     refreshChartsRender();
-    
-    var encabezadoChico = document.getElementById('id-encabezado-chico');
-    var encabezado = document.getElementById('id-encabezado');
-    var textoGrande = document.getElementById('texto-encabezado-grande');
-    if (textoGrande) {
-        textoGrande.textContent =
-            'En esta página se presenta la totalidad de los indicadores agrupados por dimensión y autonomía, junto con su serie histórica.' +
-            ' Los números indican los valores totales para cada indicador. Haciendo clic en el mismo puede verse la desagregación por sexo.';
-        textoGrande.style.paddingTop = '40px';
-    }
-    var textoChico = document.getElementById('texto-encabezado-chico');
-    var logoEstadistica = document.getElementById('logo-estadistica');
-    var logoConsejo = document.getElementById('logo-consejo');
-
     var foot = document.getElementById('foot-texto');
     var footOtroRenglon = document.getElementById('foot-texto-2');
     if (foot) {
@@ -402,22 +354,6 @@ window.addEventListener('load', function () {
     if (footOtroRenglon) {
         footOtroRenglon.textContent = 'Gobierno de la Ciudad de Buenos Aires';
     }
-    var despliegueEspecialDiv = document.querySelectorAll('[div-despliegue-especial]');
-    var despliegueEspecialTd = document.querySelectorAll('[despliegue-especial]');
-    Array.prototype.forEach.call(despliegueEspecialDiv, function (div, i) {
-        var info = div.getAttribute('especial-info');
-        var tablaEspecialData = div.getAttribute('valores-especiales');
-        var tablaEspecial = tableCreate(info, tablaEspecialData);
-        tablaEspecial.setAttribute('class', 'tabla-desp-especial');
-        tablaEspecial.setAttribute('id', info);
-        var divPorId = document.getElementById(info);
-        despliegueEspecialTd[i].addEventListener('mouseover', function () {
-            divPorId.appendChild(tablaEspecial);
-        });
-        despliegueEspecialTd[i].addEventListener('mouseleave', function () {
-            divPorId.removeChild(tablaEspecial);
-        });
-    });
     window.addEventListener('scroll', function () {
         ["id-encabezado", "div-encabezado-titulo-tabulado", "foot", "annios-links"].forEach(function (id) {
             var div = document.getElementById(id);
