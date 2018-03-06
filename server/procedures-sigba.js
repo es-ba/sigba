@@ -19,7 +19,6 @@ ProceduresExamples = [
             {name:'camposCortantes'      ,typeName:'text'},
             {name:'cortantes'            ,typeName:'text'},
             {name:'annioCortante'        ,typeName:'text'},
-            {name:'usuario'              ,typeName:'text'},
         ],
         coreFunction:function(context, parameters){
             var condicion=(parameters.annioCortante!='TRUE')?'cc.valor_corte = $3 ':' $3';
@@ -49,7 +48,6 @@ ProceduresExamples = [
             {name:'camposCortantes'      ,typeName:'text'},
             {name:'cortantes'            ,typeName:'text'},
             {name:'annioCortante'        ,typeName:'text'},
-            {name:'usuario'              ,typeName:'text'},
         ],
         coreFunction:function(context, parameters){
             var condicion=(parameters.annioCortante!='TRUE')?'cc.valor_corte = $3 ':' $3';
@@ -74,10 +72,6 @@ ProceduresExamples = [
         action:'tabulado/habilitar',
         parameters:[
             {name:'indicador'       ,typeName:'text'},
-            //{name:'camposCortantes' ,typeName:'text'},
-            //{name:'cortantes'       ,typeName:'text'},
-            //{name:'annioCortante'   ,typeName:'text'},
-           // {name:'usuario'         ,typeName:'text'},
             {name:'habilitar'       ,typeName:'boolean'},
             {name:'cortantes'   ,typeName:'jsonb'}
         ],

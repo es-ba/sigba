@@ -77,7 +77,6 @@ class AppSIGBA extends backend.AppBackend{
         });
     }
     reporteBonito(client, defTables, annios, where,color,controles) {
-//        var urlYClasesTabulados='principal';
         var be = this;
         var skin=be.config['client-setup'].skin;
         var skinUrl=(skin?skin+'/':'');
@@ -235,7 +234,6 @@ class AppSIGBA extends backend.AppBackend{
                                         });
                                         be.cortantesEnPrincipal.cortantesPrincipalesArr.forEach(function(variable){
                                             if(!test){
-                                            //if(!(variable.variable_principal in filaAPrincipal.cortes)){
                                                 valCeldasPrincipal[indiceCeldasPrincipal['null']]=filaAPrincipal;
                                             }else{
                                                 valCeldasPrincipal[indiceCeldasPrincipal[filaAPrincipal.cortes[variable.variable_principal]]]=filaAPrincipal;
@@ -291,7 +289,6 @@ class AppSIGBA extends backend.AppBackend{
                                                     tabulado=changing(tabulado,infoMatrixGraf);
                                                     controles.filasEnDimension[registro.dimension][
                                                         Math.max(0, controles.posicionEnDimension[registro.dimension]-7)
-                                                        //Math.max(0, controles.filasEnDimension[registro.dimension].length-6)
                                                     ].content.push(html.td({
                                                         rowspan:7, 
                                                         class:'box-grafico-principal',
@@ -554,7 +551,7 @@ class AppSIGBA extends backend.AppBackend{
     }
     
     traerInfoTabulado(client,indicador, annio,tabulado){
-        var be=this;
+        var be=this;   
         var arr_cortantes=Object.keys(tabulado.cortantes)
         return client.query(
             "select string_agg(v.denominacion,'|' ORDER BY v.orden, v.variable) as denom_default, "+
