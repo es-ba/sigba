@@ -213,7 +213,7 @@ BEGIN
   LOOP
     FOR key,value IN SELECT * FROM jsonb_each_text(param_total.corte)
     LOOP 
-      columnas=array_append(columnas, key);
+      columnas=array_append(columnas, quote_ident(key));
       valores=array_append(valores,quote_literal(value));
     END LOOP;
     str_for_insert=replace(str_pre_insert,'#columnas',array_to_string(columnas,','));
@@ -272,6 +272,7 @@ declare
   corte         jsonb;
   filas_calculadas int;
   valorAInsertar   text;
+  v_quoted_set     text[];
 begin
     set search_path=sigba;
     delete from totales_calculados;
@@ -303,7 +304,9 @@ begin
                and sets @> ARRAY['annio']
            ORDER BY 1
         LOOP
-            str_sum_agru= replace(str_sum,'#agrupacion',array_to_string(unSet.sets,','));
+            select array_agg(quote_ident(ident)) into v_quoted_set
+              from unnest(unSet.sets) ident;
+            str_sum_agru= replace(str_sum,'#agrupacion',array_to_string(v_quoted_set,','));
             FOR registro IN EXECUTE str_sum_agru USING v_indcortante.indicador, v_indcortante.cortantevar
             LOOP
                 cortante='{}';
