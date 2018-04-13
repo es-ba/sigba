@@ -1194,6 +1194,26 @@ class AppSIGBA extends backend.AppBackend{
             'signos_convencionales'
         ]);
     }
+    
+    releerEstructuraBaseDeDatos(client){
+        return client.query(
+            `SELECT column_name FROM information_schema.columns WHERE table_name ='valores' 
+                AND column_name NOT IN ('cortantes','cortes','es_automatico','fecha_validacion','indicador','origen_validacion','usu_validacion') 
+                ORDER BY  column_name; 
+        `).fetchAll().then(function(result){
+            return result.rows;
+        })
+    }
+    postConfig(){
+        var be=this;
+        return be.getDbClient().then(function(cli){
+            var client=cli;
+            be.releerEstructuraBaseDeDatos(client).then(function(campos){
+                console.log("··························",campos)
+            });
+        })
+    }
+    
 }
 
 process.on('uncaughtException', function(err){
