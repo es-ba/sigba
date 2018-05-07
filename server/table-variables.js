@@ -14,7 +14,7 @@ module.exports = function(context){
             {name: 'denominacion'         ,typeName:'text'   },
             {name: 'corte'                ,typeName:'boolean'},
             {name: 'orden'                ,typeName:'integer'},
-            {name: 'estado_tabla_valores' ,typeName:'text'},
+            {name: 'estado_tabla_valores' ,typeName:'text'   },
         ],
         primaryKey:['variable'],
         detailTables:[
