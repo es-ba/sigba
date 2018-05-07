@@ -10,10 +10,11 @@ module.exports = function(context){
             delete:false
         },    
         fields: [
-            {name: 'variable'       ,typeName:'text'   ,nullable:false},
-            {name: 'denominacion'   ,typeName:'text'   },
-            {name: 'corte'          ,typeName:'boolean'},
-            {name: 'orden'          ,typeName:'integer'},
+            {name: 'variable'             ,typeName:'text'   ,nullable:false},
+            {name: 'denominacion'         ,typeName:'text'   },
+            {name: 'corte'                ,typeName:'boolean'},
+            {name: 'orden'                ,typeName:'integer'},
+            {name: 'estado_tabla_valores' ,typeName:'text'},
         ],
         primaryKey:['variable'],
         detailTables:[
