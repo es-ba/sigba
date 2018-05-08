@@ -1194,31 +1194,29 @@ class AppSIGBA extends backend.AppBackend{
             'signos_convencionales'
         ]);
     }
-    releerEstructuraBaseDeDatos(){
+    releerEstructuraBaseDeDatos(client){
         var be = this;
-        return be.inDbClient({},function(client){
-            return client.query(
-                `SELECT *
-                FROM variables v LEFT JOIN (
-                    SELECT column_name 
-                    FROM information_schema.columns WHERE table_name ='valores' 
-                        AND column_name NOT IN ('cortantes','cortes','es_automatico','fecha_validacion','indicador','origen_validacion','usu_validacion')
-                    ) x ON v.variable = x.column_name`
-            ).fetchAll().then(function(result){
-                be.variablesDinamicas=result.rows.map(function(row){
-                    return {
-                        name:row.variable,
-                        isSlicer:row.corte,
-                        label:row.denominacion, 
-                        typeName:'text',
-                        clientSide:!row.column_name?'nuevaFaltaGenerar':(
-                            row.estado_tabla_valores=='quitar'?'quitarFaltaGenerar':null
-                        ),
-                        serverSide:row.column_name && row.estado_tabla_valores=='quitar'?true:null
-                    };
-                });
-                return true;
-            })
+        return client.query(
+            `SELECT *
+            FROM variables v LEFT JOIN (
+                SELECT column_name 
+                FROM information_schema.columns WHERE table_name ='valores' 
+                    AND column_name NOT IN ('cortantes','cortes','es_automatico','fecha_validacion','indicador','origen_validacion','usu_validacion')
+                ) x ON v.variable = x.column_name`
+        ).fetchAll().then(function(result){
+            be.variablesDinamicas=result.rows.map(function(row){
+                return {
+                    name:row.variable,
+                    isSlicer:row.corte,
+                    label:row.denominacion, 
+                    typeName:'text',
+                    clientSide:!row.column_name?'nuevaFaltaGenerar':(
+                        row.estado_tabla_valores=='quitar'?'quitarFaltaGenerar':null
+                    ),
+                    serverSide:row.column_name && row.estado_tabla_valores=='quitar'?true:null
+                };
+            });
+            return true;
         })
     }
     postConfig(){
@@ -1268,7 +1266,10 @@ class AppSIGBA extends backend.AppBackend{
             {name:'g_g_activ'      ,isSlicer:true, label:'Grandes grupos de actividad'           , typeName:'text'}
         ];
         */
-        return be.releerEstructuraBaseDeDatos();
+        var be = this;
+        return be.inDbClient({},function(client){
+           return be.releerEstructuraBaseDeDatos(client);
+        })
     }
     
 }

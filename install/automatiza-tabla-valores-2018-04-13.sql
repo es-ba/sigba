@@ -30,7 +30,9 @@ BEGIN
   LOOP
     IF estado_variable.estado_tabla_valores='nueva' THEN 
       EXECUTE format('ALTER TABLE valores ADD COLUMN %I TEXT',estado_variable.variable);
-      EXECUTE format('UPDATE variables SET estado_tabla_valores=NULL WHERE variable=%L',estado_variable.variable);
+      UPDATE variables 
+        SET estado_tabla_valores=NULL 
+        WHERE variable=estado_variable.variable;
     END IF;
     IF estado_variable.estado_tabla_valores='quitar' THEN
       BEGIN
@@ -41,7 +43,8 @@ BEGIN
         WHEN OTHERS THEN 
           RAISE;
       END;
-      DELETE FROM variables v WHERE v.variable=estado_variable.variable;
+      DELETE FROM variables v 
+        WHERE v.variable=estado_variable.variable;
     END IF;
   END LOOP;
   return 'OK';
