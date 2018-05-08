@@ -9,6 +9,15 @@
             "request": "launch",
             "name": "Launch Program",
             "program": "${workspaceFolder}\\server\\server-sigba.js"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "DumpDb",
+            "program": "${workspaceFolder}\\server\\server-sigba.js",
+            "args": [
+                "--dump-db"
+            ]
         }
     ]
 }

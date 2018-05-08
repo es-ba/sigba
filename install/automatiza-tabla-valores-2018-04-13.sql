@@ -4,6 +4,17 @@ SET search_path=sigba;
 ALTER TABLE variables ADD COLUMN estado_tabla_valores TEXT;
 ALTER TABLE variables ADD CONSTRAINT "valor invalido en estado_variable" CHECK (estado_tabla_valores=ANY (ARRAY['nueva'::TEXT,'quitar'::TEXT]));
 alter table variables alter column "estado_tabla_valores" set default 'nueva';
+alter table variables alter column "corte" set default true;
+
+delete from cortes where variable in ('um', 'fte');
+delete from variables where variable in ('um', 'fte');
+
+ALTER TABLE sigba.cortes DROP CONSTRAINT cortes_variable_fkey;
+alter table "cortes" add constraint "cortes variables REL" foreign key ("variable") references "variables" ("variable")  on delete cascade on update cascade;
+alter table "indicadores_variables" drop constraint  "indicadores_variables_variable_fkey";
+alter table "indicadores_variables" add constraint  "indicadores_variables variables REL" foreign key ("variable") references "variables" ("variable")  on update cascade;
+alter table "indicadores_variables" drop constraint  "indicadores_variables_indicador_fkey";
+alter table "indicadores_variables" add constraint  "indicadores_variables indicador REL" foreign key ("indicador") references "indicadores" ("indicador")  on update cascade;
 
 
 DROP FUNCTION IF EXISTS sigba.agregar_quitar_variables();

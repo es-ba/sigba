@@ -2,11 +2,14 @@
 
 module.exports = function(context){
     var puedeEditar = context.user.usu_rol === 'ingresador'  || context.user.usu_rol ==='admin'  || context.user.usu_rol ==='programador';
-    return context.be.tableDefAdapt({
+    var be=context.be;
+    return be.tableDefAdapt({
         name:'valores',
         editable: puedeEditar,
         fields: [
             {name: 'indicador'     ,               label:'Código indicador'                      , typeName:'text' ,nullable:false},
+        ].concat(be.variablesDinamicas||[]).concat([
+            /*
             {name:'valor'          ,               label:'Valor'                                 , typeName:'text'},
             {name:'cv'             ,               label:'Coeficiente de variación'              , typeName:'text'},
             {name:'num'            ,               label:'Numerador'                             , typeName:'text'},
@@ -48,13 +51,14 @@ module.exports = function(context){
             {name:'t_prest'        ,isSlicer:true, label:'Tipo de prestación'                    , typeName:'text'},
             {name:'fte_ingr'       ,isSlicer:true, label:'Fuente de ingreso'                     , typeName:'text'},
             {name:'g_g_activ'      ,isSlicer:true, label:'Grandes grupos de actividad'           , typeName:'text'},
+            */
             {name:'cortes'         ,isSlicer:true, label:'Cortes'  , typeName:'jsonb', nullable:true, allow:{select: true,insert:false, update:false}},
             {name:'cortantes'      ,isSlicer:true, label:'Cortantes'                             , typeName:'jsonb', allow:{select: true,insert:false, update:false}},
             {name:'usu_validacion'                                                               , typeName:'text' , allow:{select: true,insert:false, update:false}},
             {name:'fecha_validacion'                                                             , typeName:'timestamp', allow:{select: true,insert:false, update:false}},
             {name:'origen_validacion'                                                            , typeName:'text'     , allow:{select: true,insert:false, update:false}},
             {name:'es_automatico'                                                                , typeName:'boolean'  , allow:{select: true,insert:false, update:false}},
-        ],
+        ]),
         slicerField:'cortes',
         primaryKey:['indicador','cortes'], // poner acá el autonumérico
         foreignKeys:[

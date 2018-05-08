@@ -1037,8 +1037,7 @@ class AppSIGBA extends backend.AppBackend{
             })
         });
         mainApp.get(baseUrl+'/principal-signos_convencionales',function(req,res){
-            return be.getDbClient(req).then(function(cli){
-                var client=cli;
+            return be.inDbClient(req,function(client){
                 var skin=be.config['client-setup'].skin;
                 var skinUrl=(skin?skin+'/':'');
                 return client.query(`SELECT signo,denominacion,orden FROM signos_convencionales ORDER BY orden`).fetchAll().then(function(result){
@@ -1073,7 +1072,7 @@ class AppSIGBA extends backend.AppBackend{
                         res.send(pantalla.toHtmlText({pretty:true}));
                         res.end();
                     })
-                }).catch(MiniTools.serveErr(req,res)).then(function(){client.done()});
+                })
             })
         })
     }
@@ -1195,24 +1194,81 @@ class AppSIGBA extends backend.AppBackend{
             'signos_convencionales'
         ]);
     }
-    
-    releerEstructuraBaseDeDatos(client){
-        return client.query(
-            `SELECT column_name FROM information_schema.columns WHERE table_name ='valores' 
-                AND column_name NOT IN ('cortantes','cortes','es_automatico','fecha_validacion','indicador','origen_validacion','usu_validacion') 
-                ORDER BY  column_name; 
-        `).fetchAll().then(function(result){
-            return result.rows;
+    releerEstructuraBaseDeDatos(){
+        var be = this;
+        return be.inDbClient({},function(client){
+            return client.query(
+                `SELECT *
+                FROM variables v LEFT JOIN (
+                    SELECT column_name 
+                    FROM information_schema.columns WHERE table_name ='valores' 
+                        AND column_name NOT IN ('cortantes','cortes','es_automatico','fecha_validacion','indicador','origen_validacion','usu_validacion')
+                    ) x ON v.variable = x.column_name`
+            ).fetchAll().then(function(result){
+                be.variablesDinamicas=result.rows.map(function(row){
+                    return {
+                        name:row.variable,
+                        isSlicer:row.corte,
+                        label:row.denominacion, 
+                        typeName:'text',
+                        clientSide:!row.column_name?'nuevaFaltaGenerar':(
+                            row.estado_tabla_valores=='quitar'?'quitarFaltaGenerar':null
+                        ),
+                        serverSide:row.column_name && row.estado_tabla_valores=='quitar'?true:null
+                    };
+                });
+                return true;
+            })
         })
     }
     postConfig(){
         var be=this;
-        return be.getDbClient().then(function(cli){
-            var client=cli;
-            be.releerEstructuraBaseDeDatos(client).then(function(campos){
-                console.log("··························",campos)
-            });
-        })
+        /*
+        be.variablesDinamicas=[
+            {name:'valor'          ,               label:'Valor'                                 , typeName:'text'},
+            {name:'cv'             ,               label:'Coeficiente de variación'              , typeName:'text'},
+            {name:'num'            ,               label:'Numerador'                             , typeName:'text'},
+            {name:'dem'            ,               label:'Denominador'                           , typeName:'text'},
+            {name:'annio'          ,isSlicer:true, label:'Año'                                   , typeName:'text'},        
+            {name:'sexo'           ,isSlicer:true, label:'Sexo'                                  , typeName:'text'},
+            {name:'t_a_par'        ,isSlicer:true, label:'Tipo de atención en el parto'          , typeName:'text'},
+            {name:'s_jefe'         ,isSlicer:true, label:'Sexo del jefe'                         , typeName:'text'},
+            {name:'s_gest'         ,isSlicer:true, label:'Sector de gestión'                     , typeName:'text'},
+            {name:'cat_ocup'       ,isSlicer:true, label:'Categoría ocupacional'                 , typeName:'text'},
+            {name:'n_instruc'      ,isSlicer:true, label:'Nivel de Instrucción alcanzado'        , typeName:'text'},
+            {name:'prec_lab'       ,isSlicer:true, label:'Precariedad laboral'                   , typeName:'text'},
+            {name:'calif_tarea'    ,isSlicer:true, label:'Calificación de la tarea'              , typeName:'text'},
+            {name:'l_residen'      ,isSlicer:true, label:'Lugar de residencia'                   , typeName:'text'},
+            {name:'t_hog'          ,isSlicer:true, label:'Tipo de hogar'                         , typeName:'text'},
+            {name:'sit_conv_dm'    ,isSlicer:true, label:'Situación de convivencia de la madre'  , typeName:'text'},
+            {name:'peri'           ,isSlicer:true, label:'Período'                               , typeName:'text'},
+            {name:'l_ocu'          ,isSlicer:true, label:'Local de ocurrencia'                   , typeName:'text'},
+            {name:'n_ens'          ,isSlicer:true, label:'Nivel de enseñanza'                    , typeName:'text'},
+            {name:'jer_ocup'       ,isSlicer:true, label:'Jerarquia ocupacional'                 , typeName:'text'},
+            {name:'ringr_ctotcaba' ,isSlicer:true, label:'Relación ingresos - Canasta Total de la Ciudad de Buenos Aires'  , typeName:'text'},
+            {name:'desagr'         ,isSlicer:true, label:'Desagregación territorial'             , typeName:'text'},
+            {name:'t_viol_obs'     ,isSlicer:true, label:'Tipo de violencia observada'           , typeName:'text'},
+            {name:'calif_ocup'     ,isSlicer:true, label:'Calificación ocupacional'              , typeName:'text'},
+            {name:'c_labor'        ,isSlicer:true, label:'Condición laboral'                     , typeName:'text'},
+            {name:'r_ten_viv'      ,isSlicer:true, label:'Regimen de tenencia de la vivienda'    , typeName:'text'},
+            {name:'dom'            ,isSlicer:true, label:'Dominio'                               , typeName:'text'},
+            {name:'g_edad'         ,isSlicer:true, label:'Grupo de Edad (en años)'               , typeName:'text'},
+            {name:'edad'           ,isSlicer:true, label:'Edad '                                 , typeName:'text'},
+            {name:'reg_seg_soc'    ,isSlicer:true, label:'Registro en la seguridad social'       , typeName:'text'},
+            {name:'c_asist'        ,isSlicer:true, label:'Condición de asistencia escolar'       , typeName:'text'},
+            {name:'quin_ingr_fliar',isSlicer:true, label:'Quintil de ingreso per cápita familiar', typeName:'text'},
+            {name:'l_nac'          ,isSlicer:true, label:'Lugar de nacimiento'                   , typeName:'text'},
+            {name:'sexo_nac'       ,isSlicer:true, label:'Sexo por Lugar de nacimiento'          , typeName:'text'},
+            {name:'sexo_asis'      ,isSlicer:true, label:'Sexo por asistencia'                   , typeName:'text'},
+            {name:'t_cob_sal'      ,isSlicer:true, label:'Tipo de cobertura de salud'            , typeName:'text'},
+            {name:'c_activ'        ,isSlicer:true, label:'Condición de actividad'                , typeName:'text'},
+            {name:'t_activ'        ,isSlicer:true, label:'Tipo de actividad'                     , typeName:'text'},
+            {name:'t_prest'        ,isSlicer:true, label:'Tipo de prestación'                    , typeName:'text'},
+            {name:'fte_ingr'       ,isSlicer:true, label:'Fuente de ingreso'                     , typeName:'text'},
+            {name:'g_g_activ'      ,isSlicer:true, label:'Grandes grupos de actividad'           , typeName:'text'}
+        ];
+        */
+        return be.releerEstructuraBaseDeDatos();
     }
     
 }

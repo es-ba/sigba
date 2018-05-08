@@ -74,6 +74,7 @@ ProceduresExamples = [
         ],
         coreFunction:async function(context, parameters){
             await context.client.query("SELECT agregar_quitar_variables()").execute();
+            await context.be.releerEstructuraBaseDeDatos();
             return 'ok';
         }
     },

@@ -12,7 +12,7 @@ module.exports = function(context){
         fields: [
             {name: 'variable'             ,typeName:'text'   ,nullable:false},
             {name: 'denominacion'         ,typeName:'text'   },
-            {name: 'corte'                ,typeName:'boolean'},
+            {name: 'corte'                ,typeName:'boolean',allow:{select:false}, defaultValue:true},
             {name: 'orden'                ,typeName:'integer'},
             {name: 'estado_tabla_valores' ,typeName:'text'   ,allow:{select:false}, defaultValue:'nueva'},
         ],
@@ -27,7 +27,8 @@ module.exports = function(context){
             logicalDeletes:{
                 fieldName:'estado_tabla_valores',
                 valueToDelete:'quitar'
-            }
+            },
+            where:"corte",
         }
     },context);
 }

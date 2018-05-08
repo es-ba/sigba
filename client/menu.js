@@ -1,7 +1,6 @@
 "use strict";
 
-// var html=require('js-to-html').html;
-var html=jsToHtml.html;
+var html=require('js-to-html').html;
 
 var my = myOwn;
 
@@ -14,6 +13,21 @@ function prepareTableButtons(){
         });
     });
 }
+
+myOwn.clientSides.nuevaFaltaGenerar={
+    update: true,
+    prepare: function(depot, fieldName){
+        depot.rowControls[fieldName].style.backgroundColor='#FAE';
+        depot.rowControls[fieldName].title='No se pueden cargar valores todavía, hay que generar variables';
+    }
+};
+myOwn.clientSides.quitarFaltaGenerar={
+    update: true,
+    prepare: function(depot, fieldName){
+        depot.rowControls[fieldName].style.backgroundColor='#FAA';
+        depot.rowControls[fieldName].title='Esta columna será borrada. Hay que quitar las filas que contengan valores en ella';
+    }
+};
 
 myOwn.wScreens.calculaTotales=function(addrParams){
     var filasCalculadas;
