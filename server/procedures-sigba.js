@@ -69,6 +69,15 @@ ProceduresExamples = [
         }
     },
     {
+        action:'variables/generar',
+        parameters:[
+        ],
+        coreFunction:async function(context, parameters){
+            await context.client.query("SELECT agregar_quitar_variables()").execute();
+            return 'ok';
+        }
+    },
+    {
         action:'tabulado/habilitar',
         parameters:[
             {name:'indicador'       ,typeName:'text'},

@@ -1131,40 +1131,41 @@ class AppSIGBA extends backend.AppBackend{
     getMenu(context){
         var be = this;
         return {menu:[
-            {menuType:'menu', name:'Indicadores', menuContent:[
+            {menuType:'menu', name:'indicadores', menuContent:[
                 {menuType:'table', name:'agrupacion_principal', label:be.config['client-setup'].labels['agrupacion-principal'], },
-                {menuType:'table', name:'dimension'       , label:'Dimensión'                             },
-                {menuType:'table', name:'indicadores'     , label:'Indicadores'                           },
-                {menuType:'table', name:'tabulados'       , label:'Tabulados'                           },
-                {menuType:'table', name:'fte'             , label:'Fuente de datos '                      },
-                {menuType:'table', name:'um'              , label:'Unidad de medida'                      },
-                {menuType:'table', name:'cv'              , label:'Coeficientes de variación'             },
-                {menuType:'table', name:'indicador_annio' , label:'Cobertura'                             },
-                {menuType:'proc' , name:'alta/tabulados'  , label:'Dar de alta nuevos tabulados'                             },
+                {menuType:'table', name:'dimension'                        },
+                {menuType:'table', name:'indicadores'                      },
+                {menuType:'table', name:'tabulados'                        },
+                {menuType:'table', name:'fte'             , label:'fuente de datos '                      },
+                {menuType:'table', name:'um'              , label:'unidad de medida'                      },
+                {menuType:'table', name:'cv'              , label:'coeficientes de variación'             },
+                {menuType:'table', name:'indicador_annio' , label:'cobertura'                             },
+                {menuType:'proc' , name:'alta/tabulados'  , label:'dar de alta nuevos tabulados'                             },
             ]},
-            {menuType:'menu'    , name:'Variables de corte' , menuContent:[
-                {menuType:'table', name:'variables'       , label:'Variables'            },
-                {menuType:'table', name:'cortes'          , label:'Cortes'                                },
+            {menuType:'menu'    , name:'variables de corte' , menuContent:[
+                {menuType:'table', name:'variables'       },
+                {menuType:'table', name:'cortes'          },
+                {menuType:'proc' , name:'generar'    , proc:'variables/generar'     },
             ]},
-            {menuType:'menu'    , name:'Ubicación Variables'   , menuContent:[
-                {menuType:'table'    , name:'Indicadores-Variables'   , table:'indicadores_variables'},
-                {menuType:'table'    , name:'Tabulados-Variables'     , table:'tabulados_variables'},
+            {menuType:'menu'    , name:'ubicación variables'   , menuContent:[
+                {menuType:'table'    , name:'indicadores-variables'   , table:'indicadores_variables'},
+                {menuType:'table'    , name:'tabulados-variables'     , table:'tabulados_variables'},
             ]},
             
-            {menuType:'menu'     , name:'Valores'                 , menuContent:[
-                {menuType:'proc', label:'Borrar datos valores', name:'borrar/valores'},
-                {menuType:'table'    , name:'Valores'                 , table:'valores'              },
+            {menuType:'menu'     , name:'valores'                 , menuContent:[
+                {menuType:'proc', label:'borrar datos valores', name:'borrar/valores'},
+                {menuType:'table'    , name:'valores'                 , table:'valores'              },
             ]},
             // {menuType:'table'    , name:'Celdas'                  , table:'celdas'               },
             // {menuType:'table'    , name:'Cortes-Celdas'           , table:'cortes_celdas'        },
-            {menuType:'path'     , name:'Tabulados'               , path:'/principal'            },
-            {menuType:'menu'     , name:'Totales'                 , menuContent:[
-                {menuType:'calculaTotales' , name:'Calcular totales'},
-                {menuType:'table'          , name:'Discrepancias'         , table:'diferencia_totales'},
+            {menuType:'path'     , name:'tabulados'               , path:'/principal'            },
+            {menuType:'menu'     , name:'totales'                 , menuContent:[
+                {menuType:'calculaTotales' , name:'calcular totales'},
+                {menuType:'table'          , name:'discrepancias'         , table:'diferencia_totales'},
             ]},
             {menuType:'menu'     , name:'configuración'                 , menuContent:[
                 {menuType:'table'    , name:'signos_convencionales', label:'signos convencionales'},
-                {menuType:'table'    , name:'variables_principales', label:'Variables Principales del sistema'},
+                {menuType:'table'    , name:'variables_principales', label:'variables principales del sistema'},
                 //{menuType:'table'    , name:'parametros'           , label:'Parámetros del home'},
                 {menuType:'table'    , name:'usuarios'},
             ]},
