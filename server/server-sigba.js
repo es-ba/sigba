@@ -1130,10 +1130,46 @@ class AppSIGBA extends backend.AppBackend{
     getMenu(context){
         var be = this;
         return {menu:[
-            {menuType:'menu', name:'indicadores', menuContent:[
+            //{menuType:'menu', name:'configuracion',  menuContent:[
+                {menuType:'menu', name:'particiones'              , label:'división temática' , menuContent:[
+                    {menuType:'table', name:'agrupacion_principal', label:be.config['client-setup'].labels['agrupacion-principal'], },
+                    {menuType:'table', name:'dimension'   },
+                    {menuType:'table', name:'indicadores' },
+                ]},
+                {menuType:'menu', name:'atributos', label:'atributos de indicadores', menuContent:[
+                    {menuType:'table', name:'fte'             , label:'fuente de datos '                          },
+                    {menuType:'table', name:'um'              , label:'unidad de medida'                          },
+                    {menuType:'table', name:'cv'              , label:'coeficientes de variación'                 },
+                    {menuType:'table', name:'indicador_annio' , label:'cobertura'                                 },
+                    {menuType:'table'    , name:'signos_convencionales', label:'signos convencionales'            },
+                    {menuType:'table'    , name:'variables_principales', label:'variables principales del sistema'},
+                ]},
+                {menuType:'menu'    , name:'variables' , menuContent:[
+                    {menuType:'table', name:'variables'                                              },
+                    {menuType:'table', name:'cortes'                                                 },
+                    {menuType:'table', name:'indicadores-variables'   , table:'indicadores_variables'},
+                    {menuType:'proc' , name:'generar'                 , label:'generar-variables' , proc:'variables/generar'},
+                    {menuType:'table', name:'tabulados-variables'     , table:'tabulados_variables'  },
+                ]},
+                {menuType:'menu', name:'tabulados', menuContent:[
+                   {menuType:'table', name:'tabulados'                                               },
+                   {menuType:'proc' , name:'alta/tabulados'  , label:'generar tabulados'             },
+                ]},
+                {menuType:'menu'     , name:'valores'        , label:'datos'           , menuContent:[
+                    {menuType:'table'    , name:'valores'                 , table:'valores'},
+                    {menuType:'proc', label:'borrar datos valores', name:'borrar/valores'  },
+                    {menuType:'calculaTotales' , name:'calcular totales'},
+                    {menuType:'table'          , name:'discrepancias'         , table:'diferencia_totales'},
+                ]},
+                {menuType:'path'     , name:'principal'  , path:'/principal' },
+                {menuType:'menu'     , name:'sistema'    , menuContent:[
+                    {menuType:'table'    , name:'usuarios'}
+                ]},
+            //]}
+            
+            /*{menuType:'menu', name:'indicadores', menuContent:[
                 {menuType:'table', name:'agrupacion_principal', label:be.config['client-setup'].labels['agrupacion-principal'], },
-                {menuType:'table', name:'dimension'                        },
-                {menuType:'table', name:'indicadores'                      },
+                
                 {menuType:'table', name:'tabulados'                        },
                 {menuType:'table', name:'fte'             , label:'fuente de datos '                      },
                 {menuType:'table', name:'um'              , label:'unidad de medida'                      },
@@ -1150,14 +1186,14 @@ class AppSIGBA extends backend.AppBackend{
                 {menuType:'table'    , name:'indicadores-variables'   , table:'indicadores_variables'},
                 {menuType:'table'    , name:'tabulados-variables'     , table:'tabulados_variables'},
             ]},
-            
             {menuType:'menu'     , name:'valores'                 , menuContent:[
-                {menuType:'proc', label:'borrar datos valores', name:'borrar/valores'},
-                {menuType:'table'    , name:'valores'                 , table:'valores'              },
-            ]},
+                    {menuType:'table'    , name:'valores'                 , table:'valores'},
+                    {menuType:'proc', label:'borrar datos valores', name:'borrar/valores'  },
+                ]},
+            {menuType:'path'     , name:'principal'               , path:'/principal'            },
             // {menuType:'table'    , name:'Celdas'                  , table:'celdas'               },
             // {menuType:'table'    , name:'Cortes-Celdas'           , table:'cortes_celdas'        },
-            {menuType:'path'     , name:'tabulados'               , path:'/principal'            },
+            
             {menuType:'menu'     , name:'totales'                 , menuContent:[
                 {menuType:'calculaTotales' , name:'calcular totales'},
                 {menuType:'table'          , name:'discrepancias'         , table:'diferencia_totales'},
@@ -1167,7 +1203,7 @@ class AppSIGBA extends backend.AppBackend{
                 {menuType:'table'    , name:'variables_principales', label:'variables principales del sistema'},
                 //{menuType:'table'    , name:'parametros'           , label:'Parámetros del home'},
                 {menuType:'table'    , name:'usuarios'},
-            ]},
+            ]},*/
         ]}
     }
     getTables(){
