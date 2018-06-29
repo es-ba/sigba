@@ -61,6 +61,9 @@ module.exports = function(context){
         ]),
         slicerField:'cortes',
         primaryKey:['indicador','cortes'], // poner acá el autonumérico
+        constraints: [
+            { constraintType: 'check', consName:'la columna valor no debe contener comas', expr: "valor not like '%,%'" },
+        ],
         foreignKeys:[
             {references:'indicadores'      , fields:['indicador']},
         ]
