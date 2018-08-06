@@ -23,6 +23,7 @@ module.exports = function(context){
             {name:'principal_es_serie'         , label:'En principal se muestra serie'         , typeName:'boolean'  , defaultValue:'false'},
             {name:'denominacion'               , label:'Denominación'    , typeName:'text'     },
             {name:'nota_pie'                   , label:'Nota al pie'     , typeName:'text'     },
+            {name:'margen_leyenda'             , label:'Margen para leyenda inferior'          , typeName:'integer'},
         ], 
         primaryKey:['indicador','cortantes'],
         foreignKeys:[

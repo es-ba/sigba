@@ -641,7 +641,7 @@ class AppSIGBA extends backend.AppBackend{
                 
                 }).then(function(){
                     return client.query(
-                        "SELECT habilitado,mostrar_cuadro cuadro,mostrar_grafico grafico, tipo_grafico,orientacion,apilado "+
+                        "SELECT habilitado,mostrar_cuadro cuadro,mostrar_grafico grafico, tipo_grafico,orientacion,apilado,margen_leyenda "+
                         "FROM tabulados WHERE indicador=$1 AND cortantes=$2"
                     ,[indicador,tabulado.cortantes]).fetchOneRowIfExists().then(function(result){
                         var caracteristicasTabulado=result.row;
@@ -651,7 +651,7 @@ class AppSIGBA extends backend.AppBackend{
                             tabulado.tipo_grafico=caracteristicasTabulado.tipo_grafico;
                             tabulado.orientacion=caracteristicasTabulado.orientacion;
                             tabulado.apilado=caracteristicasTabulado.apilado;
-                    
+                            tabulado.margen_leyenda=caracteristicasTabulado.margen_leyenda;
                         return tabulado;
                     })
                 })
@@ -712,6 +712,7 @@ class AppSIGBA extends backend.AppBackend{
                                     tipo_grafico:fila.tipo_grafico,
                                     orientacion:fila.orientacion,
                                     apilado:fila.apilado,
+                                    margen_leyenda:fila.margen_leyenda,
                                     i_denom:infoParaTabulado.i_denom,
                                     nota_pie:infoParaTabulado.con_nota?infoParaTabulado.nota_pie:null,
                                     fuente:infoParaTabulado.f_denom,

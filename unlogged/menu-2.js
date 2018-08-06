@@ -116,6 +116,9 @@ function generateChart(elementWithMatrix, svgWidth) {
                         min: minZYValue,
                         max: maxZYValue
                     },
+                    x: {
+                        height: tabuladoInfo.margen_leyenda
+                    }
                 }
             }
         };
