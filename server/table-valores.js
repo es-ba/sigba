@@ -10,8 +10,8 @@ module.exports = function(context){
             {name: 'indicador'     ,               label:'Código indicador'                      , typeName:'text' ,nullable:false},
         ].concat(be.variablesDinamicas||[]).concat([
             
-            /*{name:'valor'          ,               label:'Valor'                                 , typeName:'text'},
-            {name:'cv'             ,               label:'Coeficiente de variación'              , typeName:'text'},
+            {name:'valor'          ,               label:'Valor'                                 , typeName:'text'},
+            /*{name:'cv'             ,               label:'Coeficiente de variación'              , typeName:'text'},
             {name:'num'            ,               label:'Numerador'                             , typeName:'text'},
             {name:'dem'            ,               label:'Denominador'                           , typeName:'text'},
             {name:'annio'          ,isSlicer:true, label:'Año'                                   , typeName:'text'},        
