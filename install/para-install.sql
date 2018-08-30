@@ -399,7 +399,7 @@ begin
   return tabIn;
 end;
 $BODY$
-  LANGUAGE plpgsql VOLATILE SECURITY DEFINER
+  LANGUAGE plpgsql VOLATILE SECURITY DEFINER;
 --ALTER FUNCTION syncro_tabulados()
 --  OWNER TO sigba_owner;
 ----------------------------------------------------------------------
