@@ -403,8 +403,8 @@ $BODY$
 --ALTER FUNCTION syncro_tabulados()
 --  OWNER TO sigba_owner;
 ----------------------------------------------------------------------
-ALTER TABLE tabulados_variables
-DROP  CONSTRAINT "tabulados_variables tabulados REL ";
+--ALTER TABLE tabulados_variables
+--DROP  CONSTRAINT "tabulados_variables tabulados REL ";
 ALTER TABLE tabulados_variables
 ADD CONSTRAINT "tabulados_variables tabulados REL " FOREIGN KEY (indicador, cortantes)
       REFERENCES tabulados (indicador, cortantes) MATCH SIMPLE
