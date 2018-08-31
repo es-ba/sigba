@@ -172,7 +172,7 @@ CREATE TABLE totales_calculados(
   CONSTRAINT totales_calculados_pkey PRIMARY KEY (indicador, corte)
 );
 
-grant select on "totales_calculados" to "sigba_user";
+--grant select on "totales_calculados" to "sigba_user";
 
 
 CREATE OR REPLACE VIEW diferencia_totales AS 
@@ -182,7 +182,7 @@ CREATE OR REPLACE VIEW diferencia_totales AS
       ) tc ON tc.indicador=v.indicador AND tc.corte=v.cortes WHERE es_automatico IS FALSE
   ) x LEFT JOIN indicadores i ON i.indicador= x. indicador WHERE val<>val_cal ;
 
-grant select on "diferencia_totales" to "sigba_user";
+--grant select on "diferencia_totales" to "sigba_user";
 
 CREATE OR REPLACE FUNCTION cargar_totales()
   RETURNS integer AS
