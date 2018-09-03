@@ -67,13 +67,11 @@ class AppSIGBA extends backend.AppBackend{
        return str.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
     }
     // FALTA IMPLEMENTAR ESTO
-    nombreDelHome(client){
-        return Promise.resolve([]).then(function(){return 'principal';});
-        return  client.query(
-            'SELECT nombre_home FROM parametros;'
-        ).fetchOneRowIfExists().then(function(result){
-            //var nombreHome=(result.row && result.row.nombre_home)||'principal';
-            return 'principal';
+    parametrosSistema(client){
+        return Promise.resolve([]).then(function(){
+            return client.query('SELECT * FROM parametros').fetchOneRowIfExists().then(function(result){
+                return result.row
+            });
         });
     }
     reporteBonito(client, defTables, annios, where,color,controles) {
@@ -85,8 +83,8 @@ class AppSIGBA extends backend.AppBackend{
             return Promise.resolve([]);
         }
         var table=defTables[0].tabla;
-        return be.nombreDelHome(client).then(function(homeName){
-            urlYClasesTabulados=homeName;
+        return be.parametrosSistema(client).then(function(parametros){
+            urlYClasesTabulados=parametros.nombre_principal;
             return client.query(
                 'SELECT * FROM '+be.db.quoteIdent(table)+
                 ' WHERE '+(where||'true')+
@@ -1093,28 +1091,36 @@ class AppSIGBA extends backend.AppBackend{
     
     encabezado(skinUrl,esPrincipal,req,client){
         var be = this;
-        return be.obtenerGruposPrincipales(client).then(function(grupos){
-            return html.div({id:'id-encabezado'},[
-                html.a({class:'encabezado',id:'barra-superior',href:''+absolutePath+'principal'},[
-                    html.div({class:'encabezado-interno'},[
-                        html.img({class:'encabezado',id:'bs-izq',src:skinUrl+'img/logo-ciudad.png'}),
-                        html.img({class:'encabezado',id:'bs-der',src:skinUrl+'img/logo-BA.png'})
+        return be.parametrosSistema(client).then(function(parametros){
+            var srcLogoSistema='img/img-logo.png';
+            if(parametros && parametros.nombre_sistema){
+                srcLogoSistema='img/img-logo'+'-'+parametros.nombre_sistema+'.png'
+            }
+            return be.obtenerGruposPrincipales(client).then(function(grupos){
+                return html.div({id:'id-encabezado'},[
+                    html.a({class:'encabezado',id:'barra-superior',href:''+absolutePath+'principal'},[
+                        html.div({class:'encabezado-interno'},[
+                            html.img({class:'encabezado',id:'bs-izq',src:skinUrl+'img/logo-ciudad.png'}),
+                            html.img({class:'encabezado',id:'bs-der',src:skinUrl+'img/logo-BA.png'})
+                        ]),
                     ]),
-                ]),
-                html.div({class:'encabezado',id:'barra-inferior'},
-                    [].concat([
-                        html.a({class:'a-principal',href:''+absolutePath+'principal'},[html.img({class:'encabezado',id:'img-logo',src:skinUrl+'img/img-logo.png'})])
-                    ]).concat(be.config['client-setup'].logos.map(function(logoName){
-                            return html.a({class:'a-principal',href:''+absolutePath+'principal'},[html.img({class:'encabezado',id:'logo-'+logoName,src:skinUrl+'img/img-logo-'+logoName+'.png'})]);
-                    }).concat([be.config['client-setup'].conTextoPrincipal?html.div({class:'encabezado',id:'texto-encabezado-grande'}):null]).concat(
-                        esPrincipal?html.div({class:'contiene-grupos'},grupos.map(function(grupo){
-                            var href=''+absolutePath+'principal#'+grupo.codigo;
-                            var src=skinUrl+'img/'+grupo.codigo+'.png';
-                            return html.a({class:'grupo-a',href:href,title:grupo.denominacion},[html.img({class:'grupo-img',src:src})])
-                        })):null
-                    ))
-                )
-            ]);
+                    html.div({class:'encabezado',id:'barra-inferior'},
+                        [].concat([
+                            html.a({class:'a-principal',href:''+absolutePath+'principal'},[html.img(
+                                {class:'encabezado',id:'img-logo',src:skinUrl+srcLogoSistema}
+                            )])
+                        ]).concat(be.config['client-setup'].logos.map(function(logoName){
+                                return html.a({class:'a-principal',href:''+absolutePath+'principal'},[html.img({class:'encabezado',id:'logo-'+logoName,src:skinUrl+'img/img-logo-'+logoName+'.png'})]);
+                        }).concat([be.config['client-setup'].conTextoPrincipal?html.div({class:'encabezado',id:'texto-encabezado-grande'}):null]).concat(
+                            esPrincipal?html.div({class:'contiene-grupos'},grupos.map(function(grupo){
+                                var href=''+absolutePath+'principal#'+grupo.codigo;
+                                var src=skinUrl+'img/'+grupo.codigo+'.png';
+                                return html.a({class:'grupo-a',href:href,title:grupo.denominacion},[html.img({class:'grupo-img',src:src})])
+                            })):null
+                        ))
+                    )
+                ]);
+            })
         })
     }
     foot(skinUrl){
