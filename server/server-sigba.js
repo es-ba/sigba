@@ -208,7 +208,7 @@ class AppSIGBA extends backend.AppBackend{
                                     return be.db.quoteLiteral(JSON.stringify(crt));
                                 }).join(',')+") AND "+cortantesEnPrincipalObj.cortes.map(function(crt,i){
                                     for(var key in crt){
-                                        return "cortes->> "+be.db.quoteLiteral(key)+" = "+be.db.quoteLiteral(crt[key]);
+                                        return "cortes->> "+be.db.quoteNullable(key)+" = "+be.db.quoteNullable(crt[key]);
                                     }
                                 }).join(' AND ');
                                 return client.query(
