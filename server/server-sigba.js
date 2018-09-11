@@ -23,6 +23,7 @@ if(process.argv[2]=='--dir'){
 var extensionServeStatic = require('extension-serve-static');
 
 var changing = require('best-globals').changing;
+var coalesce = require('best-globals').coalesce;
 var backend = require("backend-plus");
 var MiniTools = require("mini-tools");
 var jsToHtml=require('js-to-html');
@@ -203,7 +204,8 @@ class AppSIGBA extends backend.AppBackend{
                                 }
                                 
                             }).then(function(){
-                                var sqlPrincipalTest="SELECT * FROM celdas WHERE indicador=$1 AND cortantes in ( "+
+                                var sqlPrincipalTest="SELECT indicador,cortes,coalesce(valor::text,valor_esp) valor,cv,num,dem,cortantes,usu_validacion,fecha_validacion,origen_validacion,es_automatico,valor_esp FROM celdas WHERE indicador=$1 AND cortantes in ( "+
+                                //var sqlPrincipalTest="SELECT * FROM celdas WHERE indicador=$1 AND cortantes in ( "+
                                 cortantesEnPrincipalObj.variablesPrincipal.map(function(crt){
                                     return be.db.quoteLiteral(JSON.stringify(crt));
                                 }).join(',')+") AND "+cortantesEnPrincipalObj.cortes.map(function(crt,i){
@@ -243,7 +245,7 @@ class AppSIGBA extends backend.AppBackend{
                                     return valCeldasPrincipal;
                                 }).then(function(valoresPrincipal){
                                     valoresPrincipal.forEach(function(valorPrincipal){
-                                        var indicadorAnnio
+                                        var indicadorAnnio;
                                         var valorReporteBonito=(valorPrincipal.valor==null)?'///':be.puntosEnMiles(be.decimalesYComa(valorPrincipal.valor,registro.decimales,','));
                                         listaTdValores.push(html.td({class:'td-valores'},valorReporteBonito));
                                     })
@@ -365,7 +367,8 @@ class AppSIGBA extends backend.AppBackend{
                         throw new Error("invalid varInv");
                     }
                     return 'cc_'+varInv+'.valor_corte '+varInv;
-                }).join(',') +", valor, cv " + 
+                //}).join(',') +", valor, cv " + 
+                }).join(',') +", coalesce(valor::text,valor_esp) valor, cv " + 
                     "\n  FROM celdas v  LEFT JOIN "+ variables.map(function(varInv){
                         return (" cortes_celdas cc_"+varInv +
                             " ON v.indicador=cc_"+varInv+".indicador AND v.cortes=cc_"+varInv+".cortes AND cc_"+varInv+".variable='"+varInv+"'" +
@@ -1243,7 +1246,7 @@ class AppSIGBA extends backend.AppBackend{
             FROM variables v LEFT JOIN (
                 SELECT column_name 
                 FROM information_schema.columns WHERE table_name ='valores' 
-                    AND column_name NOT IN ('cortantes','cortes','es_automatico','fecha_validacion','indicador','origen_validacion','usu_validacion')
+                    AND column_name NOT IN ('valor','cortantes','cortes','es_automatico','fecha_validacion','indicador','origen_validacion','usu_validacion')
                 ) x ON v.variable = x.column_name`
         ).fetchAll().then(function(result){
             be.variablesDinamicas=result.rows.map(function(row){
