@@ -205,7 +205,6 @@ class AppSIGBA extends backend.AppBackend{
                                 
                             }).then(function(){
                                 var sqlPrincipalTest="SELECT indicador,cortes,coalesce(valor::text,valor_esp) valor,cv,num,dem,cortantes,usu_validacion,fecha_validacion,origen_validacion,es_automatico,valor_esp FROM celdas WHERE indicador=$1 AND cortantes in ( "+
-                                //var sqlPrincipalTest="SELECT * FROM celdas WHERE indicador=$1 AND cortantes in ( "+
                                 cortantesEnPrincipalObj.variablesPrincipal.map(function(crt){
                                     return be.db.quoteLiteral(JSON.stringify(crt));
                                 }).join(',')+") AND "+cortantesEnPrincipalObj.cortes.map(function(crt,i){
@@ -367,7 +366,6 @@ class AppSIGBA extends backend.AppBackend{
                         throw new Error("invalid varInv");
                     }
                     return 'cc_'+varInv+'.valor_corte '+varInv;
-                //}).join(',') +", valor, cv " + 
                 }).join(',') +", coalesce(valor::text,valor_esp) valor, cv " + 
                     "\n  FROM celdas v  LEFT JOIN "+ variables.map(function(varInv){
                         return (" cortes_celdas cc_"+varInv +
@@ -1174,45 +1172,6 @@ class AppSIGBA extends backend.AppBackend{
                 {menuType:'menu'     , name:'sistema'    , menuContent:[
                     {menuType:'table'    , name:'usuarios'}
                 ]},
-            //]}
-            
-            /*{menuType:'menu', name:'indicadores', menuContent:[
-                {menuType:'table', name:'agrupacion_principal', label:be.config['client-setup'].labels['agrupacion-principal'], },
-                
-                {menuType:'table', name:'tabulados'                        },
-                {menuType:'table', name:'fte'             , label:'fuente de datos '                      },
-                {menuType:'table', name:'um'              , label:'unidad de medida'                      },
-                {menuType:'table', name:'cv'              , label:'coeficientes de variación'             },
-                {menuType:'table', name:'indicador_annio' , label:'cobertura'                             },
-                {menuType:'proc' , name:'alta/tabulados'  , label:'dar de alta nuevos tabulados'                             },
-            ]},
-            {menuType:'menu'    , name:'variables de corte' , menuContent:[
-                {menuType:'table', name:'variables'       },
-                {menuType:'table', name:'cortes'          },
-                {menuType:'proc' , name:'generar'    , proc:'variables/generar'     },
-            ]},
-            {menuType:'menu'    , name:'ubicación variables'   , menuContent:[
-                {menuType:'table'    , name:'indicadores-variables'   , table:'indicadores_variables'},
-                {menuType:'table'    , name:'tabulados-variables'     , table:'tabulados_variables'},
-            ]},
-            {menuType:'menu'     , name:'valores'                 , menuContent:[
-                    {menuType:'table'    , name:'valores'                 , table:'valores'},
-                    {menuType:'proc', label:'borrar datos valores', name:'borrar/valores'  },
-                ]},
-            {menuType:'path'     , name:'principal'               , path:'/principal'            },
-            // {menuType:'table'    , name:'Celdas'                  , table:'celdas'               },
-            // {menuType:'table'    , name:'Cortes-Celdas'           , table:'cortes_celdas'        },
-            
-            {menuType:'menu'     , name:'totales'                 , menuContent:[
-                {menuType:'calculaTotales' , name:'calcular totales'},
-                {menuType:'table'          , name:'discrepancias'         , table:'diferencia_totales'},
-            ]},
-            {menuType:'menu'     , name:'configuración'                 , menuContent:[
-                {menuType:'table'    , name:'signos_convencionales', label:'signos convencionales'},
-                {menuType:'table'    , name:'variables_principales', label:'variables principales del sistema'},
-                //{menuType:'table'    , name:'parametros'           , label:'Parámetros del home'},
-                {menuType:'table'    , name:'usuarios'},
-            ]},*/
         ]}
     }
     getTables(){
@@ -1236,7 +1195,8 @@ class AppSIGBA extends backend.AppBackend{
             'cortes_celdas',
             'tabulados_variables',
             'diferencia_totales',
-            'signos_convencionales'
+            'signos_convencionales',
+            'totales_calculados'
         ]);
     }
     releerEstructuraBaseDeDatos(client){
