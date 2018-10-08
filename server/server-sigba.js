@@ -179,7 +179,9 @@ class AppSIGBA extends backend.AppBackend{
                         if(table==='indicadores'){
                             var listaTdValores=[];
                             var ultimoAnnioDisponible;
-                            var cortantesEnPrincipalObj;
+                            if(be.hayCortantePrincipal){
+                                var cortantesEnPrincipalObj;
+                            }
                             obtenerValoresPrincipal=client.query(
                                 `select max(cortes->>'annio') annio from celdas where indicador=$1`,[registro.indicador]
                             ).fetchOneRowIfExists().then(function(result){
@@ -188,11 +190,13 @@ class AppSIGBA extends backend.AppBackend{
                                     variablesPrincipal:[{"annio":true}],
                                     cortes:[{"annio":ultimoAnnioDisponible}]
                                 };
-                                be.cortantesEnPrincipal.cortantesPrincipalesArr.forEach(function(variable){
-                                    var variablePrincipal={"annio":true};
-                                    variablePrincipal[variable.variable_principal]=true;
-                                    cortantesEnPrincipalObj.variablesPrincipal.push(variablePrincipal);
-                                })
+                                if(be.hayCortantePrincipal){
+                                    be.cortantesEnPrincipal.cortantesPrincipalesArr.forEach(function(variable){
+                                        var variablePrincipal={"annio":true};
+                                        variablePrincipal[variable.variable_principal]=true;
+                                        cortantesEnPrincipalObj.variablesPrincipal.push(variablePrincipal);
+                                    })
+                                }
                                 if(registro.indicador && registro.corte_principal){
                                     var test={}
                                     test[registro.corte_principal]=registro.valor_principal;
@@ -204,7 +208,7 @@ class AppSIGBA extends backend.AppBackend{
                                 }
                                 
                             }).then(function(){
-                                var sqlPrincipalTest="SELECT indicador,cortes,coalesce(valor::text,valor_esp) valor,cv,num,dem,cortantes,usu_validacion,fecha_validacion,origen_validacion,es_automatico,valor_esp FROM celdas WHERE indicador=$1 AND cortantes in ( "+
+                                var sqlPrincipal="SELECT indicador,cortes,coalesce(valor::text,valor_esp) valor,cv,num,dem,cortantes,usu_validacion,fecha_validacion,origen_validacion,es_automatico,valor_esp FROM celdas WHERE indicador=$1 AND cortantes in ( "+
                                 cortantesEnPrincipalObj.variablesPrincipal.map(function(crt){
                                     return be.db.quoteLiteral(JSON.stringify(crt));
                                 }).join(',')+") AND "+cortantesEnPrincipalObj.cortes.map(function(crt,i){
@@ -213,32 +217,37 @@ class AppSIGBA extends backend.AppBackend{
                                     }
                                 }).join(' AND ');
                                 return client.query(
-                                    sqlPrincipalTest
+                                    sqlPrincipal
                                     ,[registro.indicador]
                                 ).fetchAll().then(function(result){
                                     var filasValoresAPrincipal=result.rows;
                                     var valCeldasPrincipal=[];
                                     var indiceCeldasPrincipal={'null': 0};
                                     valCeldasPrincipal[indiceCeldasPrincipal['null']]={valor:null};
-                                    be.cortantesEnPrincipal.categoriasPrincipalArr.forEach(function(categoria,i){
-                                        indiceCeldasPrincipal[categoria.valor]=i+1; 
-                                        valCeldasPrincipal[i+1]={valor:null};
-                                    });
-                                    var crtPrincArr=be.cortantesEnPrincipal.cortantesPrincipalesArr.map(function(crt){
-                                            return crt.variable_principal;
-                                    });
-                                    filasValoresAPrincipal.forEach(function(filaAPrincipal){
-                                        var test=Object.keys(filaAPrincipal.cortes).some(function(element){
-                                            return crtPrincArr.indexOf(element)>=0
+                                    if(be.hayCortantePrincipal){
+                                        be.cortantesEnPrincipal.categoriasPrincipalArr.forEach(function(categoria,i){
+                                            indiceCeldasPrincipal[categoria.valor]=i+1; 
+                                            valCeldasPrincipal[i+1]={valor:null};
                                         });
-                                        be.cortantesEnPrincipal.cortantesPrincipalesArr.forEach(function(variable){
-                                            if(!test){
-                                                valCeldasPrincipal[indiceCeldasPrincipal['null']]=filaAPrincipal;
-                                            }else{
-                                                valCeldasPrincipal[indiceCeldasPrincipal[filaAPrincipal.cortes[variable.variable_principal]]]=filaAPrincipal;
-                                            }
+                                    
+                                        var crtPrincArr=be.cortantesEnPrincipal.cortantesPrincipalesArr.map(function(crt){
+                                                return crt.variable_principal;
                                         });
-                                    });
+                                        filasValoresAPrincipal.forEach(function(filaAPrincipal){
+                                            var test=Object.keys(filaAPrincipal.cortes).some(function(element){
+                                                return crtPrincArr.indexOf(element)>=0
+                                            });
+                                            be.cortantesEnPrincipal.cortantesPrincipalesArr.forEach(function(variable){
+                                                if(!test){
+                                                    valCeldasPrincipal[indiceCeldasPrincipal['null']]=filaAPrincipal;
+                                                }else{
+                                                    valCeldasPrincipal[indiceCeldasPrincipal[filaAPrincipal.cortes[variable.variable_principal]]]=filaAPrincipal;
+                                                }
+                                            });
+                                        });
+                                    }else{
+                                        valCeldasPrincipal[indiceCeldasPrincipal['null']]=filasValoresAPrincipal[0];
+                                    }
                                     annioPrincipal=ultimoAnnioDisponible;
                                     listaTdValores.push(html.td({class:'td-valores'},annioPrincipal));
                                     return valCeldasPrincipal;
@@ -470,15 +479,19 @@ class AppSIGBA extends backend.AppBackend{
             var cortantesPrincipalesArr=result.rows;
             return cortantesPrincipalesArr;
         }).then(function(cortantesPrincipalesArr){
-            return client.query(
-                "select valor_corte,denominacion,orden from cortes where variable=$1 order by orden",
-                [cortantesPrincipalesArr[0].variable_principal]
-            ).fetchAll().then(function(result){
-                var categoriasPrincipalArr=result.rows.map(function(categorias){
-                    return {valor:categorias.valor_corte,denominacion:categorias.denominacion}
+            if(cortantesPrincipalesArr.length){
+                return client.query(
+                    "select valor_corte,denominacion,orden from cortes where variable=$1 order by orden",
+                    [cortantesPrincipalesArr[0].variable_principal]
+                ).fetchAll().then(function(result){
+                    var categoriasPrincipalArr=result.rows.map(function(categorias){
+                        return {valor:categorias.valor_corte,denominacion:categorias.denominacion}
+                    })
+                    return {cortantesPrincipalesArr,categoriasPrincipalArr}
                 })
-                return {cortantesPrincipalesArr,categoriasPrincipalArr}
-            })
+            }else{
+                return false;
+            }
         });
     }
     defs_annio(annio){
@@ -835,7 +848,7 @@ class AppSIGBA extends backend.AppBackend{
             var annios={};
             var client;
             var categoriasPrincipalLista;
-            var cortantePrincipal;
+            //var cortantePrincipal;
             var encabezado;
             var skin=be.config['client-setup'].skin;
             var skinUrl=(skin?skin+'/':'');
@@ -843,10 +856,14 @@ class AppSIGBA extends backend.AppBackend{
             return be.getDbClient(req).then(function(cli){
                 client=cli;
                 return be.cortantesPrincipal(client).then(function(cortanteEnPrincipal){
-                    be.cortantesEnPrincipal=cortanteEnPrincipal;
-                    categoriasPrincipalLista=cortanteEnPrincipal.categoriasPrincipalArr;
-                    cortantePrincipal=cortanteEnPrincipal;
-                
+                    if(cortanteEnPrincipal){
+                        be.hayCortantePrincipal=true;
+                        be.cortantesEnPrincipal=cortanteEnPrincipal;
+                        categoriasPrincipalLista=cortanteEnPrincipal.categoriasPrincipalArr;
+                        //cortantePrincipal=cortanteEnPrincipal;
+                    }else{
+                        be.hayCortantePrincipal=false;
+                    }
                 }).then(function(){
                     return be.encabezado(skinUrl,true,req,client).then(function(encabezadoHtml){
                         encabezado=encabezadoHtml;
@@ -900,9 +917,9 @@ class AppSIGBA extends backend.AppBackend{
                                         html.th('Año'),
                                         html.th('Total')
                                     ].concat(
-                                        categoriasPrincipalLista.map(function(categoria){
+                                        be.hayCortantePrincipal?categoriasPrincipalLista.map(function(categoria){
                                             return html.th(categoria.denominacion)
-                                        })
+                                        }):null
                                     ).concat([
                                         html.th({class:'th-vacio',}),
                                         html.th({class:'th-vacio',})
