@@ -246,7 +246,9 @@ class AppSIGBA extends backend.AppBackend{
                                             });
                                         });
                                     }else{
-                                        valCeldasPrincipal[indiceCeldasPrincipal['null']]=filasValoresAPrincipal[0];
+                                        if(filasValoresAPrincipal[0]){
+                                            valCeldasPrincipal[indiceCeldasPrincipal['null']]=filasValoresAPrincipal[0];
+                                        }
                                     }
                                     annioPrincipal=ultimoAnnioDisponible;
                                     listaTdValores.push(html.td({class:'td-valores'},annioPrincipal));
