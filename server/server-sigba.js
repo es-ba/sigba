@@ -1293,6 +1293,12 @@ class AppSIGBA extends backend.AppBackend{
         var be = this;
         return be.inDbClient({},function(client){
            return be.releerEstructuraBaseDeDatos(client);
+        }).then(function(){
+            return be.inDbClient({},function(client){
+                return client.query(`SELECT valor_esp from celdas;`).execute();
+            })
+        }).catch(function(err){
+            console.log("*********************  AGREGAR LA COLUMN valor_esp en tablas valor y celdas********************")
         })
     }
     
