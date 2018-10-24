@@ -1117,7 +1117,10 @@ class AppSIGBA extends backend.AppBackend{
                 srcLogoSistema='img/img-logo'+'-'+parametros.nombre_sistema+'.png'
             }
             return be.obtenerGruposPrincipales(client).then(function(grupos){
-                return html.div({id:'id-encabezado'},[
+                if(parametros.texto_sistema){
+                    var textoLey=html.div({id:'texto'},parametros.texto_sistema)
+                }
+                var encabezadoCompletoHtml=html.div({id:'id-encabezado'},[
                     html.a({class:'encabezado',id:'barra-superior',href:''+absolutePath+'principal'},[
                         html.div({class:'encabezado-interno'},[
                             html.img({class:'encabezado',id:'bs-izq',src:skinUrl+'img/logo-ciudad.png'}),
@@ -1132,14 +1135,15 @@ class AppSIGBA extends backend.AppBackend{
                         ]).concat(be.config['client-setup'].logos.map(function(logoName){
                                 return html.a({class:'a-principal',href:''+absolutePath+'principal'},[html.img({class:'encabezado',id:'logo-'+logoName,src:skinUrl+'img/img-logo-'+logoName+'.png'})]);
                         }).concat([be.config['client-setup'].conTextoPrincipal?html.div({class:'encabezado',id:'texto-encabezado-grande'}):null]).concat(
-                            esPrincipal?html.div({class:'contiene-grupos'},grupos.map(function(grupo){
+                            esPrincipal?textoLey?textoLey:html.div({class:'contiene-grupos'},grupos.map(function(grupo){
                                 var href=''+absolutePath+'principal#'+grupo.codigo;
                                 var src=skinUrl+'img/'+grupo.codigo+'.png';
                                 return html.a({class:'grupo-a',href:href,title:grupo.denominacion},[html.img({class:'grupo-img',src:src})])
                             })):null
                         ))
                     )
-                ]);
+                ])
+                return encabezadoCompletoHtml;
             })
         })
     }
