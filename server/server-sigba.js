@@ -530,9 +530,6 @@ class AppSIGBA extends backend.AppBackend{
             { type: 'css', module: 'c3' },
             { type: 'css', module: 'graphicator' }
         ]
-        if(this.config["client-setup"].css){
-            ownIncludes.push({ type: 'css', module: this.config["client-setup"].css })
-        }
         return ownIncludes.concat(super.clientIncludes(req, hideBEPlusInclusions));
     }
 
@@ -545,14 +542,18 @@ class AppSIGBA extends backend.AppBackend{
         if(esAdmin){
             listaJS.push(html.script({src:'menu-3.js'}));
         }
-        var listaCSS = be.csss(hideBEPlusInclusions);
-        return html.head([
+        var listaHead=[
             html.meta({name:'viewport', content:'width=device-width'}),
             html.meta({name:'viewport', content:'initial-scale=1.0'}),
             html.title(title),
            // html.title(esPrincipal?'Tabulados':'Tabulado'),
             html.link({rel:"stylesheet", type:"text/css", href:"css/tabulados.css"}),
-        ].concat(listaJS).concat(listaCSS.map(function(css){
+        ];
+        if(this.config["client-setup"].css){
+            listaHead.push(html.link({rel:"stylesheet", type:"text/css", href:"css/"+this.config["client-setup"].css}))
+        }
+        var listaCSS = be.csss(hideBEPlusInclusions);
+        return html.head(listaHead.concat(listaJS).concat(listaCSS.map(function(css){
             return html.link({href: css, rel: "stylesheet"});
         })).concat(listaCSS.map(function(css){
             var skin=be.config['client-setup'].skin;
