@@ -517,8 +517,8 @@ class AppSIGBA extends backend.AppBackend{
         return (req && req.user && (req.user.usu_rol=='admin'|| req.user.usu_rol=='programador') && req.user.active==true);
     }
 
-    ownClientIncludes(){
-        return [
+    clientIncludes(req, hideBEPlusInclusions) {
+        var ownIncludes=[
             { type: 'js', module: 'graphicator', path:'graphicator'},
             { type: 'js', module: 'best-globals', path:'best-globals'},
             { type: 'js', module: 'require-bro'},
@@ -529,11 +529,11 @@ class AppSIGBA extends backend.AppBackend{
             { type: 'js', module: 'tabulator', path:'tabulator'},
             { type: 'css', module: 'c3' },
             { type: 'css', module: 'graphicator' }
-        ];
-    }
-
-    clientIncludes(req, hideBEPlusInclusions) {
-        return this.ownClientIncludes(req).concat(super.clientIncludes(req, hideBEPlusInclusions));
+        ]
+        if(this.config["client-setup"].css){
+            ownIncludes.push({ type: 'css', module: this.config["client-setup"].css })
+        }
+        return ownIncludes.concat(super.clientIncludes(req, hideBEPlusInclusions));
     }
 
     headSigba(esPrincipal,req,title){
