@@ -1033,25 +1033,28 @@ class AppSIGBA extends backend.AppBackend{
             var skinUrl=(skin?skin+'/':'');
             return be.getDbClient(req).then(function(cli){
                 var client=cli;
-                return client.query(`SELECT denominacion,leyes FROM agrupacion_principal WHERE agrupacion_principal=$1`,[agrupacion_principal]).fetchOneRowIfExists().then(function(result){
-                    var arregloLeyes=result.row.leyes.split('; ');
-                    var paginaLey=html.html([
-                        be.headSigba(false,req,'Leyes'),
-                        html.body({"que-pantalla": 'ley'},[
-                            html.div({id:'total-layout','menu-type':'hidden'},[
-                                be.encabezado(skinUrl,false,req,client),
-                                html.h2({id:'agrupacion_principal_'+agrupacion_principal},result.row.denominacion),
-                                html.div({id:'ley_agrupacion_principal_'+agrupacion_principal},
-                                    arregloLeyes.map(function(ley){
-                                        return html.div({class:'leyes'},ley);
-                                    })
-                                ),
-                                be.foot(skinUrl)
+                return be.encabezado(skinUrl,false,req,client).then(function(encab){
+                    return client.query(`SELECT denominacion,leyes FROM agrupacion_principal WHERE agrupacion_principal=$1`,[agrupacion_principal]).fetchOneRowIfExists().then(function(result){
+                        var arregloLeyes=result.row.leyes.split('; ');
+                        console.log(be.encabezado(skinUrl,false,req,client))
+                        var paginaLey=html.html([
+                            be.headSigba(false,req,'Leyes'),
+                            html.body({"que-pantalla": 'ley'},[
+                                html.div({id:'total-layout','menu-type':'hidden'},[
+                                    encab,
+                                    html.h2({id:'agrupacion_principal_'+agrupacion_principal},result.row.denominacion),
+                                    html.div({id:'ley_agrupacion_principal_'+agrupacion_principal},
+                                        arregloLeyes.map(function(ley){
+                                            return html.div({class:'leyes'},ley);
+                                        })
+                                    ),
+                                    be.foot(skinUrl)
+                                ])
                             ])
-                        ])
-                    ]);
-                    res.send(paginaLey.toHtmlText({pretty:true}));
-                    res.end();
+                        ]);
+                        res.send(paginaLey.toHtmlText({pretty:true}));
+                        res.end();
+                    })
                 }).catch(MiniTools.serveErr(req,res)).then(function(){client.done()});
             })
         });
