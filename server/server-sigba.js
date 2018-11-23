@@ -1033,15 +1033,14 @@ class AppSIGBA extends backend.AppBackend{
             var skinUrl=(skin?skin+'/':'');
             return be.getDbClient(req).then(function(cli){
                 var client=cli;
-                return be.encabezado(skinUrl,false,req,client).then(function(encab){
+                return be.encabezado(skinUrl,false,req,client).then(function(encabezado){
                     return client.query(`SELECT denominacion,leyes FROM agrupacion_principal WHERE agrupacion_principal=$1`,[agrupacion_principal]).fetchOneRowIfExists().then(function(result){
                         var arregloLeyes=result.row.leyes.split('; ');
-                        console.log(be.encabezado(skinUrl,false,req,client))
                         var paginaLey=html.html([
                             be.headSigba(false,req,'Leyes'),
                             html.body({"que-pantalla": 'ley'},[
                                 html.div({id:'total-layout','menu-type':'hidden'},[
-                                    encab,
+                                    encabezado,
                                     html.h2({id:'agrupacion_principal_'+agrupacion_principal},result.row.denominacion),
                                     html.div({id:'ley_agrupacion_principal_'+agrupacion_principal},
                                         arregloLeyes.map(function(ley){
