@@ -20,6 +20,8 @@ if(process.argv[2]=='--dir'){
     console.log('cwd',process.cwd());
 }
 
+var FILASXGRAFICO=7;
+
 var extensionServeStatic = require('extension-serve-static');
 
 var changing = require('best-globals').changing;
@@ -119,7 +121,9 @@ class AppSIGBA extends backend.AppBackend{
                         `,[registro.indicador]).fetchOneRowIfExists().then(function(resultado){
                             registro.ficha=resultado.row;
                     })}).then(function(){
-                        listaTd=[html.td({class:'td-'+urlYClasesTabulados+'-renglones',colspan:4-defTables.length},[html.div({class:'espacio-reserva'},'-')])].concat(
+                        listaTd=[
+                            html.td({class:'td-'+urlYClasesTabulados+'-renglones',colspan:4-defTables.length},[html.div({class:'espacio-reserva'},'-')])
+                        ].concat(
                             defTables[0].camposAMostrar.map(function(nombreCampo,i){
                                 var id=registro[defTables[0].campoId];
                                 var attributes={colspan:i?1:defTables.length+1+(defTables[0].tabla=='indicadores'?0:6),class:'campo_'+nombreCampo};
@@ -148,14 +152,16 @@ class AppSIGBA extends backend.AppBackend{
                                     }
                                 }
                                 var sufijoTab=defTables[0].tabla||'';
-                                var htmlIcono= html.span({class:'span-img-icono'+sufijoTab},
-                                    registro.icono?html.img({class:'img-icono-'+sufijoTab,src:skinUrl+'img/'+registro.icono}):null);
-                                    var htmlA={class:'es-link'};
-                                    if(registro.indicador){
-                                        htmlA.href=''+absolutePath+''+urlYClasesTabulados+'-indicador?indicador='+(registro.indicador||'');
-                                        htmlA['cant-cortantes']=result.row.cant_cortantes;
-                                    }
-                            return html.td(attributes,[
+                                var htmlIcono= html.span(
+                                    {class:'span-img-icono'+sufijoTab},
+                                    registro.icono?html.img({class:'img-icono-'+sufijoTab,src:skinUrl+'img/'+registro.icono}):null
+                                );
+                                var htmlA={class:'es-link'};
+                                if(registro.indicador){
+                                    htmlA.href=''+absolutePath+''+urlYClasesTabulados+'-indicador?indicador='+(registro.indicador||'');
+                                    htmlA['cant-cortantes']=result.row.cant_cortantes;
+                                }
+                                return html.td(attributes,[
                                     htmlIcono,
                                     html.span({id:id, class:'ancla'},"\u00a0"),
                                     html.a(htmlA,registro.denominacion_principal?registro.denominacion_principal:registro[nombreCampo]),
@@ -238,11 +244,13 @@ class AppSIGBA extends backend.AppBackend{
                                                 return crtPrincArr.indexOf(element)>=0
                                             });
                                             be.cortantesEnPrincipal.cortantesPrincipalesArr.forEach(function(variable){
+                                                var posicionCeldas;
                                                 if(!test){
-                                                    valCeldasPrincipal[indiceCeldasPrincipal['null']]=filaAPrincipal;
+                                                    posicionCeldas='null';
                                                 }else{
-                                                    valCeldasPrincipal[indiceCeldasPrincipal[filaAPrincipal.cortes[variable.variable_principal]]]=filaAPrincipal;
+                                                    posicionCeldas=filaAPrincipal.cortes[variable.variable_principal];
                                                 }
+                                                valCeldasPrincipal[indiceCeldasPrincipal[posicionCeldas]]=filaAPrincipal;
                                             });
                                         });
                                     }else{
@@ -256,7 +264,10 @@ class AppSIGBA extends backend.AppBackend{
                                 }).then(function(valoresPrincipal){
                                     valoresPrincipal.forEach(function(valorPrincipal){
                                         var indicadorAnnio;
-                                        var valorReporteBonito=(valorPrincipal.valor==null)?'///':be.puntosEnMiles(be.decimalesYComa(valorPrincipal.valor,registro.decimales,','));
+                                        var valorReporteBonito=
+                                            (valorPrincipal.valor==null)?
+                                            '///':
+                                            be.puntosEnMiles(be.decimalesYComa(valorPrincipal.valor,registro.decimales,','));
                                         listaTdValores.push(html.td({class:'td-valores'},valorReporteBonito));
                                     })
                                     controles.filasEnDimension[registro.dimension]=controles.filasEnDimension[registro.dimension]||[];
@@ -273,7 +284,10 @@ class AppSIGBA extends backend.AppBackend{
                             })
                         }
                         return obtenerValoresPrincipal.then(function(listaDeseada){
-                            var estaFila=html.tr({class:'nivel-titulo',"nivel-titulo": defTables.length, "color-agrupacion_principal":color||'otro'},listaTd.concat(listaDeseada))
+                            var estaFila=html.tr(
+                                {class:'nivel-titulo',"nivel-titulo": defTables.length, "color-agrupacion_principal":color||'otro'},
+                                listaTd.concat(listaDeseada)
+                            )
                             var obtenerTabuladoPrincipal=Promise.resolve([]);
                             if(table==='indicadores'){
                                 controles.filasEnDimension[registro.dimension].push(estaFila);
@@ -297,16 +311,39 @@ class AppSIGBA extends backend.AppBackend{
                                                 var matrixGrafico=matrix.matrixGraf;
                                                 return be.traeInfoMatrix(client,registro.indicador).then(function(infoMatrixGraf){
                                                     tabulado=changing(tabulado,infoMatrixGraf);
+                                                    /* TODO: si hay dos gráficos en la misma dimensión hay que controlar también en qué lugar
+                                                             se agregó el último gráfico
+                                                    */
+                                                    var dondeAgregar=Math.max(0, controles.posicionEnDimension[registro.dimension]-FILASXGRAFICO)
+                                                    var filasEnEstaDimension=controles.filasEnDimension[registro.dimension];
+                                                    var renglonesDeRelleno=0;
+                                                    if(filasEnEstaDimension.length<FILASXGRAFICO){
+                                                        /* que este valor sea igual al height de [nivel-titulo=1] */
+                                                        var renglonesDeRelleno=(FILASXGRAFICO-filasEnEstaDimension.length-1);
+                                                        var alturaDelRelleno=55*(FILASXGRAFICO-filasEnEstaDimension.length-1);
+                                                    }
                                                     controles.filasEnDimension[registro.dimension][
-                                                        Math.max(0, controles.posicionEnDimension[registro.dimension]-7)
+                                                        dondeAgregar
                                                     ].content.push(html.td({
-                                                        rowspan:7, 
+                                                        rowspan:FILASXGRAFICO-renglonesDeRelleno, 
                                                         class:'box-grafico-principal',
                                                     },html.div({
                                                         class:'tabulado-html',
                                                         'para-graficador':JSON.stringify(matrixGrafico),
                                                         'info-tabulado':JSON.stringify(tabulado)
                                                     })));
+                                                    /* la siguente condición vale solo si se puede poner un gráfico por dimensión */
+                                                    if(filasEnEstaDimension.length<FILASXGRAFICO){
+                                                        filasEnEstaDimension[controles.filasEnDimension[registro.dimension].length-1].content.push(
+                                                            html.tr({
+                                                                class:'nivel-titulo',
+                                                                "nivel-titulo": defTables.length, 
+                                                                "color-agrupacion_principal":color||'otro'
+                                                            },[
+                                                                html.td({class:'td-principal-renglones',colspan:7},[html.div({style:'height:'+alturaDelRelleno+'px;'})])
+                                                            ])
+                                                        )
+                                                    }
                                                     return matrixGrafico;
                                                 })
                                             });
