@@ -20,7 +20,8 @@ if(process.argv[2]=='--dir'){
     console.log('cwd',process.cwd());
 }
 
-var FILASXGRAFICO=7;
+var FILASXGRAFICO=6;
+var COLSPANRELLENO=9;
 
 var extensionServeStatic = require('extension-serve-static');
 
@@ -334,13 +335,16 @@ class AppSIGBA extends backend.AppBackend{
                                                     })));
                                                     /* la siguente condición vale solo si se puede poner un gráfico por dimensión */
                                                     if(filasEnEstaDimension.length<FILASXGRAFICO){
+                                                        if(!be.hayCortantePrincipal){
+                                                            COLSPANRELLENO=7;
+                                                        }
                                                         filasEnEstaDimension[controles.filasEnDimension[registro.dimension].length-1].content.push(
                                                             html.tr({
                                                                 class:'nivel-titulo',
                                                                 "nivel-titulo": defTables.length, 
                                                                 "color-agrupacion_principal":color||'otro'
                                                             },[
-                                                                html.td({class:'td-principal-renglones',colspan:7},[html.div({style:'height:'+alturaDelRelleno+'px;'})])
+                                                                html.td({class:'td-principal-renglones',colspan:COLSPANRELLENO},[html.div({style:'height:'+alturaDelRelleno+'px;'})])
                                                             ])
                                                         )
                                                     }
