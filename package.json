@@ -12,6 +12,6 @@
     "pg-triggers": "~0.2.1",
     "tabulator": "~0.2.38",
     "type-store": "~0.2.19",
-    "graphicator": "~0.29.7"
+    "graphicator": "~0.29.9"
   }
 }
