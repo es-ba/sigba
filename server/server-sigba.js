@@ -20,9 +20,13 @@ if(process.argv[2]=='--dir'){
     console.log('cwd',process.cwd());
 }
 
+var FILASXGRAFICO=6;
+var COLSPANRELLENO=9;
+
 var extensionServeStatic = require('extension-serve-static');
 
 var changing = require('best-globals').changing;
+var coalesce = require('best-globals').coalesce;
 var backend = require("backend-plus");
 var MiniTools = require("mini-tools");
 var jsToHtml=require('js-to-html');
@@ -67,13 +71,11 @@ class AppSIGBA extends backend.AppBackend{
        return str.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
     }
     // FALTA IMPLEMENTAR ESTO
-    nombreDelHome(client){
-        return Promise.resolve([]).then(function(){return 'principal';});
-        return  client.query(
-            'SELECT nombre_home FROM parametros;'
-        ).fetchOneRowIfExists().then(function(result){
-            //var nombreHome=(result.row && result.row.nombre_home)||'principal';
-            return 'principal';
+    parametrosSistema(client){
+        return Promise.resolve([]).then(function(){
+            return client.query('SELECT * FROM parametros').fetchOneRowIfExists().then(function(result){
+                return result.row
+            });
         });
     }
     reporteBonito(client, defTables, annios, where,color,controles) {
@@ -85,8 +87,8 @@ class AppSIGBA extends backend.AppBackend{
             return Promise.resolve([]);
         }
         var table=defTables[0].tabla;
-        return be.nombreDelHome(client).then(function(homeName){
-            urlYClasesTabulados=homeName;
+        return be.parametrosSistema(client).then(function(parametros){
+            urlYClasesTabulados=parametros.nombre_principal;
             return client.query(
                 'SELECT * FROM '+be.db.quoteIdent(table)+
                 ' WHERE '+(where||'true')+
@@ -120,7 +122,9 @@ class AppSIGBA extends backend.AppBackend{
                         `,[registro.indicador]).fetchOneRowIfExists().then(function(resultado){
                             registro.ficha=resultado.row;
                     })}).then(function(){
-                        listaTd=[html.td({class:'td-'+urlYClasesTabulados+'-renglones',colspan:4-defTables.length},[html.div({class:'espacio-reserva'},'-')])].concat(
+                        listaTd=[
+                            html.td({class:'td-'+urlYClasesTabulados+'-renglones',colspan:4-defTables.length},[html.div({class:'espacio-reserva'},'-')])
+                        ].concat(
                             defTables[0].camposAMostrar.map(function(nombreCampo,i){
                                 var id=registro[defTables[0].campoId];
                                 var attributes={colspan:i?1:defTables.length+1+(defTables[0].tabla=='indicadores'?0:6),class:'campo_'+nombreCampo};
@@ -149,14 +153,16 @@ class AppSIGBA extends backend.AppBackend{
                                     }
                                 }
                                 var sufijoTab=defTables[0].tabla||'';
-                                var htmlIcono= html.span({class:'span-img-icono'+sufijoTab},
-                                    registro.icono?html.img({class:'img-icono-'+sufijoTab,src:skinUrl+'img/'+registro.icono}):null);
-                                    var htmlA={class:'es-link'};
-                                    if(registro.indicador){
-                                        htmlA.href=''+absolutePath+''+urlYClasesTabulados+'-indicador?indicador='+(registro.indicador||'');
-                                        htmlA['cant-cortantes']=result.row.cant_cortantes;
-                                    }
-                            return html.td(attributes,[
+                                var htmlIcono= html.span(
+                                    {class:'span-img-icono'+sufijoTab},
+                                    registro.icono?html.img({class:'img-icono-'+sufijoTab,src:skinUrl+'img/'+registro.icono}):null
+                                );
+                                var htmlA={class:'es-link'};
+                                if(registro.indicador){
+                                    htmlA.href=''+absolutePath+''+urlYClasesTabulados+'-indicador?indicador='+(registro.indicador||'');
+                                    htmlA['cant-cortantes']=result.row.cant_cortantes;
+                                }
+                                return html.td(attributes,[
                                     htmlIcono,
                                     html.span({id:id, class:'ancla'},"\u00a0"),
                                     html.a(htmlA,registro.denominacion_principal?registro.denominacion_principal:registro[nombreCampo]),
@@ -180,7 +186,9 @@ class AppSIGBA extends backend.AppBackend{
                         if(table==='indicadores'){
                             var listaTdValores=[];
                             var ultimoAnnioDisponible;
-                            var cortantesEnPrincipalObj;
+                            if(be.hayCortantePrincipal){
+                                var cortantesEnPrincipalObj;
+                            }
                             obtenerValoresPrincipal=client.query(
                                 `select max(cortes->>'annio') annio from celdas where indicador=$1`,[registro.indicador]
                             ).fetchOneRowIfExists().then(function(result){
@@ -189,11 +197,13 @@ class AppSIGBA extends backend.AppBackend{
                                     variablesPrincipal:[{"annio":true}],
                                     cortes:[{"annio":ultimoAnnioDisponible}]
                                 };
-                                be.cortantesEnPrincipal.cortantesPrincipalesArr.forEach(function(variable){
-                                    var variablePrincipal={"annio":true};
-                                    variablePrincipal[variable.variable_principal]=true;
-                                    cortantesEnPrincipalObj.variablesPrincipal.push(variablePrincipal);
-                                })
+                                if(be.hayCortantePrincipal){
+                                    be.cortantesEnPrincipal.cortantesPrincipalesArr.forEach(function(variable){
+                                        var variablePrincipal={"annio":true};
+                                        variablePrincipal[variable.variable_principal]=true;
+                                        cortantesEnPrincipalObj.variablesPrincipal.push(variablePrincipal);
+                                    })
+                                }
                                 if(registro.indicador && registro.corte_principal){
                                     var test={}
                                     test[registro.corte_principal]=registro.valor_principal;
@@ -205,48 +215,60 @@ class AppSIGBA extends backend.AppBackend{
                                 }
                                 
                             }).then(function(){
-                                var sqlPrincipalTest="SELECT * FROM celdas WHERE indicador=$1 AND cortantes in ( "+
+                                var sqlPrincipal="SELECT indicador,cortes,coalesce(valor::text,valor_esp) valor,cv,num,dem,cortantes,usu_validacion,fecha_validacion,origen_validacion,es_automatico,valor_esp FROM celdas WHERE indicador=$1 AND cortantes in ( "+
                                 cortantesEnPrincipalObj.variablesPrincipal.map(function(crt){
                                     return be.db.quoteLiteral(JSON.stringify(crt));
                                 }).join(',')+") AND "+cortantesEnPrincipalObj.cortes.map(function(crt,i){
                                     for(var key in crt){
-                                        return "cortes->> "+be.db.quoteLiteral(key)+" = "+be.db.quoteLiteral(crt[key]);
+                                        return "cortes->> "+be.db.quoteNullable(key)+" = "+be.db.quoteNullable(crt[key]);
                                     }
                                 }).join(' AND ');
                                 return client.query(
-                                    sqlPrincipalTest
+                                    sqlPrincipal
                                     ,[registro.indicador]
                                 ).fetchAll().then(function(result){
                                     var filasValoresAPrincipal=result.rows;
                                     var valCeldasPrincipal=[];
                                     var indiceCeldasPrincipal={'null': 0};
                                     valCeldasPrincipal[indiceCeldasPrincipal['null']]={valor:null};
-                                    be.cortantesEnPrincipal.categoriasPrincipalArr.forEach(function(categoria,i){
-                                        indiceCeldasPrincipal[categoria.valor]=i+1; 
-                                        valCeldasPrincipal[i+1]={valor:null};
-                                    });
-                                    var crtPrincArr=be.cortantesEnPrincipal.cortantesPrincipalesArr.map(function(crt){
-                                            return crt.variable_principal;
-                                    });
-                                    filasValoresAPrincipal.forEach(function(filaAPrincipal){
-                                        var test=Object.keys(filaAPrincipal.cortes).some(function(element){
-                                            return crtPrincArr.indexOf(element)>=0
+                                    if(be.hayCortantePrincipal){
+                                        be.cortantesEnPrincipal.categoriasPrincipalArr.forEach(function(categoria,i){
+                                            indiceCeldasPrincipal[categoria.valor]=i+1; 
+                                            valCeldasPrincipal[i+1]={valor:null};
                                         });
-                                        be.cortantesEnPrincipal.cortantesPrincipalesArr.forEach(function(variable){
-                                            if(!test){
-                                                valCeldasPrincipal[indiceCeldasPrincipal['null']]=filaAPrincipal;
-                                            }else{
-                                                valCeldasPrincipal[indiceCeldasPrincipal[filaAPrincipal.cortes[variable.variable_principal]]]=filaAPrincipal;
-                                            }
+                                    
+                                        var crtPrincArr=be.cortantesEnPrincipal.cortantesPrincipalesArr.map(function(crt){
+                                                return crt.variable_principal;
                                         });
-                                    });
+                                        filasValoresAPrincipal.forEach(function(filaAPrincipal){
+                                            var test=Object.keys(filaAPrincipal.cortes).some(function(element){
+                                                return crtPrincArr.indexOf(element)>=0
+                                            });
+                                            be.cortantesEnPrincipal.cortantesPrincipalesArr.forEach(function(variable){
+                                                var posicionCeldas;
+                                                if(!test){
+                                                    posicionCeldas='null';
+                                                }else{
+                                                    posicionCeldas=filaAPrincipal.cortes[variable.variable_principal];
+                                                }
+                                                valCeldasPrincipal[indiceCeldasPrincipal[posicionCeldas]]=filaAPrincipal;
+                                            });
+                                        });
+                                    }else{
+                                        if(filasValoresAPrincipal[0]){
+                                            valCeldasPrincipal[indiceCeldasPrincipal['null']]=filasValoresAPrincipal[0];
+                                        }
+                                    }
                                     annioPrincipal=ultimoAnnioDisponible;
                                     listaTdValores.push(html.td({class:'td-valores'},annioPrincipal));
                                     return valCeldasPrincipal;
                                 }).then(function(valoresPrincipal){
                                     valoresPrincipal.forEach(function(valorPrincipal){
-                                        var indicadorAnnio
-                                        var valorReporteBonito=(valorPrincipal.valor==null)?'///':be.puntosEnMiles(be.decimalesYComa(valorPrincipal.valor,registro.decimales,','));
+                                        var indicadorAnnio;
+                                        var valorReporteBonito=
+                                            (valorPrincipal.valor==null)?
+                                            '///':
+                                            be.puntosEnMiles(be.decimalesYComa(valorPrincipal.valor,registro.decimales,','));
                                         listaTdValores.push(html.td({class:'td-valores'},valorReporteBonito));
                                     })
                                     controles.filasEnDimension[registro.dimension]=controles.filasEnDimension[registro.dimension]||[];
@@ -263,7 +285,10 @@ class AppSIGBA extends backend.AppBackend{
                             })
                         }
                         return obtenerValoresPrincipal.then(function(listaDeseada){
-                            var estaFila=html.tr({class:'nivel-titulo',"nivel-titulo": defTables.length, "color-agrupacion_principal":color||'otro'},listaTd.concat(listaDeseada))
+                            var estaFila=html.tr(
+                                {class:'nivel-titulo',"nivel-titulo": defTables.length, "color-agrupacion_principal":color||'otro'},
+                                listaTd.concat(listaDeseada)
+                            )
                             var obtenerTabuladoPrincipal=Promise.resolve([]);
                             if(table==='indicadores'){
                                 controles.filasEnDimension[registro.dimension].push(estaFila);
@@ -287,16 +312,42 @@ class AppSIGBA extends backend.AppBackend{
                                                 var matrixGrafico=matrix.matrixGraf;
                                                 return be.traeInfoMatrix(client,registro.indicador).then(function(infoMatrixGraf){
                                                     tabulado=changing(tabulado,infoMatrixGraf);
+                                                    /* TODO: si hay dos gráficos en la misma dimensión hay que controlar también en qué lugar
+                                                             se agregó el último gráfico
+                                                    */
+                                                    var dondeAgregar=Math.max(0, controles.posicionEnDimension[registro.dimension]-FILASXGRAFICO)
+                                                    var filasEnEstaDimension=controles.filasEnDimension[registro.dimension];
+                                                    var renglonesDeRelleno=0;
+                                                    if(filasEnEstaDimension.length<FILASXGRAFICO){
+                                                        /* que este valor sea igual al height de [nivel-titulo=1] */
+                                                        var renglonesDeRelleno=(FILASXGRAFICO-filasEnEstaDimension.length-1);
+                                                        var alturaDelRelleno=55*(FILASXGRAFICO-filasEnEstaDimension.length-1);
+                                                    }
                                                     controles.filasEnDimension[registro.dimension][
-                                                        Math.max(0, controles.posicionEnDimension[registro.dimension]-7)
+                                                        dondeAgregar
                                                     ].content.push(html.td({
-                                                        rowspan:7, 
+                                                        rowspan:FILASXGRAFICO-renglonesDeRelleno, 
                                                         class:'box-grafico-principal',
                                                     },html.div({
                                                         class:'tabulado-html',
                                                         'para-graficador':JSON.stringify(matrixGrafico),
                                                         'info-tabulado':JSON.stringify(tabulado)
                                                     })));
+                                                    /* la siguente condición vale solo si se puede poner un gráfico por dimensión */
+                                                    if(filasEnEstaDimension.length<FILASXGRAFICO){
+                                                        if(!be.hayCortantePrincipal){
+                                                            COLSPANRELLENO=7;
+                                                        }
+                                                        filasEnEstaDimension[controles.filasEnDimension[registro.dimension].length-1].content.push(
+                                                            html.tr({
+                                                                class:'nivel-titulo',
+                                                                "nivel-titulo": defTables.length, 
+                                                                "color-agrupacion_principal":color||'otro'
+                                                            },[
+                                                                html.td({class:'td-principal-renglones',colspan:COLSPANRELLENO},[html.div({style:'height:'+alturaDelRelleno+'px;'})])
+                                                            ])
+                                                        )
+                                                    }
                                                     return matrixGrafico;
                                                 })
                                             });
@@ -367,7 +418,7 @@ class AppSIGBA extends backend.AppBackend{
                         throw new Error("invalid varInv");
                     }
                     return 'cc_'+varInv+'.valor_corte '+varInv;
-                }).join(',') +", valor, cv " + 
+                }).join(',') +", coalesce(valor::text,valor_esp) valor, cv " + 
                     "\n  FROM celdas v  LEFT JOIN "+ variables.map(function(varInv){
                         return (" cortes_celdas cc_"+varInv +
                             " ON v.indicador=cc_"+varInv+".indicador AND v.cortes=cc_"+varInv+".cortes AND cc_"+varInv+".variable='"+varInv+"'" +
@@ -471,15 +522,19 @@ class AppSIGBA extends backend.AppBackend{
             var cortantesPrincipalesArr=result.rows;
             return cortantesPrincipalesArr;
         }).then(function(cortantesPrincipalesArr){
-            return client.query(
-                "select valor_corte,denominacion,orden from cortes where variable=$1 order by orden",
-                [cortantesPrincipalesArr[0].variable_principal]
-            ).fetchAll().then(function(result){
-                var categoriasPrincipalArr=result.rows.map(function(categorias){
-                    return {valor:categorias.valor_corte,denominacion:categorias.denominacion}
+            if(cortantesPrincipalesArr.length){
+                return client.query(
+                    "select valor_corte,denominacion,orden from cortes where variable=$1 order by orden",
+                    [cortantesPrincipalesArr[0].variable_principal]
+                ).fetchAll().then(function(result){
+                    var categoriasPrincipalArr=result.rows.map(function(categorias){
+                        return {valor:categorias.valor_corte,denominacion:categorias.denominacion}
+                    })
+                    return {cortantesPrincipalesArr,categoriasPrincipalArr}
                 })
-                return {cortantesPrincipalesArr,categoriasPrincipalArr}
-            })
+            }else{
+                return false;
+            }
         });
     }
     defs_annio(annio){
@@ -503,8 +558,8 @@ class AppSIGBA extends backend.AppBackend{
         return (req && req.user && (req.user.usu_rol=='admin'|| req.user.usu_rol=='programador') && req.user.active==true);
     }
 
-    ownClientIncludes(){
-        return [
+    clientIncludes(req, hideBEPlusInclusions) {
+        var ownIncludes=[
             { type: 'js', module: 'graphicator', path:'graphicator'},
             { type: 'js', module: 'best-globals', path:'best-globals'},
             { type: 'js', module: 'require-bro'},
@@ -515,11 +570,8 @@ class AppSIGBA extends backend.AppBackend{
             { type: 'js', module: 'tabulator', path:'tabulator'},
             { type: 'css', module: 'c3' },
             { type: 'css', module: 'graphicator' }
-        ];
-    }
-
-    clientIncludes(req, hideBEPlusInclusions) {
-        return this.ownClientIncludes(req).concat(super.clientIncludes(req, hideBEPlusInclusions));
+        ]
+        return ownIncludes.concat(super.clientIncludes(req, hideBEPlusInclusions));
     }
 
     headSigba(esPrincipal,req,title){
@@ -531,14 +583,18 @@ class AppSIGBA extends backend.AppBackend{
         if(esAdmin){
             listaJS.push(html.script({src:'menu-3.js'}));
         }
-        var listaCSS = be.csss(hideBEPlusInclusions);
-        return html.head([
+        var listaHead=[
             html.meta({name:'viewport', content:'width=device-width'}),
             html.meta({name:'viewport', content:'initial-scale=1.0'}),
             html.title(title),
            // html.title(esPrincipal?'Tabulados':'Tabulado'),
             html.link({rel:"stylesheet", type:"text/css", href:"css/tabulados.css"}),
-        ].concat(listaJS).concat(listaCSS.map(function(css){
+        ];
+        if(this.config["client-setup"].css){
+            listaHead.push(html.link({rel:"stylesheet", type:"text/css", href:"css/"+this.config["client-setup"].css}))
+        }
+        var listaCSS = be.csss(hideBEPlusInclusions);
+        return html.head(listaHead.concat(listaJS).concat(listaCSS.map(function(css){
             return html.link({href: css, rel: "stylesheet"});
         })).concat(listaCSS.map(function(css){
             var skin=be.config['client-setup'].skin;
@@ -836,7 +892,7 @@ class AppSIGBA extends backend.AppBackend{
             var annios={};
             var client;
             var categoriasPrincipalLista;
-            var cortantePrincipal;
+            //var cortantePrincipal;
             var encabezado;
             var skin=be.config['client-setup'].skin;
             var skinUrl=(skin?skin+'/':'');
@@ -844,10 +900,14 @@ class AppSIGBA extends backend.AppBackend{
             return be.getDbClient(req).then(function(cli){
                 client=cli;
                 return be.cortantesPrincipal(client).then(function(cortanteEnPrincipal){
-                    be.cortantesEnPrincipal=cortanteEnPrincipal;
-                    categoriasPrincipalLista=cortanteEnPrincipal.categoriasPrincipalArr;
-                    cortantePrincipal=cortanteEnPrincipal;
-                
+                    if(cortanteEnPrincipal){
+                        be.hayCortantePrincipal=true;
+                        be.cortantesEnPrincipal=cortanteEnPrincipal;
+                        categoriasPrincipalLista=cortanteEnPrincipal.categoriasPrincipalArr;
+                        //cortantePrincipal=cortanteEnPrincipal;
+                    }else{
+                        be.hayCortantePrincipal=false;
+                    }
                 }).then(function(){
                     return be.encabezado(skinUrl,true,req,client).then(function(encabezadoHtml){
                         encabezado=encabezadoHtml;
@@ -901,9 +961,9 @@ class AppSIGBA extends backend.AppBackend{
                                         html.th('Año'),
                                         html.th('Total')
                                     ].concat(
-                                        categoriasPrincipalLista.map(function(categoria){
+                                        be.hayCortantePrincipal?categoriasPrincipalLista.map(function(categoria){
                                             return html.th(categoria.denominacion)
-                                        })
+                                        }):null
                                     ).concat([
                                         html.th({class:'th-vacio',}),
                                         html.th({class:'th-vacio',})
@@ -1014,25 +1074,27 @@ class AppSIGBA extends backend.AppBackend{
             var skinUrl=(skin?skin+'/':'');
             return be.getDbClient(req).then(function(cli){
                 var client=cli;
-                return client.query(`SELECT denominacion,leyes FROM agrupacion_principal WHERE agrupacion_principal=$1`,[agrupacion_principal]).fetchOneRowIfExists().then(function(result){
-                    var arregloLeyes=result.row.leyes.split('; ');
-                    var paginaLey=html.html([
-                        be.headSigba(false,req,'Leyes'),
-                        html.body({"que-pantalla": 'ley'},[
-                            html.div({id:'total-layout','menu-type':'hidden'},[
-                                be.encabezado(skinUrl,false,req,client),
-                                html.h2({id:'agrupacion_principal_'+agrupacion_principal},result.row.denominacion),
-                                html.div({id:'ley_agrupacion_principal_'+agrupacion_principal},
-                                    arregloLeyes.map(function(ley){
-                                        return html.div({class:'leyes'},ley);
-                                    })
-                                ),
-                                be.foot(skinUrl)
+                return be.encabezado(skinUrl,false,req,client).then(function(encabezado){
+                    return client.query(`SELECT denominacion,leyes FROM agrupacion_principal WHERE agrupacion_principal=$1`,[agrupacion_principal]).fetchOneRowIfExists().then(function(result){
+                        var arregloLeyes=result.row.leyes.split('; ');
+                        var paginaLey=html.html([
+                            be.headSigba(false,req,'Leyes'),
+                            html.body({"que-pantalla": 'ley'},[
+                                html.div({id:'total-layout','menu-type':'hidden'},[
+                                    encabezado,
+                                    html.h2({id:'agrupacion_principal_'+agrupacion_principal},result.row.denominacion),
+                                    html.div({id:'ley_agrupacion_principal_'+agrupacion_principal},
+                                        arregloLeyes.map(function(ley){
+                                            return html.div({class:'leyes'},ley);
+                                        })
+                                    ),
+                                    be.foot(skinUrl)
+                                ])
                             ])
-                        ])
-                    ]);
-                    res.send(paginaLey.toHtmlText({pretty:true}));
-                    res.end();
+                        ]);
+                        res.send(paginaLey.toHtmlText({pretty:true}));
+                        res.end();
+                    })
                 }).catch(MiniTools.serveErr(req,res)).then(function(){client.done()});
             })
         });
@@ -1093,28 +1155,40 @@ class AppSIGBA extends backend.AppBackend{
     
     encabezado(skinUrl,esPrincipal,req,client){
         var be = this;
-        return be.obtenerGruposPrincipales(client).then(function(grupos){
-            return html.div({id:'id-encabezado'},[
-                html.a({class:'encabezado',id:'barra-superior',href:''+absolutePath+'principal'},[
-                    html.div({class:'encabezado-interno'},[
-                        html.img({class:'encabezado',id:'bs-izq',src:skinUrl+'img/logo-ciudad.png'}),
-                        html.img({class:'encabezado',id:'bs-der',src:skinUrl+'img/logo-BA.png'})
+        return be.parametrosSistema(client).then(function(parametros){
+            var srcLogoSistema='img/img-logo.png';
+            if(parametros && parametros.nombre_sistema){
+                srcLogoSistema='img/img-logo'+'-'+parametros.nombre_sistema+'.png'
+            }
+            return be.obtenerGruposPrincipales(client).then(function(grupos){
+                if(parametros.texto_sistema){
+                    var textoLey=html.div({id:'texto'},parametros.texto_sistema)
+                }
+                var encabezadoCompletoHtml=html.div({id:'id-encabezado'},[
+                    html.a({class:'encabezado',id:'barra-superior',href:''+absolutePath+'principal'},[
+                        html.div({class:'encabezado-interno'},[
+                            html.img({class:'encabezado',id:'bs-izq',src:skinUrl+'img/logo-ciudad.png'}),
+                            html.img({class:'encabezado',id:'bs-der',src:skinUrl+'img/logo-BA.png'})
+                        ]),
                     ]),
-                ]),
-                html.div({class:'encabezado',id:'barra-inferior'},
-                    [].concat([
-                        html.a({class:'a-principal',href:''+absolutePath+'principal'},[html.img({class:'encabezado',id:'img-logo',src:skinUrl+'img/img-logo.png'})])
-                    ]).concat(be.config['client-setup'].logos.map(function(logoName){
-                            return html.a({class:'a-principal',href:''+absolutePath+'principal'},[html.img({class:'encabezado',id:'logo-'+logoName,src:skinUrl+'img/img-logo-'+logoName+'.png'})]);
-                    }).concat([be.config['client-setup'].conTextoPrincipal?html.div({class:'encabezado',id:'texto-encabezado-grande'}):null]).concat(
-                        esPrincipal?html.div({class:'contiene-grupos'},grupos.map(function(grupo){
-                            var href=''+absolutePath+'principal#'+grupo.codigo;
-                            var src=skinUrl+'img/'+grupo.codigo+'.png';
-                            return html.a({class:'grupo-a',href:href,title:grupo.denominacion},[html.img({class:'grupo-img',src:src})])
-                        })):null
-                    ))
-                )
-            ]);
+                    html.div({class:'encabezado',id:'barra-inferior'},
+                        [].concat([
+                            html.a({class:'a-principal',href:''+absolutePath+'principal'},[html.img(
+                                {class:'encabezado',id:'img-logo',src:skinUrl+srcLogoSistema}
+                            )])
+                        ]).concat(be.config['client-setup'].logos.map(function(logoName){
+                                return html.a({class:'a-principal',href:''+absolutePath+'principal'},[html.img({class:'encabezado',id:'logo-'+logoName,src:skinUrl+'img/img-logo-'+logoName+'.png'})]);
+                        }).concat([be.config['client-setup'].conTextoPrincipal?html.div({class:'encabezado',id:'texto-encabezado-grande'}):null]).concat(
+                            esPrincipal?textoLey?textoLey:html.div({class:'contiene-grupos'},grupos.map(function(grupo){
+                                var href=''+absolutePath+'principal#'+grupo.codigo;
+                                var src=skinUrl+'img/'+grupo.codigo+'.png';
+                                return html.a({class:'grupo-a',href:href,title:grupo.denominacion},[html.img({class:'grupo-img',src:src})])
+                            })):null
+                        ))
+                    )
+                ])
+                return encabezadoCompletoHtml;
+            })
         })
     }
     foot(skinUrl){
@@ -1165,45 +1239,6 @@ class AppSIGBA extends backend.AppBackend{
                 {menuType:'menu'     , name:'sistema'    , menuContent:[
                     {menuType:'table'    , name:'usuarios'}
                 ]},
-            //]}
-            
-            /*{menuType:'menu', name:'indicadores', menuContent:[
-                {menuType:'table', name:'agrupacion_principal', label:be.config['client-setup'].labels['agrupacion-principal'], },
-                
-                {menuType:'table', name:'tabulados'                        },
-                {menuType:'table', name:'fte'             , label:'fuente de datos '                      },
-                {menuType:'table', name:'um'              , label:'unidad de medida'                      },
-                {menuType:'table', name:'cv'              , label:'coeficientes de variación'             },
-                {menuType:'table', name:'indicador_annio' , label:'cobertura'                             },
-                {menuType:'proc' , name:'alta/tabulados'  , label:'dar de alta nuevos tabulados'                             },
-            ]},
-            {menuType:'menu'    , name:'variables de corte' , menuContent:[
-                {menuType:'table', name:'variables'       },
-                {menuType:'table', name:'cortes'          },
-                {menuType:'proc' , name:'generar'    , proc:'variables/generar'     },
-            ]},
-            {menuType:'menu'    , name:'ubicación variables'   , menuContent:[
-                {menuType:'table'    , name:'indicadores-variables'   , table:'indicadores_variables'},
-                {menuType:'table'    , name:'tabulados-variables'     , table:'tabulados_variables'},
-            ]},
-            {menuType:'menu'     , name:'valores'                 , menuContent:[
-                    {menuType:'table'    , name:'valores'                 , table:'valores'},
-                    {menuType:'proc', label:'borrar datos valores', name:'borrar/valores'  },
-                ]},
-            {menuType:'path'     , name:'principal'               , path:'/principal'            },
-            // {menuType:'table'    , name:'Celdas'                  , table:'celdas'               },
-            // {menuType:'table'    , name:'Cortes-Celdas'           , table:'cortes_celdas'        },
-            
-            {menuType:'menu'     , name:'totales'                 , menuContent:[
-                {menuType:'calculaTotales' , name:'calcular totales'},
-                {menuType:'table'          , name:'discrepancias'         , table:'diferencia_totales'},
-            ]},
-            {menuType:'menu'     , name:'configuración'                 , menuContent:[
-                {menuType:'table'    , name:'signos_convencionales', label:'signos convencionales'},
-                {menuType:'table'    , name:'variables_principales', label:'variables principales del sistema'},
-                //{menuType:'table'    , name:'parametros'           , label:'Parámetros del home'},
-                {menuType:'table'    , name:'usuarios'},
-            ]},*/
         ]}
     }
     getTables(){
@@ -1227,7 +1262,8 @@ class AppSIGBA extends backend.AppBackend{
             'cortes_celdas',
             'tabulados_variables',
             'diferencia_totales',
-            'signos_convencionales'
+            'signos_convencionales',
+            'totales_calculados'
         ]);
     }
     releerEstructuraBaseDeDatos(client){
@@ -1237,7 +1273,7 @@ class AppSIGBA extends backend.AppBackend{
             FROM variables v LEFT JOIN (
                 SELECT column_name 
                 FROM information_schema.columns WHERE table_name ='valores' 
-                    AND column_name NOT IN ('cortantes','cortes','es_automatico','fecha_validacion','indicador','origen_validacion','usu_validacion')
+                    AND column_name NOT IN ('valor','cortantes','cortes','es_automatico','fecha_validacion','indicador','origen_validacion','usu_validacion')
                 ) x ON v.variable = x.column_name`
         ).fetchAll().then(function(result){
             be.variablesDinamicas=result.rows.map(function(row){
@@ -1305,6 +1341,12 @@ class AppSIGBA extends backend.AppBackend{
         var be = this;
         return be.inDbClient({},function(client){
            return be.releerEstructuraBaseDeDatos(client);
+        }).then(function(){
+            return be.inDbClient({},function(client){
+                return client.query(`SELECT valor_esp from celdas;`).execute();
+            })
+        }).catch(function(err){
+            console.log("*********************  AGREGAR LA COLUMN valor_esp en tablas valor y celdas********************")
         })
     }
     

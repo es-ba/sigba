@@ -19,6 +19,7 @@ module.exports = function(context){
         ],
         constraints:[
             {constraintType:'check' , consName:"valor invalido en ubicacion", expr:"ubicacion in ('fil', 'col')"},
+            {constraintType:'check' , consName:"valor invalido en ctrl_totales", expr:"ctrl_totales in ('s', 't','o')"},
         ]
     },context);
 }

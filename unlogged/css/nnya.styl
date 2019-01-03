@@ -63,7 +63,7 @@ body
   border-bottom 1px solid #FFF
   
 [esta-habilitado="no"] .td-cortante-posible:hover  
-  background-color #37BCB2
+  background-color #5fb5e1
   
 [esta-habilitado="si"] .td-cortante-posible
   background-color #EEEEEE
@@ -71,7 +71,7 @@ body
   border-top 1px solid #FFF
   
 [esta-habilitado="si"] .td-cortante-posible:hover  
-  background-color #37BCB2
+  background-color #5fb5e1
   color #ffff
   
 .img-info-indicador
@@ -111,13 +111,16 @@ body
   transition .3s ease-in-out
   
 .img-ley-agrupacion_principal
-  display: none
+  display: inline
   width 18px
   padding 3px
   margin-bottom -5px
   
 .img-ley-agrupacion_principal:hover
-  display: none
+  display: inline
+
+.link-ley-agrupacion_principal
+  display: inline
   cursor pointer
   -webkit-transform scale(1.2)
   transform scale(1.2)
@@ -129,11 +132,11 @@ body
   left 0
   
 #div-encabezado-titulo-tabulado
-  background-color #1a9698
-  background -webkit-linear-gradient(#1a9698, #3a668f)
-  background -o-linear-gradient(#1a9698, #3a668f)
-  background -moz-linear-gradient(#1a9698, #3a668f)
-  background linear-gradient(#1a9698, #3a668f)
+  background-color #8d959d
+  background -webkit-linear-gradient(#3f79bb, #2b5584)
+  background -o-linear-gradient(#3f79bb, #2b5584)
+  background -moz-linear-gradient(#3f79bb, #2b5584)
+  background linear-gradient(#3f79bb, #2b5584)
   color #FFF
   font-size 100%
   padding 4px
@@ -142,7 +145,7 @@ body
   /* display inline-block */
   z-index 1000
   line-height 30px
-  border solid 1px #2f879d
+  border solid 0px #2f879d
   
 #indicadores-titulo
   float left
@@ -196,15 +199,15 @@ table
   vertical-align top
 
 .tabla-inicio th
-  background-color #385678
-  color #79a0bd
+  background-color #244b77
+  color #7bb5e1
   font-weight bolder
     
 .head-inicio
   line-height 20px
   z-index 1000
-  color #79a0bd
-  background-color #385678
+  color #7bb5e1
+  background-color #244b77
   
 td
   nowrap()
@@ -289,6 +292,7 @@ thead th, #caption-signos_convencionales
   border-collapse collapse 
 
 .tabulator-cell
+  background-color #f6f6f6
   border-right 1px solid #FFF
   border-bottom 1px solid #FFF
   border-top 1px solid #FFF 
@@ -352,12 +356,11 @@ thead th, #caption-signos_convencionales
   text-decoration none
 
 #signos_convencionales-link:hover
-  color #fff
-  background-color #f1b940
+  color #78bfee
 
 .annio-cortante-posible:hover
   color #0f314a
-  background-color #18beb6
+  background-color #5fb5e1
 
 .annio-cortante-posible:focus
   color #403b3b
@@ -430,19 +433,19 @@ thead th, #caption-signos_convencionales
   color #3c4043
 
 h2
-  background-color #375677
+  background-color #244b77
   color #FFF
   font-size 80%
   line-height 20px
   padding 5px
-  border-bottom 2px solid #15BCAF 
+  border-bottom 2px solid #5fb5e1 
 
 #annios-links
-  background-color #1a9698
-  background -webkit-linear-gradient(#1a9698, #3a668f)
-  background -o-linear-gradient(#1a9698, #3a668f)
-  background -moz-linear-gradient(#1a9698, #3a668f)
-  background linear-gradient(#1a9698, #3a668f)
+  background-color #8d959d
+  background -webkit-linear-gradient(#3f79bb, #2b5584)
+  background -o-linear-gradient(#3f79bb, #2b5584)
+  background -moz-linear-gradient(#3f79bb, #2b5584)
+  background linear-gradient(#3f79bb, #2b5584)
   color #FFF
   font-size 100%
   /* padding 4px */
@@ -454,11 +457,11 @@ h2
   height 40px
   
 #barra-annios
-  background-color #1a9698
-  background -webkit-linear-gradient(#1a9698, #3a668f)
-  background -o-linear-gradient(#1a9698, #3a668f)
-  background -moz-linear-gradient(#1a9698, #3a668f)
-  background linear-gradient(#1a9698, #3a668f)
+  background-color #8d959d
+  background -webkit-linear-gradient(#3f79bb, #2b5584)
+  background -o-linear-gradient(#3f79bb, #2b5584)
+  background -moz-linear-gradient(#3f79bb, #2b5584)
+  background linear-gradient(#3f79bb, #2b5584)
   padding 4px
   display inline-block
   line-height 30px
@@ -717,6 +720,8 @@ h2
 
 [nivel-titulo="3"]
   font-size 110%
+  color #fff
+  background-color #8295ac
 
 [nivel-titulo="2"]
   font-size 90%
@@ -733,231 +738,556 @@ h2
   font-size 80%
   color #767777
 
-[color-agrupacion_principal="auto0"][nivel-titulo="1"] .sennial-indicador-elegido-grafico
-  background-image url('../confort/img/indicador-elegido-naranja.png')
+[color-agrupacion_principal="derch1"][nivel-titulo="1"] .sennial-indicador-elegido-grafico
+  background-image url('../confort/img/nnya-indicador-elegido-naranja.png')
   min-width 16px
   background-repeat no-repeat
   background-color fff
   background-position center 
-
-[color-agrupacion_principal="auto0"][nivel-titulo="3"]
+  
+[color-agrupacion_principal="derch1"][nivel-titulo="3"]
   background-color #f09d1b
-
-[color-agrupacion_principal="auto0"][nivel-titulo="3"] a, a:visited
+  
+[color-agrupacion_principal="derch1"][nivel-titulo="3"] a, a:visited
   color #fff
   
-[color-agrupacion_principal="auto0"][nivel-titulo="2"]
+[color-agrupacion_principal="derch1"][nivel-titulo="2"]
   background-color #fff
   color #f09d1b
+  
+[color-agrupacion_principal="derch1"][nivel-titulo="2"] td
+  border-bottom 1px solid #cecbc8
 
-[color-agrupacion_principal="auto0"][nivel-titulo="2"] a, a:visited
+[color-agrupacion_principal="derch1"][nivel-titulo="2"] a, a:visited
   color #f09d1b
   
-[color-agrupacion_principal="auto0"][nivel-titulo="1"]
+[color-agrupacion_principal="derch1"][nivel-titulo="1"]
   background-color #eeeeee
   color #5c5c5c
   border-top 1px solid #c9c2b9 
  
-[color-agrupacion_principal="auto0"][nivel-titulo="1"] a, a:visited
+[color-agrupacion_principal="derch1"][nivel-titulo="1"] a, a:visited
   color #5a6878
 
-[color-agrupacion_principal="auto0"][nivel-titulo="1"] .es-link:hover
+[color-agrupacion_principal="derch1"][nivel-titulo="1"] .es-link:hover
   color #f09d1b
 
-[color-agrupacion_principal="auto0"][nivel-titulo="1"] .td-valores a:hover
+[color-agrupacion_principal="derch1"][nivel-titulo="1"] .td-valores a:hover
   color #e3ab00
   
-[color-agrupacion_principal="auto1"][nivel-titulo="1"] .sennial-indicador-elegido-grafico
-  background-image url('../confort/img/indicador-elegido-verde.png')
+[color-agrupacion_principal="derch3"][nivel-titulo="1"] .sennial-indicador-elegido-grafico
+  background-image url('../confort/img/nnya-indicador-elegido-verde.png')
   width 16px
   background-repeat no-repeat
   background-color fff
   background-position center
   
-[color-agrupacion_principal="auto1"][nivel-titulo="3"]
-  background-color #1FAE92
+[color-agrupacion_principal="derch3"][nivel-titulo="3"]
+  background-color #94b249
   
-[color-agrupacion_principal="auto1"][nivel-titulo="3"] a, a:visited
+[color-agrupacion_principal="derch3"][nivel-titulo="3"] a, a:visited
   color #FFF
 
-[color-agrupacion_principal="auto1"][nivel-titulo="2"]
+[color-agrupacion_principal="derch3"][nivel-titulo="2"]
   background-color #fff
   color #198d76
 
-[color-agrupacion_principal="auto1"][nivel-titulo="2"] a, a:visited
-  color #1FAE92
+[color-agrupacion_principal="derch3"][nivel-titulo="2"] td
+  border-bottom 1px solid #cecbc8
   
-[color-agrupacion_principal="auto1"][nivel-titulo="1"]
+[color-agrupacion_principal="derch3"][nivel-titulo="2"] a, a:visited
+  color #94b249
+  
+[color-agrupacion_principal="derch3"][nivel-titulo="1"]
   background-color #eeeeee
   color #5c5c5c
   border-top 1px solid #c9c2b9 
 
-[color-agrupacion_principal="auto1"][nivel-titulo="1"] a, a:visited
+[color-agrupacion_principal="derch3"][nivel-titulo="1"] a, a:visited
   color #5a6878
 
-[color-agrupacion_principal="auto1"][nivel-titulo="1"] .es-link:hover
-  color #1fae92
+[color-agrupacion_principal="derch3"][nivel-titulo="1"] .es-link:hover
+  color #94b249
 
-[color-agrupacion_principal="auto1"][nivel-titulo="1"] .td-valores a:hover
-  color #1fae92
+[color-agrupacion_principal="derch3"][nivel-titulo="1"] .td-valores a:hover
+  color #94b249
 
-[color-agrupacion_principal="auto1"][nivel-titulo="1"] .td-valores a:hover
-  color #1fae92
+[color-agrupacion_principal="derch3"][nivel-titulo="1"] .td-valores a:hover
+  color #94b249
   
-[color-agrupacion_principal="auto2"][nivel-titulo="1"] .sennial-indicador-elegido-grafico
-  background-image url('../confort/img/indicador-elegido-violeta.png')
+[color-agrupacion_principal="derch2"][nivel-titulo="1"] .sennial-indicador-elegido-grafico
+  background-image url('../confort/img/nnya-indicador-elegido-rojo.png')
   width 16px
   background-repeat no-repeat
   background-color fff
   background-position center
   
-[color-agrupacion_principal="auto2"][nivel-titulo="3"] a, a:visited
+[color-agrupacion_principal="derch2"][nivel-titulo="3"] a, a:visited
   color #fff
-
-[color-agrupacion_principal="auto2"][nivel-titulo="3"]
-  background-color #A05B9F
+ 
+[color-agrupacion_principal="derch2"][nivel-titulo="3"]
+  background-color #e45416
   
-[color-agrupacion_principal="auto2"][nivel-titulo="2"]
+[color-agrupacion_principal="derch2"][nivel-titulo="2"]
   background-color #fff
   font-size 88%
 
-[color-agrupacion_principal="auto2"][nivel-titulo="2"] a, a:visited
-  color #A05B9F
+[color-agrupacion_principal="derch2"][nivel-titulo="2"] td
+  border-bottom 1px solid #cecbc8
+   
+[color-agrupacion_principal="derch2"][nivel-titulo="2"] a, a:visited
+  color #e45416
   
-[color-agrupacion_principal="auto2"][nivel-titulo="1"]
+[color-agrupacion_principal="derch2"][nivel-titulo="1"]
   background-color #eeeeee
   color #5c5c5c
   border-top 1px solid #c9c2b9
   padding 5px
 
-[color-agrupacion_principal="auto2"][nivel-titulo="1"] a, a:visited
+[color-agrupacion_principal="derch2"][nivel-titulo="1"] a, a:visited
   color #5a6878
 
-[color-agrupacion_principal="auto2"][nivel-titulo="1"] .es-link:hover
+[color-agrupacion_principal="derch2"][nivel-titulo="1"] .es-link:hover
   color #7664a2
 
-[color-agrupacion_principal="auto2"][nivel-titulo="1"] .td-valores a:hover
+[color-agrupacion_principal="derch2"][nivel-titulo="1"] .td-valores a:hover
   color #7664a2
 
-[color-agrupacion_principal="auto3"][nivel-titulo="1"] .sennial-indicador-elegido-grafico
-  background-image url('../confort/img/indicador-elegido-rojo.png')
+[color-agrupacion_principal="derch16"][nivel-titulo="1"] .sennial-indicador-elegido-grafico
+  background-image url('../confort/img/nnya-indicador-elegido-violeta.png')
   width 16px
   background-repeat no-repeat
   background-color fff
   background-position center
   
-[color-agrupacion_principal="auto3"][nivel-titulo="3"]
-  background-color #EA5C1D
+[color-agrupacion_principal="derch16"][nivel-titulo="3"]
+  background-color #7d64a5
 
-[color-agrupacion_principal="auto3"][nivel-titulo="3"] a, a:visited
+[color-agrupacion_principal="derch16"][nivel-titulo="3"] a, a:visited
   color #fff
   
-[color-agrupacion_principal="auto3"][nivel-titulo="2"]
+[color-agrupacion_principal="derch16"][nivel-titulo="2"]
   background-color #fff
 
-[color-agrupacion_principal="auto3"][nivel-titulo="2"] a, a:visited
-  color #EA5C1D
+[color-agrupacion_principal="derch16"][nivel-titulo="2"] td
+  border-bottom 1px solid #cecbc8
+  
+[color-agrupacion_principal="derch16"][nivel-titulo="2"] a, a:visited
+  color #7d64a5
 
-[color-agrupacion_principal="auto3"][nivel-titulo="1"]
+[color-agrupacion_principal="derch16"][nivel-titulo="1"]
   background-color #eeeeee
   color #5c5c5c
   border-top 1px solid #c9c2b9 
   padding 5px
     
-[color-agrupacion_principal="auto3"][nivel-titulo="1"] a, a:visited
+[color-agrupacion_principal="derch16"][nivel-titulo="1"] a, a:visited
   color #5a6878
 
-[color-agrupacion_principal="auto3"][nivel-titulo="1"]  .es-link:hover
+[color-agrupacion_principal="derch16"][nivel-titulo="1"]  .es-link:hover
   color #e45515
 
-[color-agrupacion_principal="auto3"][nivel-titulo="1"] .td-valores a:hover
+[color-agrupacion_principal="derch16"][nivel-titulo="1"] .td-valores a:hover
   color #c64c16
 
-
-[color-agrupacion_principal="auto5"][nivel-titulo="3"]
-  background-color #0C7DC1
+[color-agrupacion_principal="derch4"][nivel-titulo="3"]
+  background-color #f6ae00
   
-[color-agrupacion_principal="auto5"][nivel-titulo="3"] a, a:visited
+[color-agrupacion_principal="derch4"][nivel-titulo="3"] a, a:visited
   color #fff
 
-[color-agrupacion_principal="auto5"][nivel-titulo="2"]
+[color-agrupacion_principal="derch4"][nivel-titulo="2"]
   background-color #fff
-
-[color-agrupacion_principal="auto5"][nivel-titulo="2"] a, a:visited
-  color #0C7DC1
   
-[color-agrupacion_principal="auto5"][nivel-titulo="1"]
+[color-agrupacion_principal="derch4"][nivel-titulo="2"] td
+  border-bottom 1px solid #cecbc8
+  
+[color-agrupacion_principal="derch4"][nivel-titulo="2"] a, a:visited
+  color #f6ae00
+
+[color-agrupacion_principal="derch4"][nivel-titulo="1"]  .es-link:hover
+  color #f6ae00
+  
+[color-agrupacion_principal="derch4"][nivel-titulo="1"] .td-valores a:hover
+  color #f6ae00
+  
+[color-agrupacion_principal="derch4"][nivel-titulo="1"]
   background-color #eeeeee
   color #5c5c5c
   border-top 1px solid #c9c2b9 
   padding 5px
     
-[color-agrupacion_principal="auto5"][nivel-titulo="1"] .sennial-indicador-elegido-grafico
-  background-image url('../confort/img/indicador-elegido-azul.png')
+[color-agrupacion_principal="derch4"][nivel-titulo="1"] .sennial-indicador-elegido-grafico
+  background-image url('../confort/img/nnya-indicador-elegido-amarillo.png')
   width 16px
   background-repeat no-repeat
   background-color fff
   background-position center
   
-[color-agrupacion_principal="auto5"][nivel-titulo="1"] a, a:visited
+[color-agrupacion_principal="derch4"][nivel-titulo="1"] a, a:visited
   color #5a6878
 
-[color-agrupacion_principal="auto5"][nivel-titulo="1"] .es-link:hover
-  color #247aba
-
-[color-agrupacion_principal="auto5"][nivel-titulo="1"] .td-valores a:hover
+[color-agrupacion_principal="derch4"][nivel-titulo="1"] .td-valores a:hover
   color #237fc4
 
-[color-agrupacion_principal="auto6"][nivel-titulo="3"]
-  background-color #e18900
+[color-agrupacion_principal="derch5"][nivel-titulo="1"] .sennial-indicador-elegido-grafico
+  background-image url('../confort/img/nnya-indicador-elegido-azul.png')
+  width 16px
+  background-repeat no-repeat
+  background-color fff
+  background-position center
+  
+[color-agrupacion_principal="derch5"][nivel-titulo="3"]
+  background-color #2479bb
 
-[color-agrupacion_principal="auto6"][nivel-titulo="2"]
+[color-agrupacion_principal="derch5"][nivel-titulo="2"]
   background-color #fff
-  color #d58200
+  color #2479bb
 
-[color-agrupacion_principal="auto6"][nivel-titulo="2"] td
-  border-bottom 1px solid #bbb4aa 
+[color-agrupacion_principal="derch5"][nivel-titulo="2"] td
+  border-bottom 1px solid #cecbc8 
 
-[color-agrupacion_principal="auto6"][nivel-titulo="1"]
+[color-agrupacion_principal="derch5"][nivel-titulo="1"]
   background-color #eeeeee
   color #5c5c5c
   border-top 1px solid #c9c2b9 
   padding 5px
   
-[color-agrupacion_principal="auto6"][nivel-titulo="1"] a, a:visited
+[color-agrupacion_principal="derch5"][nivel-titulo="1"] a, a:visited
   color #5a6878  
 
-[color-agrupacion_principal="auto6"][nivel-titulo="1"] .es-link:hover
-  color #e18900  
+[color-agrupacion_principal="derch5"][nivel-titulo="1"] .es-link:hover
+  color #2479bb  
 
-[color-agrupacion_principal="auto6"][nivel-titulo="1"] .td-valores a:hover
-  color #d58200
+[color-agrupacion_principal="derch5"][nivel-titulo="1"] .td-valores a:hover
+  color #2479bb
 
-[color-agrupacion_principal="auto4"][nivel-titulo="3"]
-  background-color #1fae92
+[color-agrupacion_principal="derch12"][nivel-titulo="1"] .sennial-indicador-elegido-grafico
+  background-image url('../confort/img/nnya-indicador-elegido-naranja.png')
+  width 16px
+  background-repeat no-repeat
+  background-color fff
+  background-position center
+  
+[color-agrupacion_principal="derch12"][nivel-titulo="3"]
+  background-color #f09d1b
 
-[color-agrupacion_principal="auto4"][nivel-titulo="2"]
-  background-color #dad9d9
-  color #5e7623
+[color-agrupacion_principal="derch12"][nivel-titulo="2"]
+  background-color #fff
+  color #f09d1b
 
-[color-agrupacion_principal="auto4"][nivel-titulo="2"] td
-  border-bottom 1px solid #bbb4aa  
+[color-agrupacion_principal="derch12"][nivel-titulo="2"] td
+  border-bottom 1px solid #cecbc8  
 
-[color-agrupacion_principal="auto4"][nivel-titulo="1"]
+[color-agrupacion_principal="derch12"][nivel-titulo="1"]
   background-color #eeeeee
   color #5c5c5c
   border-top 1px solid #c9c2b9 
   padding 5px
 
-[color-agrupacion_principal="auto4"][nivel-titulo="1"] a, a:visited
+[color-agrupacion_principal="derch12"][nivel-titulo="1"] a, a:visited
   color #5a6878
 
-[color-agrupacion_principal="auto4"][nivel-titulo="1"] .es-link:hover
-  color #1fae92
+[color-agrupacion_principal="derch12"][nivel-titulo="1"] .es-link:hover
+  color #f09d1b
 
-[color-agrupacion_principal="auto4"][nivel-titulo="1"] .td-valores a:hover
-  color #1fae92
+[color-agrupacion_principal="derch12"][nivel-titulo="1"] .td-valores a:hover
+  color #f09d1b
+  
+[color-agrupacion_principal="derch14"][nivel-titulo="1"] .sennial-indicador-elegido-grafico
+  background-image url('../confort/img/nnya-indicador-elegido-verde.png')
+  width 16px
+  background-repeat no-repeat
+  background-color fff
+  background-position center
+  
+[color-agrupacion_principal="derch14"][nivel-titulo="3"]
+  background-color #94b249
+  
+[color-agrupacion_principal="derch14"][nivel-titulo="3"] a, a:visited
+  color #FFF
 
+[color-agrupacion_principal="derch14"][nivel-titulo="2"]
+  background-color #fff
+  color #198d76
+
+[color-agrupacion_principal="derch14"][nivel-titulo="2"] td
+  border-bottom 1px solid #cecbc8
+  
+[color-agrupacion_principal="derch14"][nivel-titulo="2"] a, a:visited
+  color #94b249
+  
+[color-agrupacion_principal="derch14"][nivel-titulo="1"]
+  background-color #eeeeee
+  color #5c5c5c
+  border-top 1px solid #c9c2b9 
+
+[color-agrupacion_principal="derch14"][nivel-titulo="1"] a, a:visited
+  color #5a6878
+
+[color-agrupacion_principal="derch14"][nivel-titulo="1"] .es-link:hover
+  color #94b249
+
+[color-agrupacion_principal="derch14"][nivel-titulo="1"] .td-valores a:hover
+  color #94b249
+
+[color-agrupacion_principal="derch14"][nivel-titulo="1"] .td-valores a:hover
+  color #94b249
+  
+[color-agrupacion_principal="derch8"][nivel-titulo="1"] .sennial-indicador-elegido-grafico
+  background-image url('../confort/img/nnya-indicador-elegido-rojo.png')
+  width 16px
+  background-repeat no-repeat
+  background-color fff
+  background-position center
+  
+[color-agrupacion_principal="derch8"][nivel-titulo="3"] a, a:visited
+  color #fff
+ 
+[color-agrupacion_principal="derch8"][nivel-titulo="3"]
+  background-color #e45416
+  
+[color-agrupacion_principal="derch8"][nivel-titulo="2"]
+  background-color #fff
+  font-size 88%
+
+[color-agrupacion_principal="derch8"][nivel-titulo="2"] td
+  border-bottom 1px solid #cecbc8
+   
+[color-agrupacion_principal="derch8"][nivel-titulo="2"] a, a:visited
+  color #e45416
+  
+[color-agrupacion_principal="derch8"][nivel-titulo="1"]
+  background-color #eeeeee
+  color #5c5c5c
+  border-top 1px solid #c9c2b9
+  padding 5px
+
+[color-agrupacion_principal="derch8"][nivel-titulo="1"] a, a:visited
+  color #5a6878
+
+[color-agrupacion_principal="derch8"][nivel-titulo="1"] .es-link:hover
+  color #e45416
+
+[color-agrupacion_principal="derch8"][nivel-titulo="1"] .td-valores a:hover
+  color #e45416
+
+[color-agrupacion_principal="derch15"][nivel-titulo="1"] .sennial-indicador-elegido-grafico
+  background-image url('../confort/img/nnya-indicador-elegido-violeta.png')
+  width 16px
+  background-repeat no-repeat
+  background-color fff
+  background-position center
+  
+[color-agrupacion_principal="derch15"][nivel-titulo="3"]
+  background-color #7d64a5
+
+[color-agrupacion_principal="derch15"][nivel-titulo="3"] a, a:visited
+  color #fff
+  
+[color-agrupacion_principal="derch15"][nivel-titulo="2"]
+  background-color #fff
+
+[color-agrupacion_principal="derch15"][nivel-titulo="2"] td
+  border-bottom 1px solid #cecbc8
+  
+[color-agrupacion_principal="derch15"][nivel-titulo="2"] a, a:visited
+  color #7d64a5
+
+[color-agrupacion_principal="derch15"][nivel-titulo="1"]
+  background-color #eeeeee
+  color #5c5c5c
+  border-top 1px solid #c9c2b9 
+  padding 5px
+    
+[color-agrupacion_principal="derch15"][nivel-titulo="1"] a, a:visited
+  color #5a6878
+
+[color-agrupacion_principal="derch15"][nivel-titulo="1"] .es-link:hover
+  color #7d64a5
+
+[color-agrupacion_principal="derch15"][nivel-titulo="1"] .td-valores a:hover
+  color #7d64a5
+
+[color-agrupacion_principal="derch10"][nivel-titulo="3"]
+  background-color #f6ae00
+  
+[color-agrupacion_principal="derch10"][nivel-titulo="3"] a, a:visited
+  color #fff
+
+[color-agrupacion_principal="derch10"][nivel-titulo="2"]
+  background-color #fff
+  
+[color-agrupacion_principal="derch10"][nivel-titulo="2"] td
+  border-bottom 1px solid #cecbc8
+  
+[color-agrupacion_principal="derch10"][nivel-titulo="2"] a, a:visited
+  color #f6ae00
+  
+[color-agrupacion_principal="derch10"][nivel-titulo="1"]
+  background-color #eeeeee
+  color #5c5c5c
+  border-top 1px solid #c9c2b9 
+  padding 5px
+    
+[color-agrupacion_principal="derch10"][nivel-titulo="1"] .sennial-indicador-elegido-grafico
+  background-image url('../confort/img/nnya-indicador-elegido-amarillo.png')
+  width 16px
+  background-repeat no-repeat
+  background-color fff
+  background-position center
+  
+[color-agrupacion_principal="derch10"][nivel-titulo="1"] a, a:visited
+  color #5a6878
+
+[color-agrupacion_principal="derch10"][nivel-titulo="1"] .es-link:hover
+  color #f6ae00
+
+[color-agrupacion_principal="derch10"][nivel-titulo="1"] .td-valores a:hover
+  color #f6ae00
+
+[color-agrupacion_principal="derch7"][nivel-titulo="1"] .sennial-indicador-elegido-grafico
+  background-image url('../confort/img/nnya-indicador-elegido-azul.png')
+  width 16px
+  background-repeat no-repeat
+  background-color fff
+  background-position center
+  
+[color-agrupacion_principal="derch7"][nivel-titulo="3"]
+  background-color #2479bb
+
+[color-agrupacion_principal="derch7"][nivel-titulo="2"]
+  background-color #fff
+  color #2479bb
+
+[color-agrupacion_principal="derch7"][nivel-titulo="2"] td
+  border-bottom 1px solid #cecbc8 
+
+[color-agrupacion_principal="derch7"][nivel-titulo="1"]
+  background-color #eeeeee
+  color #5c5c5c
+  border-top 1px solid #c9c2b9 
+  padding 5px
+  
+[color-agrupacion_principal="derch7"][nivel-titulo="1"] a, a:visited
+  color #5a6878  
+
+[color-agrupacion_principal="derch7"][nivel-titulo="1"] .es-link:hover
+  color #2479bb  
+
+[color-agrupacion_principal="derch7"][nivel-titulo="1"] .td-valores a:hover
+  color #2479bb
+
+[color-agrupacion_principal="derch17"][nivel-titulo="1"] .sennial-indicador-elegido-grafico
+  background-image url('../confort/img/nnya-indicador-elegido-naranja.png')
+  width 16px
+  background-repeat no-repeat
+  background-color fff
+  background-position center
+  
+[color-agrupacion_principal="derch17"][nivel-titulo="3"]
+  background-color #f09d1b
+
+[color-agrupacion_principal="derch17"][nivel-titulo="2"]
+  background-color #fff
+  color #f09d1b
+
+[color-agrupacion_principal="derch17"][nivel-titulo="2"] td
+  border-bottom 1px solid #cecbc8  
+
+[color-agrupacion_principal="derch17"][nivel-titulo="1"]
+  background-color #eeeeee
+  color #5c5c5c
+  border-top 1px solid #c9c2b9 
+  padding 5px
+
+[color-agrupacion_principal="derch17"][nivel-titulo="1"] a, a:visited
+  color #5a6878
+
+[color-agrupacion_principal="derch17"][nivel-titulo="1"] .es-link:hover
+  color #f09d1b
+
+[color-agrupacion_principal="derch17"][nivel-titulo="1"] .td-valores a:hover
+  color #f09d1b
+
+[color-agrupacion_principal="derch11"][nivel-titulo="1"] .sennial-indicador-elegido-grafico
+  background-image url('../confort/img/nnya-indicador-elegido-verde.png')
+  width 16px
+  background-repeat no-repeat
+  background-color fff
+  background-position center
+  
+[color-agrupacion_principal="derch11"][nivel-titulo="3"]
+  background-color #94b249
+  
+[color-agrupacion_principal="derch11"][nivel-titulo="3"] a, a:visited
+  color #FFF
+
+[color-agrupacion_principal="derch11"][nivel-titulo="2"]
+  background-color #fff
+  color #198d76
+
+[color-agrupacion_principal="derch11"][nivel-titulo="2"] td
+  border-bottom 1px solid #cecbc8
+  
+[color-agrupacion_principal="derch11"][nivel-titulo="2"] a, a:visited
+  color #94b249
+  
+[color-agrupacion_principal="derch11"][nivel-titulo="1"]
+  background-color #eeeeee
+  color #5c5c5c
+  border-top 1px solid #c9c2b9 
+
+[color-agrupacion_principal="derch11"][nivel-titulo="1"] a, a:visited
+  color #5a6878
+
+[color-agrupacion_principal="derch11"][nivel-titulo="1"] .es-link:hover
+  color #94b249
+
+[color-agrupacion_principal="derch11"][nivel-titulo="1"] .td-valores a:hover
+  color #94b249
+
+[color-agrupacion_principal="derch11"][nivel-titulo="1"] .td-valores a:hover
+  color #94b249
+
+[color-agrupacion_principal="derch9"][nivel-titulo="1"] .sennial-indicador-elegido-grafico
+  background-image url('../confort/img/nnya-indicador-elegido-rojo.png')
+  width 16px
+  background-repeat no-repeat
+  background-color fff
+  background-position center
+  
+[color-agrupacion_principal="derch9"][nivel-titulo="3"] a, a:visited
+  color #fff
+ 
+[color-agrupacion_principal="derch9"][nivel-titulo="3"]
+  background-color #e45416
+  
+[color-agrupacion_principal="derch9"][nivel-titulo="2"]
+  background-color #fff
+  font-size 88%
+
+[color-agrupacion_principal="derch9"][nivel-titulo="2"] td
+  border-bottom 1px solid #cecbc8
+   
+[color-agrupacion_principal="derch9"][nivel-titulo="2"] a, a:visited
+  color #e45416
+  
+[color-agrupacion_principal="derch9"][nivel-titulo="1"]
+  background-color #eeeeee
+  color #5c5c5c
+  border-top 1px solid #c9c2b9
+  padding 5px
+
+[color-agrupacion_principal="derch9"][nivel-titulo="1"] a, a:visited
+  color #5a6878
+
+[color-agrupacion_principal="derch9"][nivel-titulo="1"] .es-link:hover
+  color #e45416
+
+[color-agrupacion_principal="derch9"][nivel-titulo="1"] .td-valores a:hover
+  color #e45416
+  
   @-webkit-keyframes animatezoom {
     from {-webkit-transform: scale(0.5)}
     to {-webkit-transform: scale(1)}
@@ -1175,8 +1505,8 @@ h2
   color #fff
   font-size 95%
   padding 3px
-  background-color #2e7792
-  border-bottom 1px solid #375677
+  background-color #8295ac
+  border-bottom 1px solid #244b77
   
 .titulo-grafico-z
   color #2b4b6d
