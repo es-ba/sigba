@@ -23,7 +23,6 @@ if(process.argv[2]=='--dir'){
 var FILASXGRAFICO=6;
 var COLSPANRELLENO=9;
 
-var extensionServeStatic = require('extension-serve-static');
 
 var changing = require('best-globals').changing;
 var coalesce = require('best-globals').coalesce;
@@ -1292,6 +1291,7 @@ class AppSIGBA extends backend.AppBackend{
         })
     }
     postConfig(){
+        super.postConfig();
         var be=this;
         /*
         be.variablesDinamicas=[
