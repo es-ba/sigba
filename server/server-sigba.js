@@ -1,4 +1,4 @@
-    "use strict";
+"use strict";
 
 /*jshint eqnull:true */
 /*jshint node:true */
@@ -718,6 +718,7 @@ class AppSIGBA extends backend.AppBackend{
             var client;
             var annio=req.query.annio;
             var indicador=req.query.indicador;
+            var contieneAnnioOcultable=false;;
             return be.getDbClient(req).then(function(cli){
                 var esAdmin=be.esAdminSigba(req);
                 var usuarioRevisor=false; // true si tiene permiso de revisor
@@ -772,9 +773,26 @@ class AppSIGBA extends backend.AppBackend{
                             }).then(function(matricesYDescripcion){
                                 var matrices=matricesYDescripcion.matrices;
                                 var descripcion=matricesYDescripcion.descripcionTabulado;
-                                tabulator.toCellTable=function(cell){
+                                var toCellColumnHeaderPrevious = tabulator.toCellColumnHeader;
+                                function calcularAnniosOcultables(attrs, varValue){
+                                    if(varValue && varValue.annio){
+                                        if(varValue.annio<2010 && varValue.annio % 5 !=0){
+                                            attrs['annio-ocultable']='si';
+                                            contieneAnnioOcultable=true;
+                                        }
+                                    }
+                                }
+                                tabulator.toCellColumnHeader=function (titleCellAttrs, varName, labelValue, varValue){
+                                    console.log('**************',varValue)
+                                    calcularAnniosOcultables(titleCellAttrs, {[varName]:varValue})
+                                    var th = toCellColumnHeaderPrevious.apply(this, arguments);
+                                    return th;
+                                }
+                                tabulator.toCellTable=function(cell, varValues){
+                                    var attrs={class:'tabulator-cell'};
+                                    calcularAnniosOcultables(attrs, varValues)
                                     var cellValor=(cell && cell.valor)?cellValor=be.decimalesYComa(cell.valor,descripcion.decimales,','):(cell?cell.valor:cell)
-                                    return html.td({class:'tabulator-cell'},[
+                                    return html.td(attrs,[
                                         html.div({id:'valor-cv'},[
                                             html.div({id:'valor-en-tabulado'},cell?be.puntosEnMiles(cellValor):'///'),
                                             html.div({id:'cv-en-tabulado'},(cell && cell.cv)?cell.cv:null)
@@ -865,6 +883,13 @@ class AppSIGBA extends backend.AppBackend{
                                                             (fila.habilitado || esAdmin)?html.span({id:"tabulado-fuente"},'Fuente: '):null,
                                                             (fila.habilitado || esAdmin)?html.span({id:"tabulado-fuente-descripcion"},descripcion.fuente):null,
                                                         ]),
+                                                        (contieneAnnioOcultable?
+                                                            html.div({class:'aclaracion-annios-ocultos'},[
+                                                                html.span({class:'nota'},"Nota: "),
+                                                                " solo se muestran los años postreriores al 2010 y los que terminan en 0 y 5 ",
+                                                                html.a({href:"#ver-todo"}, "(ver todos)")
+                                                            ])
+                                                        :null)
                                                     ])
                                                 ])
                                             ])

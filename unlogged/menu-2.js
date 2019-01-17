@@ -215,7 +215,15 @@ function updateUrlState(newUrl, method) {
     window.history[method]("Cambiar visualización entre gráfico y tabulado", "Visualización", newUrl);
 }
 
+function doHashChange(){
+    document.body.setAttribute('ver-todo', /ver-todo/.test(location.hash)?'si':'no');
+}
+
+window.addEventListener('hashchange', doHashChange);
+
+
 window.addEventListener('load', function(){
+    doHashChange();
     // when browser back or next button are used
     if(document.body.getAttribute("que-pantalla")=='indicador'){
         window.onpopstate = function (event) {
@@ -383,3 +391,4 @@ function renderHomeCharts() {
 function getChartBoxes() {
     return document.querySelectorAll('.box-grafico-principal [para-graficador]');
 }
+
