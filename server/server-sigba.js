@@ -718,7 +718,7 @@ class AppSIGBA extends backend.AppBackend{
             var client;
             var annio=req.query.annio;
             var indicador=req.query.indicador;
-            var contieneAnnioOcultable=false;;
+            var contieneAnnioOcultable=false;
             return be.getDbClient(req).then(function(cli){
                 var esAdmin=be.esAdminSigba(req);
                 var usuarioRevisor=false; // true si tiene permiso de revisor
@@ -783,7 +783,6 @@ class AppSIGBA extends backend.AppBackend{
                                     }
                                 }
                                 tabulator.toCellColumnHeader=function (titleCellAttrs, varName, labelValue, varValue){
-                                    console.log('**************',varValue)
                                     calcularAnniosOcultables(titleCellAttrs, {[varName]:varValue})
                                     var th = toCellColumnHeaderPrevious.apply(this, arguments);
                                     return th;
