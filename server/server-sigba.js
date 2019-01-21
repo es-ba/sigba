@@ -889,7 +889,7 @@ class AppSIGBA extends backend.AppBackend{
                                                         (contieneAnnioOcultable?
                                                             html.div({class:'aclaracion-annios-ocultos'},[
                                                                 html.span({class:'nota'},"Nota: "),
-                                                                " solo se muestran los años postreriores al 2010 y los que terminan en 0 y 5 ",
+                                                                " se muestran los datos correspondientes a los años terminados en 0 y 5 y, con correlatividad anual, desde 2010 en adelante ",
                                                                 html.a({href:"#ver-todo"}, "(ver todos)")
                                                             ])
                                                         :null)
