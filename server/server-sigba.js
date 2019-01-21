@@ -478,7 +478,7 @@ class AppSIGBA extends backend.AppBackend{
         return client.query(
             "SELECT i.denominacion as i_denom ,i.con_nota_pie con_nota,f.fte as fte, f.denominacion as f_denom,f.graf_ult_annios as graf_ult_annios, "
                 +"f.graf_cada_cinco as graf_cada_cinco, "
-                +"u.denominacion as u_denom,u.um as um,u.nota_pie nota_pie, i.decimales FROM indicadores i " 
+                +"u.denominacion as u_denom,u.um as um,u.nota_pie nota_pie, i.decimales, i.annios_ocultables FROM indicadores i " 
                 +"\n LEFT JOIN fte f ON f.fte=i.fte " 
                 +"\n LEFT JOIN um u ON u.um=i.um "
                 +"\n WHERE indicador=$1",
@@ -496,7 +496,8 @@ class AppSIGBA extends backend.AppBackend{
                 decimales:infoIndicador.decimales,
                 fte:infoIndicador.fte,
                 graf_ult_annios:infoIndicador.graf_ult_annios,
-                graf_cada_cinco:infoIndicador.graf_cada_cinco
+                graf_cada_cinco:infoIndicador.graf_cada_cinco,
+                annios_ocultables:infoIndicador.annios_ocultables,
             }
         })
     }
@@ -766,6 +767,7 @@ class AppSIGBA extends backend.AppBackend{
                                     fte:infoParaTabulado.fte,
                                     graf_ult_annios:infoParaTabulado.graf_ult_annios,
                                     graf_cada_cinco:infoParaTabulado.graf_cada_cinco,
+                                    annios_ocultables:infoParaTabulado.annios_ocultables,
                                 };
                                 matrices.matrixTab.caption=infoParaTabulado.i_denom;
                                 matrices.matrixGraf.caption=infoParaTabulado.i_denom;
@@ -775,10 +777,12 @@ class AppSIGBA extends backend.AppBackend{
                                 var descripcion=matricesYDescripcion.descripcionTabulado;
                                 var toCellColumnHeaderPrevious = tabulator.toCellColumnHeader;
                                 function calcularAnniosOcultables(attrs, varValue){
-                                    if(varValue && varValue.annio){
-                                        if(varValue.annio<2010 && varValue.annio % 5 !=0){
-                                            attrs['annio-ocultable']='si';
-                                            contieneAnnioOcultable=true;
+                                    if(descripcion.annios_ocultables){
+                                        if(varValue && varValue.annio){
+                                            if(varValue.annio<2010 && varValue.annio % 5 !=0){
+                                                attrs['annio-ocultable']='si';
+                                                contieneAnnioOcultable=true;
+                                            }
                                         }
                                     }
                                 }

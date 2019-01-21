@@ -272,6 +272,7 @@ window.addEventListener('load', function(){
 
 function updateVisualization() {
     document.body.setAttribute('ver-todo', getHash('ver-todo')?'si':'no');
+    var thereIsChartContainer=document.querySelector('.chartContainer')
     if (getTabuladoElement()){
         var tglBtn = document.getElementById('toogleButton');
        // if (window.location.search.match(window.displayChartParamName)) {
@@ -281,7 +282,9 @@ function updateVisualization() {
             getTabuladoElement().style.display = 'none';
             if (tglBtn) {tglBtn.src = 'img/tabulado.png';}
         } else {
-            document.querySelector('.chartContainer').style.display = 'none';
+            if(thereIsChartContainer){
+                thereIsChartContainer.style.display = 'none';
+            }
             getTabuladoElement().style.display = 'block';
             if (tglBtn) {tglBtn.src = 'img/grafico.png';}
         }
