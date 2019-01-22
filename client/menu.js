@@ -37,7 +37,7 @@ myOwn.wScreens.calculaTotales=function(addrParams){
         return alertPromise(msg);
     });
 };
- 
+
 window.addEventListener('load', function(){
     my.autoSetup().then(prepareTableButtons);
 });

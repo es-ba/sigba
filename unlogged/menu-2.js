@@ -190,9 +190,45 @@ function getTabuladoElement() {
     return document.getElementById('tabulado-html');
 }
 
+function getAllHash(){
+    var o={}
+    var hashContent = location.hash?location.hash.replace(/^#/,''):'';
+    hashContent.split('&').forEach(function(pairNameValue){
+        var primerIgual=pairNameValue.indexOf('=');
+        var name = primerIgual>0 ? pairNameValue.substr(0,primerIgual-1) : pairNameValue;
+        var value = primerIgual>0 ? pairNameValue.substr(primerIgual+1) : true;
+        o[name] = value;
+    });
+    return o;
+}
+
+function getHash(varName){
+    return getAllHash()[varName];
+}
+
+function toAllHash(o){
+    var pairs=[]
+    for(var varName in o) if(o.hasOwnProperty(varName)){
+        var value=o[varName];
+        pairs.push(varName+(value===true?'':'='+value));
+    }
+    return pairs.length ? '#'+pairs.join('&') : '';
+}
+
+function toHash(varName, varValue){
+    var o=getAllHash();
+    if(varValue==null || varValue===false){
+        delete o[varName];
+    }else{
+        o[varName] = varValue;
+    }
+    return toAllHash(o);
+}
+
 function toggleChartTabuladoDisplay() {
     //changing url accordingly without reolading page
-    if (window.location.search.match(window.displayChartParamName)) {
+    //if (window.location.search.match(window.displayChartParamName)) {
+    if (getHash('grafico')) {
         toggleToTabulado();
     } else {
         toggleToChart();
@@ -202,12 +238,14 @@ function toggleChartTabuladoDisplay() {
 }
 
 function toggleToTabulado() {
-    var newUrl = window.location.search.match(window.displayChartParamName) ? location.href.replace(window.displayChartParamName, '') : location.href;
+    //var newUrl = window.location.search.match(window.displayChartParamName) ? location.href.replace(window.displayChartParamName, '') : location.href;
+    var newUrl = location.origin + location.pathname + location.search + toHash('grafico', false)
     updateUrlState(newUrl, "pushState");
 }
 
 function toggleToChart() {
-    var newUrl = window.location.search.match(window.displayChartParamName) ? location.href : location.href + window.displayChartParamName;
+    //var newUrl = window.location.search.match(window.displayChartParamName) ? location.href : location.href + window.displayChartParamName;
+    var newUrl = location.origin + location.pathname + location.search + toHash('grafico', true)
     updateUrlState(newUrl, "replaceState");
 }
 
@@ -215,7 +253,15 @@ function updateUrlState(newUrl, method) {
     window.history[method]("Cambiar visualización entre gráfico y tabulado", "Visualización", newUrl);
 }
 
+function doHashChange(){
+    updateVisualization();
+}
+
+window.addEventListener('hashchange', doHashChange);
+
+
 window.addEventListener('load', function(){
+    doHashChange();
     // when browser back or next button are used
     if(document.body.getAttribute("que-pantalla")=='indicador'){
         window.onpopstate = function (event) {
@@ -225,21 +271,25 @@ window.addEventListener('load', function(){
 });
 
 function updateVisualization() {
+    document.body.setAttribute('ver-todo', getHash('ver-todo')?'si':'no');
+    var thereIsChartContainer=document.querySelector('.chartContainer')
     if (getTabuladoElement()){
         var tglBtn = document.getElementById('toogleButton');
-        if (window.location.search.match(window.displayChartParamName)) {
+       // if (window.location.search.match(window.displayChartParamName)) {
+        if (getHash('grafico')) {
+            document.body.setAttribute('ver-todo', 'si');
             document.querySelector('.chartContainer').style.display = 'block';
             getTabuladoElement().style.display = 'none';
             if (tglBtn) {tglBtn.src = 'img/tabulado.png';}
         } else {
-            document.querySelector('.chartContainer').style.display = 'none';
+            if(thereIsChartContainer){
+                thereIsChartContainer.style.display = 'none';
+            }
             getTabuladoElement().style.display = 'block';
             if (tglBtn) {tglBtn.src = 'img/grafico.png';}
         }
     }
 }
-
-window.displayChartParamName = '&type=grafico';
 
 function buildToggleButton() {
     var toggleButton = document.createElement('input');
@@ -383,3 +433,4 @@ function renderHomeCharts() {
 function getChartBoxes() {
     return document.querySelectorAll('.box-grafico-principal [para-graficador]');
 }
+
