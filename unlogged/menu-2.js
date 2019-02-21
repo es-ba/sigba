@@ -67,10 +67,12 @@ function generateChart(elementWithMatrix, svgWidth) {
     zMatrices.forEach(function (matrix, indexChart) {
         matrix = curarMatrix(matrix);
         // ver interfaz graph-configuration.d.ts en graphicator
+        setMatrixCaption(matrix, chartContainer);
+        var elemIdToBind = generateChartElementId(tabuladoInfo, indexChart, chartContainer);
         var generalConfig = {
             matrix: matrix,
             tipo: tabuladoInfo.tipo_grafico,
-            idElemParaBindear: generateChartElementId(matrix, tabuladoInfo, indexChart, chartContainer),
+            idElemParaBindear: elemIdToBind,
             apilado: tabuladoInfo.apilado,
             um: tabuladoInfo.um_denominacion || '',
             c3Config: {
@@ -141,19 +143,11 @@ function generateChart(elementWithMatrix, svgWidth) {
     chartContainer.style.display = 'block';
 }
 
-function generateChartElementId(matrix, tabuladoInfo, indexChart, chartContainer) {
+function generateChartElementId(tabuladoInfo, indexChart, chartContainer) {
     var chartElementId = 'chartElement-' + tabuladoInfo.indicador + '-' + indexChart;
     var chartElement = document.createElement('div');
     chartElement.className = 'chartElement ' + tabuladoInfo.tipo_grafico;
     chartElement.setAttribute('id', chartElementId);
-
-    if (matrix.caption) {
-        var chartTitle = document.createElement('h3');
-        chartTitle.innerText = matrix.caption;
-        chartTitle.style.textAlign = 'center';
-        chartTitle.className = 'titulo-grafico-z';
-        chartContainer.appendChild(chartTitle);
-    }
     chartContainer.appendChild(chartElement);
 
     return chartElementId;
@@ -291,35 +285,11 @@ function updateVisualization() {
     }
 }
 
-function buildToggleButton() {
-    var toggleButton = document.createElement('input');
-    toggleButton.type = 'image';
-    toggleButton.id = 'toogleButton';
-    toggleButton.className += "boton_tabulados";
-    toggleButton.width = '40';
-    toggleButton.style.margin = '5';
-    toggleButton.onclick = function () {
-        toggleChartTabuladoDisplay();
-    };
-    return toggleButton;
-}
-
 function copyInputToClipboard(inputToCopy) {
     inputToCopy.value = window.location.href;
     inputToCopy.focus();
     inputToCopy.select();
     document.execCommand("Copy");
-}
-
-function buildCopyUrlButton() {
-    var copyUrlButton = document.createElement('input');
-    copyUrlButton.type = 'image';
-    copyUrlButton.src = 'img/copiarlink.png';
-    copyUrlButton.className += "boton_tabulados";
-    copyUrlButton.width = "40";
-    copyUrlButton.style.margin = '5';
-    copyUrlButton.onclick = copyUrlFunc;
-    return copyUrlButton;
 }
 
 function copyUrlFunc() {
@@ -329,43 +299,67 @@ function copyUrlFunc() {
     inputUrl.hidden = true;
 }
 
+function insertNewButton(newButton) {
+    document.getElementById('para-botones').appendChild(newButton);
+}
+
+function buildDefaultButton(onClickFunction){
+    var defaultButton = document.createElement('input');
+    defaultButton.type = 'image';
+    defaultButton.className += "boton_tabulados";
+    defaultButton.width = "40";
+    defaultButton.style.margin = '5';
+    defaultButton.onclick = onClickFunction;
+    return defaultButton;
+}
+
 function buildHiddenInputUrl() {
     var inputUrl = document.createElement('input');
     inputUrl.type = 'text';
     inputUrl.id = 'pasteBox';
     inputUrl.hidden = true;
-    return inputUrl;
+    insertNewButton(inputUrl);
 }
 
-function insertNewButton(newButton, inElement) {
-    if (inElement) {
-        inElement.appendChild(newButton);
-    } else {
-        getTabuladoElement().parentNode.insertBefore(newButton, getTabuladoElement());
-    }
+function buildCopyUrlButton() {
+    var copyUrlButton = buildDefaultButton(copyUrlFunc);
+    copyUrlButton.src = 'img/copiarlink.png';
+    insertNewButton(copyUrlButton);
+}
+
+function buildToggleButton() {
+    var toggleButton = buildDefaultButton(toggleChartTabuladoDisplay);
+    toggleButton.id = 'toogleButton';
+    insertNewButton(toggleButton);
 }
 
 function buildExportExcelButton() {
-    var exportButton = document.createElement('input');
-    exportButton.type = 'image';
+    var exportButton = buildDefaultButton(exportToExcel);
     exportButton.src = 'img/exportar.png';
-    exportButton.className += "boton_tabulados";
-    exportButton.style.margin = '5';
-    exportButton.width = "40";
-    exportButton.onclick = function () {
-        var t = new window.Tabulator();
-        t.toExcel(getTabuladoElement(), {
-            filename: getMatrix(getTabuladoElement()).caption,
-            username: (window.my) ? window.my.config.username : null
-        });
-    };
-    return exportButton;
+    insertNewButton(exportButton);
+}
+
+function buildExportChartButton() {
+    var downloadChartButton = buildDefaultButton(exportChart);
+    downloadChartButton.src = 'img/exportar.png';
+    insertNewButton(downloadChartButton);
+}
+
+function exportToExcel() {
+    var t = new window.Tabulator();
+    t.toExcel(getTabuladoElement(), {
+        filename: getMatrix(getTabuladoElement()).caption,
+        username: (window.my) ? window.my.config.username : null
+    });
+}
+
+function exportChart() {
+    window.Graphicator.downloadCharts();
 }
 
 function insertCopyUrlButton() {
-    var inElement = document.getElementById('para-botones');
-    insertNewButton(buildHiddenInputUrl(), inElement);
-    insertNewButton(buildCopyUrlButton(), inElement);
+    buildHiddenInputUrl();
+    buildCopyUrlButton();
 }
 
 function refreshChartsRender(){
@@ -378,20 +372,20 @@ window.addEventListener('load', function () {
     renderHomeCharts();
     var tabuladoElem = getTabuladoElement();
     if (tabuladoElem) {
-        var inElement = document.getElementById('para-botones');
+        
         //TODO: pasar el try catch adentro de 'generateChart' como está ahora el catch también ataja errores que no son del grafico
         try {
             generateChart(tabuladoElem, window.innerWidth - document.getElementById("div-pantalla-izquierda").offsetWidth - 32);
             if (getTabuladoInfo(tabuladoElem).tipo_grafico == 'piramide') {
                 toggleToChart();
             } else {
-                insertNewButton(buildToggleButton(), inElement);
+                buildToggleButton();
             }
             updateVisualization();
         } catch (error) {
             window.console.error('No es posible graficar el tabulado. ' + error);
         }
-        insertNewButton(buildExportExcelButton(), inElement);
+        buildExportExcelButton();
         insertCopyUrlButton();
     }
     //le hago un load para que c3 acomode algunas cosas visuales como los labels
@@ -434,3 +428,12 @@ function getChartBoxes() {
     return document.querySelectorAll('.box-grafico-principal [para-graficador]');
 }
 
+function setMatrixCaption(matrix, chartContainer){
+    if (matrix.caption) {
+        var chartTitle = document.createElement('h3');
+        chartTitle.innerText = matrix.caption;
+        chartTitle.style.textAlign = 'center';
+        chartTitle.className = 'titulo-grafico-z';
+        chartContainer.appendChild(chartTitle);
+    }
+}
