@@ -752,7 +752,8 @@ class AppSIGBA extends backend.AppBackend{
         mainApp.get(baseUrl+'/api_provisorio', function(req,res){
             var version=req.query.version;
             if(version!='0.1'){
-                res.end({error:"version incorrecta de la API"})
+                res.send({ok:false, version, error:'version incorrecta de la API'});
+                res.end()
             }
             be.servirTabuladoEspecifico(req,res, function funEntregarDatos(res, matrices){
                 res.send({ok:true, version, datos:matrices.datum})
