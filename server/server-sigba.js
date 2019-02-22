@@ -466,7 +466,7 @@ class AppSIGBA extends backend.AppBackend{
                 tabulator.defaultShowAttribute='valor';
                 var matrixTab=tabulator.toMatrix(tab.datum);
                 var matrixGraf=tabulator.toMatrix(graf.datum);
-                return {matrixTab,matrixGraf};
+                return {matrixTab,matrixGraf,datum:tab.datum};
             })
         })
     }
@@ -529,8 +529,8 @@ class AppSIGBA extends backend.AppBackend{
                 ).fetchAll().then(function(result){
                     var categoriasPrincipalArr=result.rows.map(function(categorias){
                         return {valor:categorias.valor_corte,denominacion:categorias.denominacion}
-                    })
-                    return {cortantesPrincipalesArr,categoriasPrincipalArr}
+                    });
+                    return {cortantesPrincipalesArr,categoriasPrincipalArr};
                 })
             }else{
                 return false;
@@ -702,8 +702,43 @@ class AppSIGBA extends backend.AppBackend{
             })
         });
     }
-    
+    servirTabuladoEspecifico(req, res, funEntregarDatos){
+        var be=this;
+        var annio=req.query.annio;
+        var indicador=req.query.indicador;
+        return be.inDbClient(req, function(client){
+            var esAdmin=be.esAdminSigba(req);
+            var usuarioRevisor=false; // true si tiene permiso de revisor
+            var queryStr=
+                "select indicador,c.cor cortantes , count(*) as cantidad_cortantes,c.count,c.var arr_cortantes from ( "+
+                    "select indicador, cortantes cor,jsonb_object_keys(cortantes) cor_keys,count(*),ARRAY(select jsonb_object_keys(cortantes)) var  "+
+                    "from celdas where indicador=$1 group by indicador, cortantes "+
+                ") c group by indicador,cortantes, c.count,arr_cortantes order by cortantes"
+            return client.query(queryStr, [indicador]).fetchAll().then(function(result){
+                var tabuladosPorIndicador=result.rows
+                return Promise.all(tabuladosPorIndicador.map(function(tabulado){
+                    var arr_cortantes=tabulado.arr_cortantes
+                    return be.traerInfoTabulado(client,indicador, annio,tabulado);
+                })).then(function(){
+                    var cortantesPosibles = tabuladosPorIndicador.filter(row => (row.habilitado || esAdmin));
+                    if (cortantesPosibles.length > 1){
+                        cortantesPosibles = cortantesPosibles.filter(row => row.cortantes != '{"annio":true}');
+                    }
+                    //parametro GET (CSV con todos los cortantes que hay que mostrar, lo cual define un tabulado) //cortantes por defecto son las del primer tabulado
+                    var cortante = !req.query.cortante?JSON.stringify(cortantesPosibles[0].cortantes):req.query.cortante;
+                    // tabulado que se va as mostrar
+                    var fila = cortantesPosibles.filter(function(tabulado){
+                        return JSON.stringify(tabulado.cortantes) == cortante; 
+                    })[0];
+                    return be.armaMatrices(client, fila, annio, indicador).then(function(matrices){
+                        return funEntregarDatos(res, matrices, client, indicador, annio, fila, result, cortantesPosibles, cortante, esAdmin);
+                    });
+                });
+            }).catch(MiniTools.serveErr(req,res));
+        });
+    }
     addSchrödingerServices(mainApp, baseUrl){
+        var be = this;
         mainApp.use(baseUrl+'/',function(req, res, next) {
             if (req.path.substr(-1) == '/' && req.path.length > 1) {
                 var query = req.url.slice(req.path.length);
@@ -712,10 +747,186 @@ class AppSIGBA extends backend.AppBackend{
                 next();
             }
         });
-        var be = this;
         var urlYClasesTabulados='principal';
         super.addSchrödingerServices(mainApp, baseUrl);
+        mainApp.get(baseUrl+'/api_provisorio', function(req,res){
+            var version=req.query.version;
+            if(version!='0.1'){
+                res.end({error:"version incorrecta de la API"})
+            }
+            be.servirTabuladoEspecifico(req,res, function funEntregarDatos(res, matrices){
+                res.send({ok:true, version, datos:matrices.datum})
+                res.end()
+            })
+        });
         mainApp.get(baseUrl+'/'+urlYClasesTabulados+'-indicador', function(req,res){
+            be.servirTabuladoEspecifico(req,res, function funEntregarDatos(res,matrices, client, indicador, annio, fila, result, cortantesPosibles, cortante, esAdmin){
+                var contieneAnnioOcultable=false;
+                return Promise.resolve().then(function(){
+                    return be.traeInfoMatrix(client,indicador).then(function(infoParaTabulado){
+                        var descripcionTabulado={};
+                        descripcionTabulado={
+                            indicador:indicador,
+                            camposCortantes:be.defs_annio(annio).cortantes,
+                            cortantes: fila.cortantes,
+                            annioCortante:annio?annio:'TRUE',
+                            cuadro:fila.cuadro,
+                            grafico:fila.grafico,
+                            tipo_grafico:fila.tipo_grafico,
+                            orientacion:fila.orientacion,
+                            apilado:fila.apilado,
+                            i_denom:infoParaTabulado.i_denom,
+                            nota_pie:infoParaTabulado.con_nota?infoParaTabulado.nota_pie:null,
+                            fuente:infoParaTabulado.f_denom,
+                            um_denominacion:infoParaTabulado.u_denom,
+                            um:infoParaTabulado.um,
+                            decimales:infoParaTabulado.decimales,
+                            fte:infoParaTabulado.fte,
+                            graf_ult_annios:infoParaTabulado.graf_ult_annios,
+                            graf_cada_cinco:infoParaTabulado.graf_cada_cinco,
+                            annios_ocultables:infoParaTabulado.annios_ocultables,
+                        };
+                        matrices.matrixTab.caption=infoParaTabulado.i_denom;
+                        matrices.matrixGraf.caption=infoParaTabulado.i_denom;
+                        return {matrices,descripcionTabulado};
+                    }).then(function(matricesYDescripcion){
+                        var matrices=matricesYDescripcion.matrices;
+                        var descripcion=matricesYDescripcion.descripcionTabulado;
+                        var toCellColumnHeaderPrevious = tabulator.toCellColumnHeader;
+                        function calcularAnniosOcultables(attrs, varValue){
+                            if(descripcion.annios_ocultables){
+                                if(varValue && varValue.annio){
+                                    if(varValue.annio<2010 && varValue.annio % 5 !=0){
+                                        attrs['annio-ocultable']='si';
+                                        contieneAnnioOcultable=true;
+                                    }
+                                }
+                            }
+                        }
+                        tabulator.toCellColumnHeader=function (titleCellAttrs, varName, labelValue, varValue){
+                            calcularAnniosOcultables(titleCellAttrs, {[varName]:varValue})
+                            var th = toCellColumnHeaderPrevious.apply(this, arguments);
+                            return th;
+                        }
+                        tabulator.toCellTable=function(cell, varValues){
+                            var attrs={class:'tabulator-cell'};
+                            calcularAnniosOcultables(attrs, varValues)
+                            var cellValor=(cell && cell.valor)?cellValor=be.decimalesYComa(cell.valor,descripcion.decimales,','):(cell?cell.valor:cell)
+                            return html.td(attrs,[
+                                html.div({id:'valor-cv'},[
+                                    html.div({id:'valor-en-tabulado'},cell?be.puntosEnMiles(cellValor):'///'),
+                                    html.div({id:'cv-en-tabulado'},(cell && cell.cv)?cell.cv:null)
+                                ])
+                            ]);
+                        };
+                        var tabuladoHtml=tabulator.toHtmlTable(matrices.matrixTab)
+                        return {tabuladoHtml,descripcionTabulado:descripcion, matrix:matrices.matrixGraf};
+                    })
+                }).then(function(tabuladoDescripcionMatriz){
+                    var tabuladoHtmlYDescripcion=result;
+                    var tabuladoHtml=tabuladoDescripcionMatriz.tabuladoHtml;
+                    var descripcion=tabuladoDescripcionMatriz.descripcionTabulado;
+                    var matrix=tabuladoDescripcionMatriz.matrix;
+                    var trCortantes=cortantesPosibles.map(function(cortanteAElegir){
+                        var denominaciones=cortanteAElegir.denom_tab.split('|');
+                        var href=''+absolutePath+''+urlYClasesTabulados+'-indicador?'+(annio?'annio='+annio+'&':'')+'indicador='+indicador+'&cortante='+JSON.stringify(cortanteAElegir.cortantes)
+                        return html.tr({class:'tr-cortante-posible','esta-habilitado':cortanteAElegir.habilitado?'si':'no'},[
+                            html.td({class:'td-cortante-posible', 'menu-item-selected':JSON.stringify(cortanteAElegir.cortantes)==cortante},[
+                                html.a({class:'a-cortante-posible',href:href},denominaciones.join('-'))
+                            ])
+                        ]);
+                    });
+                    var annios={};
+                    var anniosA=[];
+                    var anniosLinks=[];
+                    descripcion.usuario=req.user?req.user.usu_usu:{};
+                    descripcion.habilitar=!fila.habilitado;
+                    descripcion.cortante_orig=fila.cortante_orig;
+                    var validationButton=html.button({id:'validacion-tabulado',type:'button','more-info':JSON.stringify(descripcion)},'Validar tabulado')
+                    var habilitationButton=html.button({id:'habilitacion-tabulado',type:'button','more-info':JSON.stringify(descripcion)}/*,bb*/);
+                    return be.anniosCortantes(client,annios,anniosA,indicador).then(function(){
+                        anniosLinks=anniosA.map(function(annioAElegir){
+                            var href=''+absolutePath+''+urlYClasesTabulados+'-indicador?annio='+annioAElegir+'&indicador='+indicador+
+                            '&cortante='+cortante;
+                            return html.span([
+                                html.a({class:'annio-cortante-posible',href:href,'menu-item-selected':annioAElegir==annio},annioAElegir),
+                            ]);
+                        }).concat(
+                            html.span([
+                                html.a({class:'annio-cortante-posible',href:''+absolutePath+''+urlYClasesTabulados+'-indicador?indicador='+indicador+"&cortante="+cortante,'menu-item-selected':annio?false:true},'Serie')
+                            ])
+                        );
+                    }).then(function(){
+                        var skin=be.config['client-setup'].skin;
+                        var skinUrl=(skin?skin+'/':'');
+                        return be.encabezado(skinUrl,false,req,client).then(function(encabezadoHtml){
+                            var pantalla=html.div({id:'total-layout','menu-type':'hidden'},[
+                                encabezadoHtml,
+                                html.div({class:'annios-links-container',id:'annios-links'},[
+                                    html.div({id:'barra-annios'},anniosLinks),
+                                    html.div({id:'link-signos-convencionales'},[html.a({id:'signos_convencionales-link',href:''+absolutePath+'principal-signos_convencionales'},'Signos convencionales')]),
+                                    html.div({class:'float-clear'})
+                                ]),
+                                html.table({class:'tabla-links-tabulado-grafico'},[
+                                    html.tr({class:'tr-links-tabulado-grafico'},[
+                                        html.td({class:'td-links'},[
+                                            html.div({class:'div-pantallas',id:'div-pantalla-izquierda'},[
+                                                html.h2('Tabulados'),
+                                                html.table({id:'tabla-izquierda'},trCortantes)
+                                            ]),
+                                        ]),
+                                        html.td({class:'td-tabulado-grafico'},[
+                                            html.div({class:'div-pantallas',id:'div-pantalla-derecha'},[
+                                                html.h2({class:'tabulado-descripcion',id:'para-botones'},[
+                                                    html.div({class:'tabulado-descripcion-annio'},annio),
+                                                    html.div({class:'botones-tabulado-descripcion'})
+                                                ]),
+                                                ((fila.habilitado) || esAdmin)?html.div({
+                                                    id:'tabulado-html',
+                                                    class: tabuladoDescripcionMatriz.descripcionTabulado.tipo_grafico == 'piramide' ? 'hide-tabulado-cuadro': '',
+                                                    'para-graficador':JSON.stringify(matrix),
+                                                    'info-tabulado':JSON.stringify(descripcion)
+                                                },[tabuladoHtml]):null,
+                                                esAdmin?html.div([
+                                                    validationButton,
+                                                    habilitationButton
+                                                ]):null,
+                                                html.div({class:'tabulado-descripcion',id:'tabulado-descripcion-um'},[
+                                                    (fila.habilitado || esAdmin)?html.span({id:"tabulado-um"},"Unidad de medida: "):null,
+                                                    (fila.habilitado || esAdmin)?html.span({id:"tabulado-um-descripcion"},descripcion.um_denominacion):null
+                                                ]),
+                                                html.div({class:'tabulado-descripcion',id:'tabulado-descripcion-nota'},[
+                                                    ((fila.habilitado || esAdmin)&&descripcion.nota_pie)?html.span({id:"nota-porcentaje-label"},'Nota: '):null,
+                                                    ((fila.habilitado || esAdmin)&&descripcion.nota_pie)?html.span({id:"nota-porcentaje"},descripcion.nota_pie):null,
+                                                ]),
+                                                html.div({class:'tabulado-descripcion',id:'tabulado-descripcion-fuente'},[
+                                                    (fila.habilitado || esAdmin)?html.span({id:"tabulado-fuente"},'Fuente: '):null,
+                                                    (fila.habilitado || esAdmin)?html.span({id:"tabulado-fuente-descripcion"},descripcion.fuente):null,
+                                                ]),
+                                                (contieneAnnioOcultable?
+                                                    html.div({class:'aclaracion-annios-ocultos'},[
+                                                        html.span({class:'nota'},"Nota: "),
+                                                        " se muestran los datos correspondientes a los años terminados en 0 y 5 y, con correlatividad anual, desde 2010 en adelante ",
+                                                        html.a({href:"#ver-todo"}, "(ver todos)")
+                                                    ])
+                                                :null)
+                                            ])
+                                        ])
+                                    ])
+                                ])
+                            ]);
+                            var pagina=html.html([
+                                be.headSigba(false,req,descripcion.i_denom),
+                                html.body({"que-pantalla": 'indicador'},[pantalla,be.foot(skinUrl)])
+                            ]);
+                            res.send(pagina.toHtmlText({pretty:true}));
+                            res.end();
+                        })
+                    })
+                });
+            })
+        });
+        mainApp.get(baseUrl+'/'+urlYClasesTabulados+'-indicador-viejo', function(req,res){
             var client;
             var annio=req.query.annio;
             var indicador=req.query.indicador;
@@ -746,167 +957,171 @@ class AppSIGBA extends backend.AppBackend{
                             return JSON.stringify(tabulado.cortantes) == cortante; 
                         })[0];
                         return be.armaMatrices(client, fila, annio, indicador).then(function(matrices){
-                            return be.traeInfoMatrix(client,indicador).then(function(infoParaTabulado){
-                                var descripcionTabulado={};
-                                descripcionTabulado={
-                                    indicador:indicador,
-                                    camposCortantes:be.defs_annio(annio).cortantes,
-                                    cortantes: fila.cortantes,
-                                    annioCortante:annio?annio:'TRUE',
-                                    cuadro:fila.cuadro,
-                                    grafico:fila.grafico,
-                                    tipo_grafico:fila.tipo_grafico,
-                                    orientacion:fila.orientacion,
-                                    apilado:fila.apilado,
-                                    i_denom:infoParaTabulado.i_denom,
-                                    nota_pie:infoParaTabulado.con_nota?infoParaTabulado.nota_pie:null,
-                                    fuente:infoParaTabulado.f_denom,
-                                    um_denominacion:infoParaTabulado.u_denom,
-                                    um:infoParaTabulado.um,
-                                    decimales:infoParaTabulado.decimales,
-                                    fte:infoParaTabulado.fte,
-                                    graf_ult_annios:infoParaTabulado.graf_ult_annios,
-                                    graf_cada_cinco:infoParaTabulado.graf_cada_cinco,
-                                    annios_ocultables:infoParaTabulado.annios_ocultables,
-                                };
-                                matrices.matrixTab.caption=infoParaTabulado.i_denom;
-                                matrices.matrixGraf.caption=infoParaTabulado.i_denom;
-                                return {matrices,descripcionTabulado};
-                            }).then(function(matricesYDescripcion){
-                                var matrices=matricesYDescripcion.matrices;
-                                var descripcion=matricesYDescripcion.descripcionTabulado;
-                                var toCellColumnHeaderPrevious = tabulator.toCellColumnHeader;
-                                function calcularAnniosOcultables(attrs, varValue){
-                                    if(descripcion.annios_ocultables){
-                                        if(varValue && varValue.annio){
-                                            if(varValue.annio<2010 && varValue.annio % 5 !=0){
-                                                attrs['annio-ocultable']='si';
-                                                contieneAnnioOcultable=true;
+
+                            return Promise.resolve().then(function(){
+                                return be.traeInfoMatrix(client,indicador).then(function(infoParaTabulado){
+                                    var descripcionTabulado={};
+                                    descripcionTabulado={
+                                        indicador:indicador,
+                                        camposCortantes:be.defs_annio(annio).cortantes,
+                                        cortantes: fila.cortantes,
+                                        annioCortante:annio?annio:'TRUE',
+                                        cuadro:fila.cuadro,
+                                        grafico:fila.grafico,
+                                        tipo_grafico:fila.tipo_grafico,
+                                        orientacion:fila.orientacion,
+                                        apilado:fila.apilado,
+                                        i_denom:infoParaTabulado.i_denom,
+                                        nota_pie:infoParaTabulado.con_nota?infoParaTabulado.nota_pie:null,
+                                        fuente:infoParaTabulado.f_denom,
+                                        um_denominacion:infoParaTabulado.u_denom,
+                                        um:infoParaTabulado.um,
+                                        decimales:infoParaTabulado.decimales,
+                                        fte:infoParaTabulado.fte,
+                                        graf_ult_annios:infoParaTabulado.graf_ult_annios,
+                                        graf_cada_cinco:infoParaTabulado.graf_cada_cinco,
+                                        annios_ocultables:infoParaTabulado.annios_ocultables,
+                                    };
+                                    matrices.matrixTab.caption=infoParaTabulado.i_denom;
+                                    matrices.matrixGraf.caption=infoParaTabulado.i_denom;
+                                    return {matrices,descripcionTabulado};
+                                }).then(function(matricesYDescripcion){
+                                    var matrices=matricesYDescripcion.matrices;
+                                    var descripcion=matricesYDescripcion.descripcionTabulado;
+                                    var toCellColumnHeaderPrevious = tabulator.toCellColumnHeader;
+                                    function calcularAnniosOcultables(attrs, varValue){
+                                        if(descripcion.annios_ocultables){
+                                            if(varValue && varValue.annio){
+                                                if(varValue.annio<2010 && varValue.annio % 5 !=0){
+                                                    attrs['annio-ocultable']='si';
+                                                    contieneAnnioOcultable=true;
+                                                }
                                             }
                                         }
                                     }
-                                }
-                                tabulator.toCellColumnHeader=function (titleCellAttrs, varName, labelValue, varValue){
-                                    calcularAnniosOcultables(titleCellAttrs, {[varName]:varValue})
-                                    var th = toCellColumnHeaderPrevious.apply(this, arguments);
-                                    return th;
-                                }
-                                tabulator.toCellTable=function(cell, varValues){
-                                    var attrs={class:'tabulator-cell'};
-                                    calcularAnniosOcultables(attrs, varValues)
-                                    var cellValor=(cell && cell.valor)?cellValor=be.decimalesYComa(cell.valor,descripcion.decimales,','):(cell?cell.valor:cell)
-                                    return html.td(attrs,[
-                                        html.div({id:'valor-cv'},[
-                                            html.div({id:'valor-en-tabulado'},cell?be.puntosEnMiles(cellValor):'///'),
-                                            html.div({id:'cv-en-tabulado'},(cell && cell.cv)?cell.cv:null)
+                                    tabulator.toCellColumnHeader=function (titleCellAttrs, varName, labelValue, varValue){
+                                        calcularAnniosOcultables(titleCellAttrs, {[varName]:varValue})
+                                        var th = toCellColumnHeaderPrevious.apply(this, arguments);
+                                        return th;
+                                    }
+                                    tabulator.toCellTable=function(cell, varValues){
+                                        var attrs={class:'tabulator-cell'};
+                                        calcularAnniosOcultables(attrs, varValues)
+                                        var cellValor=(cell && cell.valor)?cellValor=be.decimalesYComa(cell.valor,descripcion.decimales,','):(cell?cell.valor:cell)
+                                        return html.td(attrs,[
+                                            html.div({id:'valor-cv'},[
+                                                html.div({id:'valor-en-tabulado'},cell?be.puntosEnMiles(cellValor):'///'),
+                                                html.div({id:'cv-en-tabulado'},(cell && cell.cv)?cell.cv:null)
+                                            ])
+                                        ]);
+                                    };
+                                    var tabuladoHtml=tabulator.toHtmlTable(matrices.matrixTab)
+                                    return {tabuladoHtml,descripcionTabulado:descripcion, matrix:matrices.matrixGraf};
+                                })
+                            }).then(function(tabuladoDescripcionMatriz){
+                                var tabuladoHtmlYDescripcion=result;
+                                var tabuladoHtml=tabuladoDescripcionMatriz.tabuladoHtml;
+                                var descripcion=tabuladoDescripcionMatriz.descripcionTabulado;
+                                var matrix=tabuladoDescripcionMatriz.matrix;
+                                var trCortantes=cortantesPosibles.map(function(cortanteAElegir){
+                                    var denominaciones=cortanteAElegir.denom_tab.split('|');
+                                    var href=''+absolutePath+''+urlYClasesTabulados+'-indicador?'+(annio?'annio='+annio+'&':'')+'indicador='+indicador+'&cortante='+JSON.stringify(cortanteAElegir.cortantes)
+                                    return html.tr({class:'tr-cortante-posible','esta-habilitado':cortanteAElegir.habilitado?'si':'no'},[
+                                        html.td({class:'td-cortante-posible', 'menu-item-selected':JSON.stringify(cortanteAElegir.cortantes)==cortante},[
+                                            html.a({class:'a-cortante-posible',href:href},denominaciones.join('-'))
                                         ])
                                     ]);
-                                };
-                                var tabuladoHtml=tabulator.toHtmlTable(matrices.matrixTab)
-                                return {tabuladoHtml,descripcionTabulado:descripcion, matrix:matrices.matrixGraf};
-                            })
-                        }).then(function(tabuladoDescripcionMatriz){
-                            var tabuladoHtmlYDescripcion=result;
-                            var tabuladoHtml=tabuladoDescripcionMatriz.tabuladoHtml;
-                            var descripcion=tabuladoDescripcionMatriz.descripcionTabulado;
-                            var matrix=tabuladoDescripcionMatriz.matrix;
-                            var trCortantes=cortantesPosibles.map(function(cortanteAElegir){
-                                var denominaciones=cortanteAElegir.denom_tab.split('|');
-                                var href=''+absolutePath+''+urlYClasesTabulados+'-indicador?'+(annio?'annio='+annio+'&':'')+'indicador='+indicador+'&cortante='+JSON.stringify(cortanteAElegir.cortantes)
-                                return html.tr({class:'tr-cortante-posible','esta-habilitado':cortanteAElegir.habilitado?'si':'no'},[
-                                    html.td({class:'td-cortante-posible', 'menu-item-selected':JSON.stringify(cortanteAElegir.cortantes)==cortante},[
-                                        html.a({class:'a-cortante-posible',href:href},denominaciones.join('-'))
-                                    ])
-                                ]);
-                            });
-                            var annios={};
-                            var anniosA=[];
-                            var anniosLinks=[];
-                            descripcion.usuario=req.user?req.user.usu_usu:{};
-                            descripcion.habilitar=!fila.habilitado;
-                            descripcion.cortante_orig=fila.cortante_orig;
-                            var validationButton=html.button({id:'validacion-tabulado',type:'button','more-info':JSON.stringify(descripcion)},'Validar tabulado')
-                            var habilitationButton=html.button({id:'habilitacion-tabulado',type:'button','more-info':JSON.stringify(descripcion)}/*,bb*/);
-                            return be.anniosCortantes(client,annios,anniosA,indicador).then(function(){
-                                anniosLinks=anniosA.map(function(annioAElegir){
-                                    var href=''+absolutePath+''+urlYClasesTabulados+'-indicador?annio='+annioAElegir+'&indicador='+indicador+
-                                    '&cortante='+cortante;
-                                    return html.span([
-                                        html.a({class:'annio-cortante-posible',href:href,'menu-item-selected':annioAElegir==annio},annioAElegir),
-                                    ]);
-                                }).concat(
-                                    html.span([
-                                        html.a({class:'annio-cortante-posible',href:''+absolutePath+''+urlYClasesTabulados+'-indicador?indicador='+indicador+"&cortante="+cortante,'menu-item-selected':annio?false:true},'Serie')
-                                    ])
-                                );
-                            }).then(function(){
-                                var skin=be.config['client-setup'].skin;
-                                var skinUrl=(skin?skin+'/':'');
-                                return be.encabezado(skinUrl,false,req,client).then(function(encabezadoHtml){
-                                    var pantalla=html.div({id:'total-layout','menu-type':'hidden'},[
-                                        encabezadoHtml,
-                                        html.div({class:'annios-links-container',id:'annios-links'},[
-                                            html.div({id:'barra-annios'},anniosLinks),
-                                            html.div({id:'link-signos-convencionales'},[html.a({id:'signos_convencionales-link',href:''+absolutePath+'principal-signos_convencionales'},'Signos convencionales')]),
-                                            html.div({class:'float-clear'})
-                                        ]),
-                                        html.table({class:'tabla-links-tabulado-grafico'},[
-                                            html.tr({class:'tr-links-tabulado-grafico'},[
-                                                html.td({class:'td-links'},[
-                                                    html.div({class:'div-pantallas',id:'div-pantalla-izquierda'},[
-                                                        html.h2('Tabulados'),
-                                                        html.table({id:'tabla-izquierda'},trCortantes)
+                                });
+                                var annios={};
+                                var anniosA=[];
+                                var anniosLinks=[];
+                                descripcion.usuario=req.user?req.user.usu_usu:{};
+                                descripcion.habilitar=!fila.habilitado;
+                                descripcion.cortante_orig=fila.cortante_orig;
+                                var validationButton=html.button({id:'validacion-tabulado',type:'button','more-info':JSON.stringify(descripcion)},'Validar tabulado')
+                                var habilitationButton=html.button({id:'habilitacion-tabulado',type:'button','more-info':JSON.stringify(descripcion)}/*,bb*/);
+                                return be.anniosCortantes(client,annios,anniosA,indicador).then(function(){
+                                    anniosLinks=anniosA.map(function(annioAElegir){
+                                        var href=''+absolutePath+''+urlYClasesTabulados+'-indicador?annio='+annioAElegir+'&indicador='+indicador+
+                                        '&cortante='+cortante;
+                                        return html.span([
+                                            html.a({class:'annio-cortante-posible',href:href,'menu-item-selected':annioAElegir==annio},annioAElegir),
+                                        ]);
+                                    }).concat(
+                                        html.span([
+                                            html.a({class:'annio-cortante-posible',href:''+absolutePath+''+urlYClasesTabulados+'-indicador?indicador='+indicador+"&cortante="+cortante,'menu-item-selected':annio?false:true},'Serie')
+                                        ])
+                                    );
+                                }).then(function(){
+                                    var skin=be.config['client-setup'].skin;
+                                    var skinUrl=(skin?skin+'/':'');
+                                    return be.encabezado(skinUrl,false,req,client).then(function(encabezadoHtml){
+                                        var pantalla=html.div({id:'total-layout','menu-type':'hidden'},[
+                                            encabezadoHtml,
+                                            html.div({class:'annios-links-container',id:'annios-links'},[
+                                                html.div({id:'barra-annios'},anniosLinks),
+                                                html.div({id:'link-signos-convencionales'},[html.a({id:'signos_convencionales-link',href:''+absolutePath+'principal-signos_convencionales'},'Signos convencionales')]),
+                                                html.div({class:'float-clear'})
+                                            ]),
+                                            html.table({class:'tabla-links-tabulado-grafico'},[
+                                                html.tr({class:'tr-links-tabulado-grafico'},[
+                                                    html.td({class:'td-links'},[
+                                                        html.div({class:'div-pantallas',id:'div-pantalla-izquierda'},[
+                                                            html.h2('Tabulados'),
+                                                            html.table({id:'tabla-izquierda'},trCortantes)
+                                                        ]),
                                                     ]),
-                                                ]),
-                                                html.td({class:'td-tabulado-grafico'},[
-                                                    html.div({class:'div-pantallas',id:'div-pantalla-derecha'},[
-                                                        html.h2({class:'tabulado-descripcion',id:'para-botones'},[
-                                                            html.div({class:'tabulado-descripcion-annio'},annio),
-                                                            html.div({class:'botones-tabulado-descripcion'})
-                                                        ]),
-                                                        ((fila.habilitado) || esAdmin)?html.div({
-                                                            id:'tabulado-html',
-                                                            class: tabuladoDescripcionMatriz.descripcionTabulado.tipo_grafico == 'piramide' ? 'hide-tabulado-cuadro': '',
-                                                            'para-graficador':JSON.stringify(matrix),
-                                                            'info-tabulado':JSON.stringify(descripcion)
-                                                        },[tabuladoHtml]):null,
-                                                        esAdmin?html.div([
-                                                            validationButton,
-                                                            habilitationButton
-                                                        ]):null,
-                                                        html.div({class:'tabulado-descripcion',id:'tabulado-descripcion-um'},[
-                                                            (fila.habilitado || esAdmin)?html.span({id:"tabulado-um"},"Unidad de medida: "):null,
-                                                            (fila.habilitado || esAdmin)?html.span({id:"tabulado-um-descripcion"},descripcion.um_denominacion):null
-                                                        ]),
-                                                        html.div({class:'tabulado-descripcion',id:'tabulado-descripcion-nota'},[
-                                                            ((fila.habilitado || esAdmin)&&descripcion.nota_pie)?html.span({id:"nota-porcentaje-label"},'Nota: '):null,
-                                                            ((fila.habilitado || esAdmin)&&descripcion.nota_pie)?html.span({id:"nota-porcentaje"},descripcion.nota_pie):null,
-                                                        ]),
-                                                        html.div({class:'tabulado-descripcion',id:'tabulado-descripcion-fuente'},[
-                                                            (fila.habilitado || esAdmin)?html.span({id:"tabulado-fuente"},'Fuente: '):null,
-                                                            (fila.habilitado || esAdmin)?html.span({id:"tabulado-fuente-descripcion"},descripcion.fuente):null,
-                                                        ]),
-                                                        (contieneAnnioOcultable?
-                                                            html.div({class:'aclaracion-annios-ocultos'},[
-                                                                html.span({class:'nota'},"Nota: "),
-                                                                " se muestran los datos correspondientes a los años terminados en 0 y 5 y, con correlatividad anual, desde 2010 en adelante ",
-                                                                html.a({href:"#ver-todo"}, "(ver todos)")
-                                                            ])
-                                                        :null)
+                                                    html.td({class:'td-tabulado-grafico'},[
+                                                        html.div({class:'div-pantallas',id:'div-pantalla-derecha'},[
+                                                            html.h2({class:'tabulado-descripcion',id:'para-botones'},[
+                                                                html.div({class:'tabulado-descripcion-annio'},annio),
+                                                                html.div({class:'botones-tabulado-descripcion'})
+                                                            ]),
+                                                            ((fila.habilitado) || esAdmin)?html.div({
+                                                                id:'tabulado-html',
+                                                                class: tabuladoDescripcionMatriz.descripcionTabulado.tipo_grafico == 'piramide' ? 'hide-tabulado-cuadro': '',
+                                                                'para-graficador':JSON.stringify(matrix),
+                                                                'info-tabulado':JSON.stringify(descripcion)
+                                                            },[tabuladoHtml]):null,
+                                                            esAdmin?html.div([
+                                                                validationButton,
+                                                                habilitationButton
+                                                            ]):null,
+                                                            html.div({class:'tabulado-descripcion',id:'tabulado-descripcion-um'},[
+                                                                (fila.habilitado || esAdmin)?html.span({id:"tabulado-um"},"Unidad de medida: "):null,
+                                                                (fila.habilitado || esAdmin)?html.span({id:"tabulado-um-descripcion"},descripcion.um_denominacion):null
+                                                            ]),
+                                                            html.div({class:'tabulado-descripcion',id:'tabulado-descripcion-nota'},[
+                                                                ((fila.habilitado || esAdmin)&&descripcion.nota_pie)?html.span({id:"nota-porcentaje-label"},'Nota: '):null,
+                                                                ((fila.habilitado || esAdmin)&&descripcion.nota_pie)?html.span({id:"nota-porcentaje"},descripcion.nota_pie):null,
+                                                            ]),
+                                                            html.div({class:'tabulado-descripcion',id:'tabulado-descripcion-fuente'},[
+                                                                (fila.habilitado || esAdmin)?html.span({id:"tabulado-fuente"},'Fuente: '):null,
+                                                                (fila.habilitado || esAdmin)?html.span({id:"tabulado-fuente-descripcion"},descripcion.fuente):null,
+                                                            ]),
+                                                            (contieneAnnioOcultable?
+                                                                html.div({class:'aclaracion-annios-ocultos'},[
+                                                                    html.span({class:'nota'},"Nota: "),
+                                                                    " se muestran los datos correspondientes a los años terminados en 0 y 5 y, con correlatividad anual, desde 2010 en adelante ",
+                                                                    html.a({href:"#ver-todo"}, "(ver todos)")
+                                                                ])
+                                                            :null)
+                                                        ])
                                                     ])
                                                 ])
                                             ])
-                                        ])
-                                    ]);
-                                    var pagina=html.html([
-                                        be.headSigba(false,req,descripcion.i_denom),
-                                        html.body({"que-pantalla": 'indicador'},[pantalla,be.foot(skinUrl)])
-                                    ]);
-                                    res.send(pagina.toHtmlText({pretty:true}));
-                                    res.end();
+                                        ]);
+                                        var pagina=html.html([
+                                            be.headSigba(false,req,descripcion.i_denom),
+                                            html.body({"que-pantalla": 'indicador'},[pantalla,be.foot(skinUrl)])
+                                        ]);
+                                        res.send(pagina.toHtmlText({pretty:true}));
+                                        res.end();
+                                    })
                                 })
                             })
-                        })
+
+                        });
                     });
                 });
             }).catch(MiniTools.serveErr(req,res)).then(function(){
