@@ -321,7 +321,7 @@ function buildHiddenInputUrl() {
     insertNewButton(inputUrl);
 }
 
-function buildCopyUrlButton() {
+function buildCopyInputButton() {
     var copyUrlButton = buildDefaultButton(copyUrlFunc);
     copyUrlButton.src = 'img/copiarlink.png';
     insertNewButton(copyUrlButton);
@@ -357,9 +357,9 @@ function exportChart() {
     window.Graphicator.downloadCharts();
 }
 
-function insertCopyUrlButton() {
+function buildCopyUrlButton() {
     buildHiddenInputUrl();
-    buildCopyUrlButton();
+    buildCopyInputButton();
 }
 
 function refreshChartsRender(){
@@ -386,7 +386,8 @@ window.addEventListener('load', function () {
             window.console.error('No es posible graficar el tabulado. ' + error);
         }
         buildExportExcelButton();
-        insertCopyUrlButton();
+        buildCopyUrlButton();
+        //buildExportChartButton();//habilitar para ver el 4to boton (exportar img)
     }
     //le hago un load para que c3 acomode algunas cosas visuales como los labels
     refreshChartsRender();
