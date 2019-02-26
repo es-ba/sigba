@@ -54,7 +54,7 @@ function generateChart(elementWithMatrix, svgWidth) {
         }
     }
     var minZYValue = Number.MAX_VALUE;
-    var maxZYValue = Number.MIN_VALUE;
+    var maxZYValue = - Number.MAX_VALUE;
     zMatrices.forEach(function (zMatrix) {
         //si es apilado dejo la matrix con los totales para calcular el max, sino curo la matrix
         var mtx = (tabuladoInfo.apilado || tabuladoInfo.tipo_grafico == 'piramide') ? zMatrix : curarMatrix(zMatrix);
@@ -116,8 +116,8 @@ function generateChart(elementWithMatrix, svgWidth) {
                     axis: {
                         y: {
                             // si es porcentaje min = 0
-                            min: 0,//maxZYValue==100? 0: Math.trunc(minZYValue),
-                            max: maxZYValue
+                            min: Math.min(0, minZYValue), //maxZYValue==100? 0: Math.trunc(minZYValue),
+                            max: Math.max(maxZYValue,0)
                         }
                     }
                 }
