@@ -82,7 +82,7 @@ function generateChart(elementWithMatrix, svgWidth) {
                     y: {
                         //siempre la misma escala para distintos graficos de variable z
                         min: minZYValue,
-                        max: maxZYValue
+                        max: maxZYValue 
                     },
                 }
             }

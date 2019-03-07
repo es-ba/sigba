@@ -737,6 +737,20 @@ class AppSIGBA extends backend.AppBackend{
             }).catch(MiniTools.serveErr(req,res));
         });
     }
+    servirListaIndicadores(req, res, funEntregarDatos){
+        var be = this;
+        return be.inDbClient(req, function(client){
+            var queryStr=`select d.dimension, i.indicador, i.denominacion , i.variable_principal, i.fte, i.um, i.universo, i.def_con, 
+              i.def_ope, i.cob, i.desagregaciones, i.uso_alc_lim, i.decimales, i.con_nota_pie, i.ods, i.especial_principal, i.denominacion_principal,
+              i.corte_principal, i.valor_principal, i.annios_ocultables, d.denominacion
+            from indicadores i left join dimension d using (dimension)
+            `
+            return client.query(queryStr).fetchAll().then(function(result){
+                var listaInd=result.rows;
+                return funEntregarDatos(res,listaInd)
+            })
+        })
+    }
     addSchrödingerServices(mainApp, baseUrl){
         var be = this;
         mainApp.use(baseUrl+'/',function(req, res, next) {
@@ -755,10 +769,13 @@ class AppSIGBA extends backend.AppBackend{
                 res.send({ok:false, version, error:'version incorrecta de la API'});
                 res.end()
             }
-            be.servirTabuladoEspecifico(req,res, function funEntregarDatos(res, matrices){
-                res.send({ok:true, version, datos:matrices.datum})
-                res.end()
-            })
+            //switch(req.traer)
+            //    case 'tabulado':
+            //        be.servirTabuladoEspecifico(req,res, function funEntregarDatos(res, matrices){
+            //            res.send({ok:true, version, datos:matrices.datum})
+            //            res.end()
+            //        })
+            //        
         });
         mainApp.get(baseUrl+'/'+urlYClasesTabulados+'-indicador', function(req,res){
             be.servirTabuladoEspecifico(req,res, function funEntregarDatos(res,matrices, client, indicador, annio, fila, result, cortantesPosibles, cortante, esAdmin){
@@ -1130,6 +1147,17 @@ class AppSIGBA extends backend.AppBackend{
                     client.done();
                 }
             });
+        });
+        mainApp.get(baseUrl+'/api_provisorio_test', function(req,res){
+            var version=req.query.version;
+            if(version!='0.1'){
+                res.send({ok:false, version, error:'version incorrecta de la API'});
+                res.end()
+            }
+            be.servirListaIndicadores(req,res, function funEntregarDatos(res, listaIndicadores){
+                res.send({ok:true, version, datos:listaIndicadores})
+                res.end()
+            })
         });
         mainApp.get(baseUrl+'/principal', function(req,res){
             var annios={};
