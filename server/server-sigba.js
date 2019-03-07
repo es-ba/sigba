@@ -24,7 +24,7 @@ var FILASXGRAFICO=6;
 var COLSPANRELLENO=9;
 
 
-var changing = require('best-globals').changing;
+var {changing, spec} = require('best-globals');
 var coalesce = require('best-globals').coalesce;
 var backend = require("backend-plus");
 var MiniTools = require("mini-tools");
@@ -740,15 +740,16 @@ class AppSIGBA extends backend.AppBackend{
     servirIndicadores(req, res, funEntregarDatos){
         var be = this;
         return be.inDbClient(req, function(client){
-            var queryStr=`select d.dimension, i.indicador, i.denominacion , i.variable_principal, i.fte, i.um, i.universo, i.def_con, 
-            i.def_ope, i.cob, i.desagregaciones, i.uso_alc_lim, i.decimales, i.con_nota_pie, i.ods, i.especial_principal, i.denominacion_principal,
-            i.corte_principal, i.valor_principal, i.annios_ocultables, u.um, u.denominacion, u.descripcion, u.nota_pie, f.fte, f.denominacion, f.descripcion,
-            f.graf_ult_annios,f.graf_cada_cinco, d.denominacion, d.agrupacion_principal, ap.denominacion,
-            tab.tabulados
-            from indicadores i left join dimension d using (dimension) left join agrupacion_principal ap using(agrupacion_principal) 
-            left join fte f using (fte) left join um u using (um) 
-            left join (select indicador, string_agg(t.cortantes::text,',') tabulados from indicadores i left join tabulados t using(indicador) where t.invalido =false and t.habilitado=true group by indicador) tab on tab.indicador=i.indicador
-            where   i.ocultar is not false
+            var queryStr=`
+                select d.dimension, i.indicador, i.denominacion , i.variable_principal, i.fte, i.um, i.universo, i.def_con, 
+                        i.def_ope, i.cob, i.desagregaciones, i.uso_alc_lim, i.decimales, i.con_nota_pie, i.ods, i.especial_principal, i.denominacion_principal,
+                        i.corte_principal, i.valor_principal, i.annios_ocultables, u.um, u.denominacion, u.descripcion, u.nota_pie, f.fte, f.denominacion, f.descripcion,
+                        f.graf_ult_annios,f.graf_cada_cinco, d.denominacion, d.agrupacion_principal, ap.denominacion,
+                        coalesce(tab.tabulados,array[]::text[]) as tabulados
+                    from indicadores i left join dimension d using (dimension) left join agrupacion_principal ap using(agrupacion_principal) 
+                        left join fte f using (fte) left join um u using (um) 
+                        left join (select indicador,  array_agg(t.cortantes::text) as tabulados from indicadores i left join tabulados t using(indicador) where t.invalido =false and t.habilitado=true group by indicador) tab on tab.indicador=i.indicador
+                    where i.ocultar is not false
             `
             return client.query(queryStr).fetchAll().then(function(result){
                 var listaInd=result.rows;
@@ -774,16 +775,58 @@ class AppSIGBA extends backend.AppBackend{
                 res.send({ok:false, version, error:'version incorrecta de la API'});
                 res.end()
             }
-            switch (req.query.traer) {
+            var es=spec;
+            var _=spec;
+            switch(req.query.traer){
                 case 'tabulado':
-                    be.servirTabuladoEspecifico(req,res, function (res, matrices){
-                        res.send({ok:true, version, datos:matrices.datum})
+                    be.servirTabuladoEspecifico(req,res, function funEntregarDatos(res, matrices){
+                        var result=
+                        es("el conjunto de datos correspondientes a un indicador",{
+                            ok:es("true ó false según el éxito del pedido"),
+                            version:es("el nombre de la versión de la API"),
+                            datos:es("la respuesta de la API a traer=tabulado",{
+                                vars:es.indexedObject("con las variables que cortan el tabulado",{
+                                    name:es("el nombre de la variable que se usa internamente"),
+                                    label:es("el nombre de la variable que debe mostrarse al usuario"),
+                                    values:es.indexedObject("con los valores posibles que puede contener la variable en el tabulado",{
+                                        label:es("la etiqueta del valor que debe ver el usuario")
+                                    })
+                                }),
+                                list:es.array("es el conjunto de datos que conforma el tabulado",
+                                    es.exclude("celda del tabulado, con las variables mencionadas en vars y el value",{cv:true})
+                                )
+                            })
+                        })({ok:true, version, datos:matrices.datum});
+                        res.send(result);
                         res.end()
-                    })
-                    break;
+                    });
+                break;
                 case 'principal':
                     be.servirIndicadores(req,res, function (res, indicadores){
-                        res.send({ok:true, version, datos:indicadores})
+                        var result=
+                        es("la información general sobre cada uno de los indicadores del sistema de indicadores y sus posibles tabulados",{
+                            ok:es("true ó false según el éxito del pedido"),
+                            version:es("el nombre de la versión de la API"),
+                            datos:es("la respuesta de la API a traer=principal",{
+                                indicadores:es.array("cada uno de los indicadores",es({
+                                    "dimension":_,
+                                    "indicador":es("código interno del indicador dentro del sistema"),
+                                    "denominacion":es("denominación del indicador (nombre a desplegar al usuario)"),
+                                    "fte":es("la fuente"),
+                                    "um":es("la unidad de medida"),
+                                    "universo":es("el universo"),
+                                    "def_con":es("la definición conceptual"),
+                                    "def_ope":es("la definición operativa"),
+                                    "cob":es("la cobertura"),
+                                    "desagregaciones":es("la desagregación"),
+                                    "uso_alc_lim":es("el uso, el alcance y sus limitaciones"),
+                                    "ods":es("la indicación de si forma parte de los ODS"),
+                                    "tabulados":es.array("la lista de los tabulados disponibles para el indicador",_)
+                                }))
+                            })
+                        })
+                        ({ok:true, version, datos:{indicadores}});
+                        res.send(result)
                         res.end()
                     })
                     break;
