@@ -737,13 +737,18 @@ class AppSIGBA extends backend.AppBackend{
             }).catch(MiniTools.serveErr(req,res));
         });
     }
-    servirListaIndicadores(req, res, funEntregarDatos){
+    servirIndicadores(req, res, funEntregarDatos){
         var be = this;
         return be.inDbClient(req, function(client){
             var queryStr=`select d.dimension, i.indicador, i.denominacion , i.variable_principal, i.fte, i.um, i.universo, i.def_con, 
-              i.def_ope, i.cob, i.desagregaciones, i.uso_alc_lim, i.decimales, i.con_nota_pie, i.ods, i.especial_principal, i.denominacion_principal,
-              i.corte_principal, i.valor_principal, i.annios_ocultables, d.denominacion
-            from indicadores i left join dimension d using (dimension)
+            i.def_ope, i.cob, i.desagregaciones, i.uso_alc_lim, i.decimales, i.con_nota_pie, i.ods, i.especial_principal, i.denominacion_principal,
+            i.corte_principal, i.valor_principal, i.annios_ocultables, u.um, u.denominacion, u.descripcion, u.nota_pie, f.fte, f.denominacion, f.descripcion,
+            f.graf_ult_annios,f.graf_cada_cinco, d.denominacion, d.agrupacion_principal, ap.denominacion,
+            tab.tabulados
+            from indicadores i left join dimension d using (dimension) left join agrupacion_principal ap using(agrupacion_principal) 
+            left join fte f using (fte) left join um u using (um) 
+            left join (select indicador, string_agg(t.cortantes::text,',') tabulados from indicadores i left join tabulados t using(indicador) where t.invalido =false and t.habilitado=true group by indicador) tab on tab.indicador=i.indicador
+            where   i.ocultar is not false
             `
             return client.query(queryStr).fetchAll().then(function(result){
                 var listaInd=result.rows;
@@ -769,13 +774,24 @@ class AppSIGBA extends backend.AppBackend{
                 res.send({ok:false, version, error:'version incorrecta de la API'});
                 res.end()
             }
-            //switch(req.traer)
-            //    case 'tabulado':
-            //        be.servirTabuladoEspecifico(req,res, function funEntregarDatos(res, matrices){
-            //            res.send({ok:true, version, datos:matrices.datum})
-            //            res.end()
-            //        })
-            //        
+            switch (req.query.traer) {
+                case 'tabulado':
+                    be.servirTabuladoEspecifico(req,res, function (res, matrices){
+                        res.send({ok:true, version, datos:matrices.datum})
+                        res.end()
+                    })
+                    break;
+                case 'principal':
+                    be.servirIndicadores(req,res, function (res, indicadores){
+                        res.send({ok:true, version, datos:indicadores})
+                        res.end()
+                    })
+                    break;
+                default:
+                    res.send({ok:false, error:'valor del campo traer no válido'})
+                    res.end();
+                    break;
+            }       
         });
         mainApp.get(baseUrl+'/'+urlYClasesTabulados+'-indicador', function(req,res){
             be.servirTabuladoEspecifico(req,res, function funEntregarDatos(res,matrices, client, indicador, annio, fila, result, cortantesPosibles, cortante, esAdmin){
@@ -1148,17 +1164,17 @@ class AppSIGBA extends backend.AppBackend{
                 }
             });
         });
-        mainApp.get(baseUrl+'/api_provisorio_test', function(req,res){
-            var version=req.query.version;
-            if(version!='0.1'){
-                res.send({ok:false, version, error:'version incorrecta de la API'});
-                res.end()
-            }
-            be.servirListaIndicadores(req,res, function funEntregarDatos(res, listaIndicadores){
-                res.send({ok:true, version, datos:listaIndicadores})
-                res.end()
-            })
-        });
+        // mainApp.get(baseUrl+'/api_provisorio_test', function(req,res){
+        //     var version=req.query.version;
+        //     if(version!='0.1'){
+        //         res.send({ok:false, version, error:'version incorrecta de la API'});
+        //         res.end()
+        //     }
+        //     be.servirIndicadores(req,res, function funEntregarDatos(res, listaIndicadores){
+        //         res.send({ok:true, version, datos:listaIndicadores})
+        //         res.end()
+        //     })
+        // });
         mainApp.get(baseUrl+'/principal', function(req,res){
             var annios={};
             var client;
