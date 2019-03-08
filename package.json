@@ -6,7 +6,7 @@
     "dump-db": "node server/server-sigba.js --dump-db"
   },
   "dependencies": {
-    "best-globals": "~0.10.12",
+    "best-globals": "~0.10.13",
     "backend-plus": "~0.27.24",
     "backend-skins": "~0.1.11",
     "codenautas-xlsx": "~0.11.12",

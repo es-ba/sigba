@@ -24,8 +24,7 @@ var FILASXGRAFICO=6;
 var COLSPANRELLENO=9;
 
 
-var {changing, spec} = require('best-globals');
-var coalesce = require('best-globals').coalesce;
+var {changing, spec, sameValues} = require('best-globals');
 var backend = require("backend-plus");
 var MiniTools = require("mini-tools");
 var jsToHtml=require('js-to-html');
@@ -728,7 +727,7 @@ class AppSIGBA extends backend.AppBackend{
                     var cortante = !req.query.cortante?JSON.stringify(cortantesPosibles[0].cortantes):req.query.cortante;
                     // tabulado que se va as mostrar
                     var fila = cortantesPosibles.filter(function(tabulado){
-                        return JSON.stringify(tabulado.cortantes) == cortante; 
+                        return sameValues(tabulado.cortantes, JSON.parse(cortante)); 
                     })[0];
                     return be.armaMatrices(client, fila, annio, indicador).then(function(matrices){
                         return funEntregarDatos(res, matrices, client, indicador, annio, fila, result, cortantesPosibles, cortante, esAdmin);
@@ -820,8 +819,8 @@ class AppSIGBA extends backend.AppBackend{
                                     "cob":es("la cobertura"),
                                     "desagregaciones":es("la desagregación"),
                                     "uso_alc_lim":es("el uso, el alcance y sus limitaciones"),
-                                    "ods":es("la indicación de si forma parte de los ODS"),
-                                    "tabulados":es.array("la lista de los tabulados disponibles para el indicador",_)
+                                    // "ods":es("la indicación de si forma parte de los ODS"),
+                                    "tabulados":_ // es.array("la lista de los tabulados disponibles para el indicador",_)
                                 }))
                             })
                         })
