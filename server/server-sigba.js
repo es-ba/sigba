@@ -113,7 +113,7 @@ class AppSIGBA extends backend.AppBackend{
                     ).fetchOneRowIfExists().then(function(resultCortantes){
                         result=resultCortantes;
                         return client.query(`
-                        SELECT i.dimension,i.indicador,i.denominacion,i.def_con,i.def_ope,i.cob,i.desagregaciones,i.uso_alc_lim,i.universo,i.metas,f.denominacion fte,u.denominacion um
+                        SELECT i.dimension,i.indicador,i.denominacion,i.def_con,i.def_ope,i.cob,i.desagregaciones,i.uso_alc_lim,i.universo,i.metas,f.denominacion fte,u.denominacion um,i.nuevo
                             FROM indicadores i LEFT JOIN fte f ON i.fte=f.fte LEFT JOIN um u ON u.um=i.um
                             WHERE i.indicador=$1
                             ORDER BY i.indicador,i.dimension
@@ -126,6 +126,9 @@ class AppSIGBA extends backend.AppBackend{
                             defTables[0].camposAMostrar.map(function(nombreCampo,i){
                                 var id=registro[defTables[0].campoId];
                                 var attributes={colspan:i?1:defTables.length+1+(defTables[0].tabla=='indicadores'?0:6),class:'campo_'+nombreCampo};
+                                if(registro.nuevo){
+                                    attributes["nuevo-registro"]='nuevo';
+                                }
                                 if(registro.indicador ){
                                     attributes.id=id;
                                     if(registro.def_con){
@@ -819,7 +822,7 @@ class AppSIGBA extends backend.AppBackend{
                                     "cob":es("la cobertura"),
                                     "desagregaciones":es("la desagregación"),
                                     "uso_alc_lim":es("el uso, el alcance y sus limitaciones"),
-                                    // "ods":es("la indicación de si forma parte de los ODS"),
+                                    "ods":es("la indicación de si forma parte de los ODS"),
                                     "tabulados":_ // es.array("la lista de los tabulados disponibles para el indicador",_)
                                 }))
                             })
