@@ -164,13 +164,13 @@ $BODY$
   LANGUAGE plpgsql IMMUTABLE
   COST 100;
 
-CREATE TABLE totales_calculados(
-  indicador text NOT NULL,
-  cortante jsonb,
-  corte jsonb,
-  valor_sum text,
-  CONSTRAINT totales_calculados_pkey PRIMARY KEY (indicador, corte)
-);
+--CREATE TABLE totales_calculados(
+--  indicador text NOT NULL,
+--  cortante jsonb,
+--  corte jsonb,
+--  valor_sum text,
+--  CONSTRAINT totales_calculados_pkey PRIMARY KEY (indicador, corte)
+--);
 
 --grant select on "totales_calculados" to "sigba_user";
 
