@@ -99,7 +99,7 @@ class AppSIGBA extends backend.AppBackend{
                         color=registro.agrupacion_principal;
                 }
                 var whereHija=(defTables[0].joinSiguiente||[]).map(function(nombreCampo){
-                    return be.db.quoteIdent(nombreCampo)+" = "+be.db.quoteText(registro[nombreCampo]);
+                    return be.db.quoteIdent(nombreCampo)+" = "+be.db.quoteLiteral(registro[nombreCampo]);
                 }).join(" and ").concat((defTables[0].condicion)?' and '+defTables[0].condicion:'');
                 return be.reporteBonito(client, defTables.slice(1), annios, whereHija,color,controles).then(function(listaTrHijos){
                     var listaTd;
