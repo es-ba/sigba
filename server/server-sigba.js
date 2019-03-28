@@ -511,7 +511,7 @@ class AppSIGBA extends backend.AppBackend{
         var sql = "SELECT distinct valor_corte annio FROM cortes_celdas "+
             "WHERE variable = 'annio'"+ (indicador?" and indicador = $1": "")+
             "ORDER BY annio desc";
-        return client.query(sql,indicador?[indicador]:[]).then(function(result){
+        return client.query(sql,indicador?[indicador]:[]).fetchAll().then(function(result){
             result.rows.forEach(function(row,i){
                 annios[row.annio]=i;
                 anniosA.push(row.annio);

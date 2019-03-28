@@ -12,6 +12,9 @@ module.exports = function(context){
             
             {name:'valor'          ,               label:'Valor'                                 , typeName:'decimal'},
             {name:'valor_esp'          ,           label:'Valor especial'                        , typeName:'text'   },
+            {name:'cv'                 ,           label:'coeficiente de variación'              , typeName:'text'   },
+            {name:'num'                ,           label:'Numerador'                             , typeName:'text'   },
+            {name:'dem'                ,           label:'Denominador'                           , typeName:'text'   },
             {name:'cortes'         ,isSlicer:true, label:'Cortes'                                , typeName:'jsonb', nullable:true, allow:{select: true,insert:false, update:false}},
             {name:'cortantes'      ,isSlicer:true, label:'Cortantes'                             , typeName:'jsonb'    , allow:{select: true,insert:false, update:false}},
             {name:'usu_validacion'                                                               , typeName:'text'     , allow:{select: true,insert:false, update:false}},
