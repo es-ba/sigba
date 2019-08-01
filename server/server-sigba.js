@@ -30,7 +30,6 @@ var MiniTools = require("mini-tools");
 var jsToHtml=require('js-to-html');
 var html=jsToHtml.html;
 var Tabulator = require('tabulator');//.Tabulator;
-var tabulator = new Tabulator();
 var likeAr = require('like-ar');
 var fs=require('fs');
 
@@ -446,6 +445,7 @@ class AppSIGBA extends backend.AppBackend{
         })
     }
     armaMatrices(client, fila,annio,indicador){
+        var tabulator = new Tabulator();
         var be = this;
         return Promise.resolve().then(function(){
             var tab={
@@ -472,10 +472,6 @@ class AppSIGBA extends backend.AppBackend{
             })
         })
     }
-    
-    
-    
-    
     traeInfoMatrix(client,indicador){
         return client.query(
             "SELECT i.denominacion as i_denom ,i.con_nota_pie con_nota,f.fte as fte, f.denominacion as f_denom,f.graf_ult_annios as graf_ult_annios, "
@@ -839,6 +835,7 @@ class AppSIGBA extends backend.AppBackend{
             }       
         });
         mainApp.get(baseUrl+'/'+urlYClasesTabulados+'-indicador', function(req,res){
+            var tabulator = new Tabulator();
             be.servirTabuladoEspecifico(req,res, function funEntregarDatos(res,matrices, client, indicador, annio, fila, result, cortantesPosibles, cortante, esAdmin){
                 var contieneAnnioOcultable=false;
                 return Promise.resolve().then(function(){
