@@ -657,12 +657,13 @@ h2
   line-height 17px
   float left
   position relative
-  overflow-y scroll
+  overflow-y auto
   padding-right 16px
-  background-image url('../confort/img/continua.png')
-  background-position right bottom
-  background-repeat no-repeat
-  background-size 12px
+  &[con-flecha-continua]
+    background-image url('../confort/img/continua.png')
+    background-position right bottom
+    background-repeat no-repeat
+    background-size 12px
 
 #logo-estadistica
   margin-top 5px
@@ -682,7 +683,7 @@ h2
 #img-logo
   margin-top 5px
   margin-left 15px
-  width 220px
+  height 107px
   padding 10px
   float left
   position relative 
