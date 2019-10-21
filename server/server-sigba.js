@@ -1284,7 +1284,7 @@ class AppSIGBA extends backend.AppBackend{
                                     html.tr([
                                         html.th(""),
                                         html.th({class:'head-inicio',style:"text-align:left" },be.config['client-setup'].labels['agrupacion-principal']),
-                                        html.th({class:'head-inicio',style:"text-align:left" },"Dimensión"),
+                                        html.th({class:'head-inicio',style:"text-align:left" },be.config['client-setup'].labels['agrupacion-secundaria']),
                                         html.th({class:'head-inicio',style:"text-align:left" },"Indicador"),
                                         html.th({class:'head-inicio',style:"text-align:right"},""),
                                         html.th('Año'),
@@ -1536,7 +1536,7 @@ class AppSIGBA extends backend.AppBackend{
             //{menuType:'menu', name:'configuracion',  menuContent:[
                 {menuType:'menu', name:'particiones'              , label:'división temática' , menuContent:[
                     {menuType:'table', name:'agrupacion_principal', label:be.config['client-setup'].labels['agrupacion-principal'], },
-                    {menuType:'table', name:'dimension'   },
+                    {menuType:'table', name:'dimension'   , label:be.config['client-setup'].labels['agrupacion-secundaria'],},
                     {menuType:'table', name:'indicadores' },
                 ]},
                 {menuType:'menu', name:'atributos', label:'atributos de indicadores', menuContent:[

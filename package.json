@@ -1,6 +1,6 @@
 {
   "name": "sigba",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "scripts": {
     "start": "node server/server-sigba.js",
     "dump-db": "node server/server-sigba.js --dump-db"
