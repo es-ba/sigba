@@ -1,4 +1,5 @@
-server:
+module.exports = 
+`server:
   port: 3053
   base-url: /sigba
   skins:
@@ -16,7 +17,6 @@ db:
   database: sigba_db
   schema: sigba
   user: sigba_user
-  password: l39jakngk3ks
 login:
   table: usuarios
   userFieldName: usu_usu
@@ -37,7 +37,6 @@ login:
       buttonLabel: Entrar
     successRedirect: /menu
     fileStore: true
-    secret: asdfk3k3ah3393xgenero
 install:
   dump:
     db:
@@ -62,4 +61,5 @@ client-setup:
     agrupacion-secundaria: Dimensión
   logos:
   - estadistica
-
+content: []  
+`;

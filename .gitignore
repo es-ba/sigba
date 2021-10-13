@@ -36,4 +36,3 @@ local-*
 *-local.*
 sessions/
 
-package-lock.json

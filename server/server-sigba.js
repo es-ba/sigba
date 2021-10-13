@@ -31,18 +31,27 @@ var jsToHtml=require('js-to-html');
 var html=jsToHtml.html;
 var Tabulator = require('tabulator');//.Tabulator;
 var likeAr = require('like-ar');
-var fs=require('fs');
+var defConfig = require("./def-config");
+var fs=require('fs').promises;
+
+console.log('$$$$$$$$$$$$$$$$$$$$$$$$')
+console.log(defConfig)
 
 class AppSIGBA extends backend.AppBackend{
     constructor(){
         super();
     }
+    configStaticConfig(){
+        super.configStaticConfig();
+        this.setStaticConfig(defConfig);
+    }
+    /*
     configList(){
         return super.configList().concat([
-            'def-config.yaml',
             'local-config.yaml'
         ]);
     }
+    */
     log(condition, f){
         if(new Date(this.config.log[condition])>new Date()){
             console.log(f());
@@ -439,7 +448,7 @@ class AppSIGBA extends backend.AppBackend{
                     }
                 });
                 datum.list=annio?result.rows.map(function(row){delete row.annio;return row;}):result.rows;
-                datum.vars=annio?datum.vars.filter(e_var => e_var.name !=='annio'):datum.vars;//fs.writeFile('C:/compartida/datum/'+indicador+'_'+Date.now()+'_datum.json',JSON.stringify(datum),{encoding:'utf8'}) 
+                datum.vars=annio?datum.vars.filter(e_var => e_var.name !=='annio'):datum.vars;
                 datum.oneColumnTitle=(annio && cantVariablesCol==0)?annio:'';
             })
         })
@@ -1217,7 +1226,7 @@ class AppSIGBA extends backend.AppBackend{
         //         res.end()
         //     })
         // });
-        mainApp.get(baseUrl+'/principal', function(req,res){
+        mainApp.get(baseUrl+'/principal', async function(req,res){
             var annios={};
             var client;
             var categoriasPrincipalLista;
@@ -1226,6 +1235,8 @@ class AppSIGBA extends backend.AppBackend{
             var skin=be.config['client-setup'].skin;
             var skinUrl=(skin?skin+'/':'');
             
+            await be.reloadContent();
+
             return be.getDbClient(req).then(function(cli){
                 client=cli;
                 return be.cortantesPrincipal(client).then(function(cortanteEnPrincipal){
@@ -1494,7 +1505,7 @@ class AppSIGBA extends backend.AppBackend{
                 if(p_texto){
                     var textoLey=html.div({id:'texto'},p_texto)
                 }
-                var encabezadoCompletoHtml=html.div({id:'id-encabezado'},[
+                var encabezadoCompletoHtml=html.div({id:'id-encabezado'},be.content['id-encabezado'] || [
                     html.a({class:'encabezado',id:'barra-superior',href:''+absolutePath+'principal'},[
                         html.div({class:'encabezado-interno'},[
                             html.img({class:'encabezado',id:'bs-izq',src:skinUrl+'img/logo-ciudad.png'}),
@@ -1621,8 +1632,8 @@ class AppSIGBA extends backend.AppBackend{
             return true;
         })
     }
-    postConfig(){
-        super.postConfig();
+    async postConfig(){
+        await super.postConfig();
         var be=this;
         /*
         be.variablesDinamicas=[
@@ -1670,15 +1681,28 @@ class AppSIGBA extends backend.AppBackend{
         ];
         */
         var be = this;
-        return be.inDbClient({},function(client){
-           return be.releerEstructuraBaseDeDatos(client);
-        }).then(function(){
-            return be.inDbClient({},function(client){
-                return client.query(`SELECT valor_esp from celdas;`).execute();
-            })
-        }).catch(function(err){
-            console.log("*********************  AGREGAR LA COLUMN valor_esp en tablas valor y celdas********************")
+        await be.inDbClient({},async function(client){
+           await be.releerEstructuraBaseDeDatos(client);
         })
+        await be.inDbClient({},async function(client){
+            try{
+                await client.query(`SELECT valor_esp from celdas;`).execute();
+            }catch(err){
+                console.log("*********************  AGREGAR LA COLUMN valor_esp en tablas valor y celdas********************")
+                throw err;
+            }
+        });
+        await be.reloadContent();
+    }
+    async reloadContent(){
+        var be = this;
+        be.content = {}
+        await Promise.all(['id-encabezado'].map(async idContenido=>{
+            if(be.config.content[idContenido]){
+                html.insecureModeEnabled = true;
+                be.content[idContenido] = html.includeHtml(await fs.readFile('client/'+be.config.content[idContenido], 'utf8'));
+            }
+        }))
     }
     
 }

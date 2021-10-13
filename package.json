@@ -1,19 +1,19 @@
 {
   "name": "sigba",
-  "version": "1.0.3",
+  "version": "1.1.0",
   "scripts": {
     "start": "node server/server-sigba.js",
     "dump-db": "node server/server-sigba.js --dump-db"
   },
   "dependencies": {
-    "best-globals": "~0.10.15",
-    "backend-plus": "~0.29.26",
-    "backend-skins": "~0.1.11",
+    "best-globals": "~0.10.32",
+    "backend-plus": "~1.11.11",
+    "backend-skins": "~0.1.15",
     "codenautas-xlsx": "~0.11.12",
-    "file-saver": "~2.0.1",
-    "pg-triggers": "~0.2.3",
+    "file-saver": "~2.0.5",
+    "pg-triggers": "~0.3.2",
     "tabulator": "~0.2.40",
-    "type-store": "~0.2.31",
+    "type-store": "~0.2.41",
     "graphicator": "~0.29.10"
   }
 }
