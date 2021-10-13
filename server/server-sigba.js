@@ -1700,7 +1700,7 @@ class AppSIGBA extends backend.AppBackend{
         await Promise.all(['id-encabezado'].map(async idContenido=>{
             if(be.config.content[idContenido]){
                 html.insecureModeEnabled = true;
-                be.content[idContenido] = html.includeHtml(await fs.readFile('client/'+be.config.content[idContenido], 'utf8'));
+                be.content[idContenido] = html.includeHtml(await fs.readFile('unlogged/'+be.config.content[idContenido], 'utf8'));
             }
         }))
     }

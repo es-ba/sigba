@@ -13,6 +13,6 @@ window.addEventListener('load', function(){
             var actual = rotables[position];
             actual.style.opacity=1;
             anterior = actual;
-        },4000)
+        },8000)
     }
 })
