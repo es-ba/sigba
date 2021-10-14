@@ -6,14 +6,14 @@
     "dump-db": "node server/server-sigba.js --dump-db"
   },
   "dependencies": {
-    "best-globals": "~0.10.32",
-    "backend-plus": "~1.11.11",
+    "backend-plus": "~1.11.13",
     "backend-skins": "~0.1.15",
+    "best-globals": "~0.10.32",
     "codenautas-xlsx": "~0.11.12",
     "file-saver": "~2.0.5",
+    "graphicator": "~0.29.10",
     "pg-triggers": "~0.3.2",
     "tabulator": "~0.2.40",
-    "type-store": "~0.2.41",
-    "graphicator": "~0.29.10"
+    "type-store": "~0.2.41"
   }
 }
