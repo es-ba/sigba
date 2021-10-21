@@ -1,8 +1,23 @@
 .enc-rotables
   opacity 0
   transition opacity 1.5s
-#barra-inferior img
-  height 100%
-  position absolute
-  top 10px
-  left 20%
+#barra-inferior
+  display block
+  background-position center 
+  background-size auto 100% 
+  background-position repeat-x 
+  background-image url(../img/cuidadosvectores_03.jpg)
+  text-align center
+  vertical-align middle
+#barra-inferior-centro
+  position relative
+  width 1162px
+  max-width 100%
+  margin-left auto
+  margin-right auto
+  img
+    width 100%
+    &.enc-rotables
+      position absolute
+      top 0px
+      left 0

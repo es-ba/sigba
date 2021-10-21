@@ -24,12 +24,14 @@ login:
   rolFieldName: usu_rol
   infoFieldList: [usu_usu, usu_rol, usu_nombre]
   activeClausule: usu_activo
+  unloggedLandPage: false
   messages:
     userOrPassFail: el nombre de usuario no existe o la clave no corresponde
     lockedFail: el usuario se encuentra bloqueado
     inactiveFail: es usuario está marcado como inactivo
   plus:
     allowHttpLogin: true
+    noLoggedUrlPath: /principal
     loginForm:
       formTitle: entrada
       usernameLabel: Usuario

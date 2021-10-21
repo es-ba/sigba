@@ -764,6 +764,15 @@ class AppSIGBA extends backend.AppBackend{
             })
         })
     }
+    linkSignosConvencionales(absolutePath, attrs){
+        var be = this;
+        return html.div(attrs ?? {id:'link-signos-convencionales'},[
+            html.a({
+                id:'signos_convencionales-link',
+                href:''+absolutePath+(be.config.content?.["marco-conceptual"]?.path ?? 'principal-signos_convencionales')
+            },be.config.content?.["marco-conceptual"]?.name ?? 'Signos convencionales')
+        ])
+    }
     addSchrödingerServices(mainApp, baseUrl){
         var be = this;
         mainApp.use(baseUrl+'/',function(req, res, next) {
@@ -949,7 +958,7 @@ class AppSIGBA extends backend.AppBackend{
                                 encabezadoHtml,
                                 html.div({class:'annios-links-container',id:'annios-links'},[
                                     html.div({id:'barra-annios'},anniosLinks),
-                                    html.div({id:'link-signos-convencionales'},[html.a({id:'signos_convencionales-link',href:''+absolutePath+'principal-signos_convencionales'},'Signos convencionales')]),
+                                    be.linkSignosConvencionales(absolutePath),
                                     html.div({class:'float-clear'})
                                 ]),
                                 html.table({class:'tabla-links-tabulado-grafico'},[
@@ -1145,7 +1154,7 @@ class AppSIGBA extends backend.AppBackend{
                                             encabezadoHtml,
                                             html.div({class:'annios-links-container',id:'annios-links'},[
                                                 html.div({id:'barra-annios'},anniosLinks),
-                                                html.div({id:'link-signos-convencionales'},[html.a({id:'signos_convencionales-link',href:''+absolutePath+'principal-signos_convencionales'},'Signos convencionales')]),
+                                                be.linkSignosConvencionales(absolutePath),                                                
                                                 html.div({class:'float-clear'})
                                             ]),
                                             html.table({class:'tabla-links-tabulado-grafico'},[
@@ -1286,7 +1295,7 @@ class AppSIGBA extends backend.AppBackend{
                             html.div({id:'div-encabezado-titulo-tabulado',class:'titulo-tabulados'},[
                                 html.a({class:'encabezado-titulo-tabulado',href:''+absolutePath+'principal'},[
                                     html.div({id:'indicadores-titulo',class:'titulo-tabulados'},'Indicadores'),
-                                    html.div({id:'titulo-signos_convencionales',class:'titulo-tabulados'},[html.a({id:'signos_convencionales-link',href:''+absolutePath+'principal-signos_convencionales'},'Signos convencionales')]),
+                                    be.linkSignosConvencionales(absolutePath, {id:'titulo-signos_convencionales',class:'titulo-tabulados'}),                                    
                                     html.div({class:'float-clear'},"")
                                 ]),
                             ]),
