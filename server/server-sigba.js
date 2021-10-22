@@ -173,7 +173,7 @@ class AppSIGBA extends backend.AppBackend{
                                 }
                                 return html.td(attributes,[
                                     htmlIcono,
-                                    html.span({id:id, class:'ancla'},"\u00a0"),
+                                    html.span({id:id, class:'ancla'},registro.icono?"\u00a0":""),
                                     html.a(htmlA,registro.denominacion_principal?registro.denominacion_principal:registro[nombreCampo]),
                                     registro.indicador?informacionIndicador:null,
                                     registro.agrupacion_principal?informacionAgrupacionPrincipal:null
@@ -1305,7 +1305,7 @@ class AppSIGBA extends backend.AppBackend{
                                         html.th(""),
                                         html.th({class:'head-inicio',style:"text-align:left" },be.config['client-setup'].labels['agrupacion-principal']),
                                         html.th({class:'head-inicio',style:"text-align:left" },be.config['client-setup'].labels['agrupacion-secundaria']),
-                                        html.th({class:'head-inicio',style:"text-align:left" },"Indicador"),
+                                        html.th({class:['head-inicio','head-mostrar'],style:"text-align:left" },"Indicador"),
                                         html.th({class:'head-inicio',style:"text-align:right"},""),
                                         html.th('Año'),
                                         html.th('Total')
