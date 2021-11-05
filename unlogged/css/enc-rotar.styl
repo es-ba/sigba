@@ -24,17 +24,29 @@
       left 0
 #sicba-logos-izq
   position absolute
-  top 40px
-  right 55px
-#sicba-logos-izq2
-  display none
-  position absolute
-  top 40px
-  right 55px
+  top 20px
+  right 30px
+  #colaboracion
+    text-align left
+    color #EDAD4D
+  .contenedor
+    display flex
+    flex-direction row
+    img
+      margin 10px
+      max-height 50px
 
 @media (max-width: 1240px)
   #sicba-logos-izq
-    display none
-  #sicba-logos-izq2
-    display unset
+    position absolute
+    top 40px
+    right 55px
+    .contenedor
+      flex-direction column
+      img
+        text-align right
+        max-height unset
+        max-width 110px
+        margin-right 0px
+        margin-left auto
 
