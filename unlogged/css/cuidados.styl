@@ -8,9 +8,10 @@ body
   padding 0px
 
 #total-layout
-  min-width 1024px
-  max-width 2000px
-    
+  min-width unset
+  max-width unset
+  width fit-content
+   
 .tabla inicio
   background-color #fff
 
@@ -534,9 +535,22 @@ h2
   overflow visible
   position relative
   
-#id-encabezado
+#signos_convencionales-link
+  padding-right 20px
+
+#foot
+  #foot-img
+    margin-left 120px
+
+#id-encabezado, #div-encabezado-titulo-tabulado, #foot, .annios-links-container
   position sticky
-  width 100%
+  width 100vw
+  min-width 768px
+  left 0
+  right 0
+
+#foot, #id-encabezado
+  min-width 1024px
   
 #barra-superior
   display block

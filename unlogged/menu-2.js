@@ -402,7 +402,7 @@ window.addEventListener('load', function () {
     window.addEventListener('scroll', function () {
         ["id-encabezado", "div-encabezado-titulo-tabulado", "foot", "annios-links"].forEach(function (id) {
             var div = document.getElementById(id);
-            if (div) {
+            if (div && div.style.position != 'sticky') {
                 if (div.offsetLeft > window.scrollX) {
                     div.style.left = window.scrollX + 'px';
                 } else if (
