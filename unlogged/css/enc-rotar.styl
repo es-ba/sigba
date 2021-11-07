@@ -18,10 +18,30 @@
   margin-right auto
   img
     width 100%
+    &#id-img-encF
+      width unset
     &.enc-rotables
       position absolute
       top 0px
       left 0
+#id-img-encF
+  display none
+
+[que-pantalla="indicador"]
+  #id-img-encF
+    display unset
+    position absolute
+    z-index -1
+    top 16px
+    left 0px
+  .enc-rotables
+    display:none
+  #barra-inferior-centro
+    width 30%
+    min-width 400px
+    min-height 120px
+    margin-left 0 
+
 #sicba-logos-izq
   position absolute
   top 20px
@@ -37,16 +57,17 @@
       max-height 50px
 
 @media (max-width: 1240px)
-  #sicba-logos-izq
-    position absolute
-    top 40px
-    right 55px
-    .contenedor
-      flex-direction column
-      img
-        text-align right
-        max-height unset
-        max-width 110px
-        margin-right 0px
-        margin-left auto
+  [que-pantalla="principal"]
+    #sicba-logos-izq
+      position absolute
+      top 40px
+      right 55px
+      .contenedor
+        flex-direction column
+        img
+          text-align right
+          max-height unset
+          max-width 110px
+          margin-right 0px
+          margin-left auto
 

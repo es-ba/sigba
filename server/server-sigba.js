@@ -1486,6 +1486,21 @@ class AppSIGBA extends backend.AppBackend{
                 })
             })
         })
+        if(be.config?.content?.descripcion){
+            var skin=be.config['client-setup'].skin;
+            var skinUrl=(skin?skin+'/':'');
+            mainApp.get(baseUrl+'/descripcion',function(req,res){
+                var pantalla = html.includeHtml(
+                    be.content.descripcion.replace('<div id="id-encabezado"></div>', be.content['id-encabezado']||'')
+                );
+                var pagina=html.html([
+                    be.headSigba(false,req,'descripción del sistema'),
+                    html.body({"que-pantalla": 'descripcion'},[pantalla,be.foot(skinUrl)])
+                ]);
+                res.send(pagina.toHtmlText({pretty:true}));
+                be.reloadContent();
+            });
+        }
     }
     
     obtenerGruposPrincipales(client){
@@ -1514,7 +1529,7 @@ class AppSIGBA extends backend.AppBackend{
                 if(p_texto){
                     var textoLey=html.div({id:'texto'},p_texto)
                 }
-                var encabezadoCompletoHtml=html.div({id:'id-encabezado'},be.content['id-encabezado'] || [
+                var encabezadoCompletoHtml=html.div({id:'id-encabezado'},be.content.iDencabezado || [
                     html.a({class:'encabezado',id:'barra-superior',href:''+absolutePath+'principal'},[
                         html.div({class:'encabezado-interno'},[
                             html.img({class:'encabezado',id:'bs-izq',src:skinUrl+'img/logo-ciudad.png'}),
@@ -1706,12 +1721,15 @@ class AppSIGBA extends backend.AppBackend{
     async reloadContent(){
         var be = this;
         be.content = {}
-        await Promise.all(['id-encabezado'].map(async idContenido=>{
+        await Promise.all(['id-encabezado', 'descripcion'].map(async idContenido=>{
             if(be.config.content[idContenido]){
                 html.insecureModeEnabled = true;
-                be.content[idContenido] = html.includeHtml(await fs.readFile('unlogged/'+be.config.content[idContenido], 'utf8'));
+                be.content[idContenido] = await fs.readFile('unlogged/'+be.config.content[idContenido], 'utf8');
             }
         }))
+        if(be.content['id-encabezado']){
+            be.content.idEncabezado = html.includeHtml(be.content['id-encabezado']);
+        }
     }
     
 }

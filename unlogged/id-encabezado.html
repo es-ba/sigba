@@ -1,14 +1,25 @@
 <div id='barra-superior' style="background:white; height:84px">
-    <img id="bs-izq" src='img/BA2016.png' style="margin-left:5%;height:auto;width:auto">
-    <img id="bs-der" src='img/logo_dgdeyc.jpg' style="height:80px; margin-bottom:4px; width:auto">
+    <a href=""><img id="bs-izq" src='img/BA2016.png' style="margin-left:5%;height:auto;width:auto"></a>
+    <a href="https://www.estadisticaciudad.gob.ar/eyc/?page_id=97934"><img id="bs-der" src='img/logo_dgdeyc.jpg' style="height:80px; margin-bottom:4px; width:auto"></a>
 </div>
 <div id='barra-inferior'>
     <link href='css/enc-rotar.css' rel="stylesheet">
     <div id=barra-inferior-centro>
-        <img id="id-img-encB" src="img/cuidados_diamante.png"                        >
-        <img id="id-img-enc0" src="img/cuidados_definicion.png"  class="enc-rotables">
-        <img id="id-img-enc1" src="img/cuidados_pobobjetivo.png" class="enc-rotables">
-        <img id="id-img-enc2" src="img/cuidados_proveedores.png" class="enc-rotables">
+        <map name="diamante" id="diamante">
+            <area shape="circle" coords="558,60,35" href="./descripcion#est" />
+            <area shape="circle" coords="408,205,35" href="./descripcion#com" />
+            <area shape="circle" coords="709,205,35" href="./descripcion#mer" />
+            <area shape="circle" coords="558,320,35" href="./descripcion#fam" />
+            <area shape="circle" coords="492,182,30" href="./descripcion#dis" />
+            <area shape="circle" coords="558,164,30" href="./descripcion#may" />
+            <area shape="circle" coords="624,182,30" href="./descripcion#nna" />
+            <area shape="circle" coords="492,182,30" href="./descripcion#dis" />
+        </map>
+        <img id="id-img-encF" src="img/flecha-volver.png">
+        <a href="./principal"><img id="id-img-encB" src="img/cuidados_diamante.png"></a>
+        <img id="id-img-enc0" src="img/cuidados_definicion.png"  usemap="#diamante" class="enc-rotables">
+        <img id="id-img-enc1" src="img/cuidados_pobobjetivo.png" usemap="#diamante" class="enc-rotables">
+        <img id="id-img-enc2" src="img/cuidados_proveedores.png" usemap="#diamante" class="enc-rotables">
     </div>
     <div id="sicba-logos-izq">
         <div id="colaboracion">Con la colaboración de</div>
