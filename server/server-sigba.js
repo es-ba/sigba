@@ -1529,7 +1529,7 @@ class AppSIGBA extends backend.AppBackend{
                 if(p_texto){
                     var textoLey=html.div({id:'texto'},p_texto)
                 }
-                var encabezadoCompletoHtml=html.div({id:'id-encabezado'},be.content.iDencabezado || [
+                var encabezadoCompletoHtml=html.div({id:'id-encabezado'},be.content.idEncabezado || [
                     html.a({class:'encabezado',id:'barra-superior',href:''+absolutePath+'principal'},[
                         html.div({class:'encabezado-interno'},[
                             html.img({class:'encabezado',id:'bs-izq',src:skinUrl+'img/logo-ciudad.png'}),
