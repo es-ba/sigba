@@ -1,14 +1,53 @@
 <div>
     <div id="id-encabezado"></div>
     <style>
-        #contenido-descripcion img {min-width:1024px; width:100%}
+        #contenido-descripcion {display:flex; flex-direction: column;}
         #contenido-descripcion .separacion {background-image: linear-gradient(rgb(105, 124, 197), rgb(81, 109, 174)); min-height:40px}
+        .bloque-horizontal{
+            display:flex;
+            flex-wrap: wrap;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+        }
+        #sistema {
+            background-position: center ;
+            background-size: auto 100% ;
+            background-position: repeat-x ;
+            background-image: url(img/cuidadosvectores_03.jpg);
+        }
+        #diamante-cuidado{
+            height: 320px
+        }
+        .titulo_descripcion { font-weight: bold; color: #f0ae58; font-size: 1.1em }
+        .texto_descripcion { margin-top:20px; color: white; line-height: 1.4em; }
+        .caja_textos {width:415px; max-width: 90vw}
     </style>
     <div id="contenido-descripcion">
         <div class="separacion"></div>
-        <div id="sistema"></div>
-        <img src='img/descripcion-sicba-sistema.jpg'>
-        <div id="cuidado"></div>
+        <div id="sistema" class="bloque-horizontal">
+            <img id="diamante-cuidado" src="img/diamante-cuidado.png">
+            <div class=caja_textos>
+                <div class=titulo_descripcion>
+                    El sistema de indicadores de cuidado
+                </div>
+                <div class=texto_descripcion>
+                    muestra con datos provenientes del Gobierno de la 
+                    Ciudad de Buenos Aires y otras fuentes, cómo se organiza 
+                    el cuidado en la ciudad, quiénes proveen y quiénes 
+                    demandan cuidado, y como seran las proyecciones de 
+                    cuidado en el corto y mediano plazo. Al ser un sistema, 
+                    habilita en ver cómo se relacionan entre sí todos los 
+                    proveedores de cuidado el mercado con el consumo, 
+                    el&nbsp;Estado con el mercado, el Estado con
+                    los hogares, los&nbsp;hogares con las organizaciones de la sociedad civil.                     
+                </div>
+            </div>
+        </div>
+        <div id="cuidado">
+            acá
+        </div>
         <img src='img/descripcion-sicba-cuidado.jpg'>
         <div id="dis"></div>
         <div id="may"></div>
