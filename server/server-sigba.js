@@ -1495,7 +1495,7 @@ class AppSIGBA extends backend.AppBackend{
                 );
                 var pagina=html.html([
                     be.headSigba(false,req,'descripción del sistema'),
-                    html.body({"que-pantalla": 'descripcion'},[pantalla,be.foot(skinUrl)])
+                    html.body({"que-pantalla": 'descripcion'},[pantalla,html.div([be.foot(skinUrl)])])
                 ]);
                 res.send(pagina.toHtmlText({pretty:true}));
                 be.reloadContent();
