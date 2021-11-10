@@ -693,7 +693,7 @@ class AppSIGBA extends backend.AppBackend{
             
             }).then(function(){
                 return client.query(
-                    "SELECT habilitado,mostrar_cuadro cuadro,mostrar_grafico grafico, tipo_grafico,orientacion,apilado "+
+                    "SELECT habilitado,mostrar_cuadro cuadro,mostrar_grafico grafico, tipo_grafico,orientacion,apilado, nota_pie "+
                     "FROM tabulados WHERE indicador=$1 AND cortantes=$2"
                 ,[indicador,tabulado.cortantes]).fetchOneRowIfExists().then(function(result){
                     var caracteristicasTabulado=result.row;
@@ -703,7 +703,7 @@ class AppSIGBA extends backend.AppBackend{
                         tabulado.tipo_grafico=caracteristicasTabulado.tipo_grafico;
                         tabulado.orientacion=caracteristicasTabulado.orientacion;
                         tabulado.apilado=caracteristicasTabulado.apilado;
-                
+                        tabulado.nota_pie_tab=caracteristicasTabulado.nota_pie;
                     return tabulado;
                 })
             })
@@ -871,6 +871,7 @@ class AppSIGBA extends backend.AppBackend{
                             apilado:fila.apilado,
                             i_denom:infoParaTabulado.i_denom,
                             nota_pie:infoParaTabulado.con_nota?infoParaTabulado.nota_pie:null,
+                            nota_pie_tab:infoParaTabulado.con_nota?fila.nota_pie_tab:null,
                             fuente:infoParaTabulado.f_denom,
                             um_denominacion:infoParaTabulado.u_denom,
                             um:infoParaTabulado.um,
@@ -990,8 +991,10 @@ class AppSIGBA extends backend.AppBackend{
                                                     (fila.habilitado || esAdmin)?html.span({id:"tabulado-um-descripcion"},descripcion.um_denominacion):null
                                                 ]),
                                                 html.div({class:'tabulado-descripcion',id:'tabulado-descripcion-nota'},[
-                                                    ((fila.habilitado || esAdmin)&&descripcion.nota_pie)?html.span({id:"nota-porcentaje-label"},'Nota: '):null,
+                                                    ((fila.habilitado || esAdmin)&&(descripcion.nota_pie||descripcion.nota_pie_tab))?html.span({id:"nota-porcentaje-label"},'Nota: '):null,
                                                     ((fila.habilitado || esAdmin)&&descripcion.nota_pie)?html.span({id:"nota-porcentaje"},descripcion.nota_pie):null,
+                                                    ((fila.habilitado || esAdmin)&&descripcion.nota_pie_tab)?(descripcion.nota_pie?
+                                                        html.div({id:"nota-tab"},descripcion.nota_pie_tab):html.span({id:"nota-tab"},descripcion.nota_pie_tab) ):null
                                                 ]),
                                                 html.div({class:'tabulado-descripcion',id:'tabulado-descripcion-fuente'},[
                                                     (fila.habilitado || esAdmin)?html.span({id:"tabulado-fuente"},'Fuente: '):null,
