@@ -3,6 +3,13 @@
     <style>
         #contenido-descripcion {display:flex; flex-direction: column;}
         #contenido-descripcion .separacion {background-image: linear-gradient(rgb(105, 124, 197), rgb(81, 109, 174)); min-height:40px}
+        .bloque-vertical{
+            display:flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 40px;
+        }
         .bloque-horizontal{
             display:flex;
             flex-wrap: wrap;
@@ -16,6 +23,7 @@
             background-size: auto 100% ;
             background-position: repeat-x ;
             background-image: url(img/cuidadosvectores_verde.jpg);
+            background-color: #4ea8a8;
             padding-top: 3%;
             padding-bottom: 3%;
         }
@@ -78,14 +86,31 @@
         #definicion-cuidado{
             width: 350px
         }
-
-        .titulo_descripcion { font-weight: bolder; color: #3a4c9b; font-size: 1.5em }
-        .texto_descripcion { margin-top:20px; color: white; line-height: 1.4em; }
+        .titulo_descripcion {font-weight: bold; font-size: 1.5em; }
+        .texto_descripcion {line-height: 1.4em; margin-top: 20px;}
+        #sistema .titulo_descripcion { color: #3a4c9b; }
+        #sistema .texto_descripcion { margin-top:20px; color: white; line-height: 1.4em; }
         .caja_textos {width:445px; max-width: 90vw}
-        .titulo_descripcion_elcuidado { font-weight: bolder;  color: #ffffff; font-size: 1.5em }
-        .texto_descripcion_cuidado { margin-top:20px; font-weight:normal; color: #435295; line-height: 1.4em; }
-        .titulo_descripcion_objetivo { font-weight: bolder;  color: #ffffff; font-size: 1.5em }
-
+        .bloque-vertical .caja_textos {min-width:445px; width: 700px; max-width: 90vw}
+        .bloque-vertical .titulo_descripcion {text-align: center;}
+        #cuidado .titulo_descripcion { color: #ffffff; }
+        #cuidado .texto_descripcion { color: #435295; }
+        #objetivo .titulo_descripcion { color: #f1b048; }
+        #objetivo .texto_descripcion { color: #ffffff; }
+        .caja_descripcion_cajitas{
+            display:flex;
+            flex-direction: column;
+        }
+        .caja_ilustrada{
+            box-sizing: border-box;
+            padding: 30px;
+            padding-top: 220px;
+            width: 416px;
+            height: 525px;
+        }
+        .caja_ilustrada#dis{
+            background-image: url(img/objetivo_fondo_dis.png)
+        }
     </style>
     <div id="contenido-descripcion">
         <div class="separacion"></div>
@@ -101,31 +126,50 @@
             </div>
         </div>
         <div id="cuidado" class="bloque-horizontal">
-           <div class=caja_textos>
-                <div class="titulo_descripcion_elcuidado">
+            <div class=caja_textos>
+                <div class="titulo_descripcion titulo_superior">
                     El cuidado
                 </div>
-                <div class=texto_descripcion_cuidado>
-                    refiere a aquellas actividades o tareas que procuran la satisfacción de necesidades
+                <div class="texto_descripcion texto_superior">
+                    El cuidado refiere a aquellas actividades o tareas que procuran la satisfacción de necesidades
                     básicas para la reproducción de la vida cotidiana de las personas a través de la provisión
-                    de elementos físicos -es decir, actividades concretas vinculadas a la atención del cuerpo de
-                    las personas y sus necesidades fisiológicas- y simbólicos -vinculado al componente afectivo
-                    y emocional- que permiten la vida en sociedad, y que involucra a proveedores y receptores
+                    de elementos físicos &mdash;es decir, actividades concretas vinculadas a la atención del cuerpo de
+                    las personas y sus necesidades fisiológicas&mdash; y simbólicos &mdash;vinculado al componente afectivo
+                    y emocional&mdash; que permiten la vida en sociedad, y que involucra a proveedores y receptores
                     de cuidados (ELA, 2014, 2012, s.f.).                     
-                </div></div>
-                <img id="definicion-cuidado" src="img/definicion-cuidado.jpg">
+                </div>
+            </div>
+            <img id="definicion-cuidado" src="img/definicion-cuidado.jpg">
         </div>
-        <div id="objetivo" class="bloque-horizontal">
-                 <div class="titulo_descripcion_objetivo">
-                     Población objetivo del cuidado
-                 </div>
-                 <div class="disca">1
-                 </div>
-                 <div class="poblacion_mayor">2
-                 </div>
-                 <div class="nnya">3
-                 </div>
-             </div>             
-         </div>
+        <div id="objetivo" class="bloque-vertical">
+            <div class=caja_textos>
+                <div class="titulo_descripcion">
+                    Población objetivo del cuidado
+                </div>
+                <div class=texto_descripcion>
+                    El cuidado permite atender las necesidades de las personas requirentes de cuidado por su edad
+                    o por sus condiciones o capacidades (niños y niñas, personas adultas mayores, enfermas o con 
+                    algunas discapacidades) y también de las que podrían auto proveerse dicho cuidado 
+                    (Rodríguez Enríquez, 2015). 
+                </div>
+            </div>
+            <div class="bloque-horizontal">
+                <div id="nna" class=caja_ilustrada>1
+                </div>
+                <div id="may" class=caja_ilustrada>2
+                </div>
+                <div id="dis" class=caja_ilustrada>
+                    <div class="titulo_descripcion">
+                        Personas con discapacidad 
+                    </div>
+                    <div class=texto_descripcion>
+                        Se considera a las personas con deficiencias físicas, mentales, intelectuales o sensoriales a largo 
+                        plazo que, al interactuar con diversas barreras, ven impedida su participación plena y efectiva en 
+                        la sociedad, en igualdad de condiciones con las demás; estén cuidados en sus domicilios o en instituciones.
+                    </div>
+
+                </div>
+            </div>
         </div>
+    </div>
 </div>
