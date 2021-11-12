@@ -36,12 +36,22 @@
             padding-top: 6%;
             padding-bottom: 6%;
         }
+        
 
         #objetivo {
             background-position: center ;
             background-size: auto 100% ;
             background-position: repeat-x ;
             background-image: url(img/cuidadosvectores_objetivo.jpg);
+            padding-top: 3%;
+            padding-bottom: 3%;
+        }
+
+        #actores {
+            background-position: center ;
+            background-size: auto 100% ;
+            background-position: repeat-x ;
+            background-color: #3fb9aa;
             padding-top: 3%;
             padding-bottom: 3%;
         }
@@ -93,16 +103,20 @@
         .caja_textos {width:445px; max-width: 90vw}
         .bloque-vertical .caja_textos {min-width:445px; width: 700px; max-width: 90vw}
         .bloque-vertical .titulo_descripcion {text-align: center;}
-        #cuidado .titulo_descripcion { color: #ffffff; padding-bottom: 25px; }
+        #cuidado .titulo_descripcion { color: #ffffff; padding-bottom: 25px;}
         #cuidado .texto_descripcion { color: #2e3a72; }
         #objetivo .titulo_descripcion { color: #f1b048; padding-bottom: 25px; }
+        #actores .titulo_descripcion { color: #ffffff; padding-bottom: 25px; }
+        #actores .texto_descripcion { color: #222c55; }
         #objetivo .texto_descripcion { color: #ffffff; }
         #dis .titulo_descripcion_caja_ilustrada {color: #f59678; }
-        #dis, #may, #nna .texto_descripcion {text-align: center; }
-        #may .titulo_descripcion_caja_ilustrada {color: #eaa9c1; }
-        #nna .titulo_descripcion_caja_ilustrada {color: #49c6ff; }
+        #nna .texto_descripcion {text-align: center; }
+        #dis .texto_descripcion {text-align: center; }
+        #may .texto_descripcion {text-align: center; }
+        #may .titulo_descripcion_caja_ilustrada {color: #eaa9c1;}
+       
 
-         .caja_descripcion_cajitas{
+        .caja_descripcion_cajitas{
             display:flex;
             flex-direction: column;
         }
@@ -114,8 +128,18 @@
             height: 425px;
             background-repeat: no-repeat;
         }
-        
-        .titulo_descripcion_caja_ilustrada {font-weight: bold; font-size: 1.2em; padding-bottom: 15px; }
+        .caja_ilustrada_actores{
+            box-sizing: border-box;
+            padding: 20px;
+            padding-top: 160px;
+            width: 318px;
+            height: 385px;
+            background-repeat: no-repeat;
+        }
+
+        .titulo_descripcion_caja_ilustrada {font-weight: bold; font-size: 1.2em; padding-bottom: 15px; text-align: center;}
+        .titulo_descripcion_actores {font-weight: bold; font-size: 1.2em; padding-bottom: 15px; text-align: center; color: #30488e;}
+        .texto_descripcion_actores {text-align: center; color: #ffffff;}
 
         .caja_ilustrada#dis{ 
             background-image: url(img/objetivo_fondo_dis.png)
@@ -125,6 +149,18 @@
         }
         .caja_ilustrada#nna{
             background-image: url(img/objetivo_fondo_nna.png)
+        }
+        .caja_ilustrada_actores#mer{ 
+            background-image: url(img/actores_fondo_mer.png)
+        }
+        .caja_ilustrada_actores#fam{
+            background-image: url(img/actores_fondo_fam.png)
+        }
+        .caja_ilustrada_actores#com{
+            background-image: url(img/actores_fondo_com.png)
+        }
+        .caja_ilustrada_actores#est{
+            background-image: url(img/actores_fondo_est.png)
         }
 
     </style>
@@ -200,6 +236,60 @@
                         Se considera a las personas con deficiencias físicas, mentales, intelectuales o sensoriales a largo 
                         plazo que, al interactuar con diversas barreras, ven impedida su participación plena y efectiva en 
                         la sociedad, en igualdad de condiciones con las demás; estén cuidados en sus domicilios o en instituciones.
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <div id="actores" class="bloque-vertical">
+            <div class=caja_textos>
+                <div class="titulo_descripcion">
+                    Actores que proveen el cuidado
+                </div>
+                <div class=texto_descripcion>
+                    Las actividades de cuidado pueden ocurrir en forma no remunerada, basada en lazos familiares o comunitarios,
+                    proveerse en el sector público o pueden estar comercializadas y ser adquiridas en el mercado. 
+
+                </div>
+            </div>
+            <div class="bloque-horizontal">
+                <div id="fam" class=caja_ilustrada_actores>
+                    <div class="titulo_descripcion_actores">
+                        Hogares 
+                    </div>
+                    <div class=texto_descripcion_actores>
+                        Incluye el trabajo doméstico y de cuidado no remunerado
+
+                    </div>
+
+                </div>
+                <div id="est" class=caja_ilustrada_actores>
+                    <div class="titulo_descripcion_actores">
+                        Estado
+                    </div>
+                    <div class=texto_descripcion_actores>
+                        Incluye actividades, dispositivos y recursos humanos destinados al cuidado en instituciones estatales (escuelas, jardines, hogares de residencia permanentes, centros de día o servicios de cuidado en el domicilio).
+
+
+                    </div>
+
+                </div>
+                <div id="mer" class=caja_ilustrada_actores>
+                    <div class="titulo_descripcion_actores">
+                        Mercado 
+                    </div>
+                    <div class=texto_descripcion_actores>
+                        Incluye actividades, dispositivos y recursos humanos destinados al cuidado en instituciones privadas por las que se paga por el servicio.
+                    </div>
+
+                </div>
+                <div id="com" class=caja_ilustrada_actores>
+                    <div class="titulo_descripcion_actores">
+                        Comunidad 
+                    </div>
+                    <div class=texto_descripcion_actores>
+                        Incluye actividades de cuidado no remunerado que se ofrecen entre miembros de diferentes hogares (parientes, amigos, vecinos) y aquellas realizadas en la comunidad y en instituciones sin fines de lucro. 
+
                     </div>
 
                 </div>
