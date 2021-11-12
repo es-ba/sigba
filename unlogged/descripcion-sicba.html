@@ -86,31 +86,47 @@
         #definicion-cuidado{
             width: 350px
         }
-        .titulo_descripcion {font-weight: bold; font-size: 1.5em; }
-        .texto_descripcion {line-height: 1.4em; margin-top: 20px;}
+        .titulo_descripcion {font-weight: bold; font-size: 1.5em; }a
+        .texto_descripcion {line-height: 1.4em; }
         #sistema .titulo_descripcion { color: #3a4c9b; }
         #sistema .texto_descripcion { margin-top:20px; color: white; line-height: 1.4em; }
         .caja_textos {width:445px; max-width: 90vw}
         .bloque-vertical .caja_textos {min-width:445px; width: 700px; max-width: 90vw}
         .bloque-vertical .titulo_descripcion {text-align: center;}
-        #cuidado .titulo_descripcion { color: #ffffff; }
-        #cuidado .texto_descripcion { color: #435295; }
-        #objetivo .titulo_descripcion { color: #f1b048; }
+        #cuidado .titulo_descripcion { color: #ffffff; padding-bottom: 25px; }
+        #cuidado .texto_descripcion { color: #2e3a72; }
+        #objetivo .titulo_descripcion { color: #f1b048; padding-bottom: 25px; }
         #objetivo .texto_descripcion { color: #ffffff; }
-        .caja_descripcion_cajitas{
+        #dis .titulo_descripcion_caja_ilustrada {color: #f59678; }
+        #dis, #may, #nna .texto_descripcion {text-align: center; }
+        #may .titulo_descripcion_caja_ilustrada {color: #eaa9c1; }
+        #nna .titulo_descripcion_caja_ilustrada {color: #49c6ff; }
+
+         .caja_descripcion_cajitas{
             display:flex;
             flex-direction: column;
         }
         .caja_ilustrada{
             box-sizing: border-box;
-            padding: 30px;
-            padding-top: 220px;
-            width: 416px;
-            height: 525px;
+            padding: 20px;
+            padding-top: 160px;
+            width: 322px;
+            height: 425px;
+            background-repeat: no-repeat;
         }
-        .caja_ilustrada#dis{
+        
+        .titulo_descripcion_caja_ilustrada {font-weight: bold; font-size: 1.2em; padding-bottom: 15px; }
+
+        .caja_ilustrada#dis{ 
             background-image: url(img/objetivo_fondo_dis.png)
         }
+        .caja_ilustrada#may{
+            background-image: url(img/objetivo_fondo_may.png)
+        }
+        .caja_ilustrada#nna{
+            background-image: url(img/objetivo_fondo_nna.png)
+        }
+
     </style>
     <div id="contenido-descripcion">
         <div class="separacion"></div>
@@ -154,12 +170,30 @@
                 </div>
             </div>
             <div class="bloque-horizontal">
-                <div id="nna" class=caja_ilustrada>1
+                <div id="nna" class=caja_ilustrada>
+                    <div class="titulo_descripcion_caja_ilustrada">
+                        Personas con discapacidad 
+                    </div>
+                    <div class=texto_descripcion>
+                        Incluye a la población de 0 a 17 años, con foco especial en la primera infancia, con o sin cuidados parentales.
+
+                    </div>
+
                 </div>
-                <div id="may" class=caja_ilustrada>2
+                <div id="may" class=caja_ilustrada>
+                    <div class="titulo_descripcion_caja_ilustrada">
+                        Personas con discapacidad 
+                    </div>
+                    <div class=texto_descripcion>
+                        Comprende a las personas de más de 60 años que presenten dependencia de otros para poder llevar una vida plena
+                        (incluyendo actividades de autocuidado y/o aquellas que permiten una vida independiente); estén cuidados en sus
+                        domicilios o en instituciones.
+
+                    </div>
+
                 </div>
                 <div id="dis" class=caja_ilustrada>
-                    <div class="titulo_descripcion">
+                    <div class="titulo_descripcion_caja_ilustrada">
                         Personas con discapacidad 
                     </div>
                     <div class=texto_descripcion>
