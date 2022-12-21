@@ -773,6 +773,15 @@ class AppSIGBA extends backend.AppBackend{
             },be.config.content?.["marco-conceptual"]?.name ?? 'Signos convencionales')
         ])
     }
+    linkContacto(absolutePath, attrs){
+        return html.div( attrs?? {id:'link-contacto'},[
+            html.a({
+                id:'contacto-link',
+                href:''+absolutePath+('#foot-contacto')
+            },'Contacto')
+        ])
+    }
+
     addSchrödingerServices(mainApp, baseUrl){
         var be = this;
         mainApp.use(baseUrl+'/',function(req, res, next) {
@@ -959,6 +968,7 @@ class AppSIGBA extends backend.AppBackend{
                                 encabezadoHtml,
                                 html.div({class:'annios-links-container',id:'annios-links'},[
                                     html.div({id:'barra-annios'},anniosLinks),
+                                    be.linkContacto(absolutePath),
                                     be.linkSignosConvencionales(absolutePath),
                                     html.div({class:'float-clear'})
                                 ]),
@@ -1298,6 +1308,7 @@ class AppSIGBA extends backend.AppBackend{
                             html.div({id:'div-encabezado-titulo-tabulado',class:'titulo-tabulados'},[
                                 html.a({class:'encabezado-titulo-tabulado',href:''+absolutePath+'principal'},[
                                     html.div({id:'indicadores-titulo',class:'titulo-tabulados'},'Indicadores'),
+                                    be.linkContacto(absolutePath,{id:'titulo-contacto',class:'titulo-tabulados'}),
                                     be.linkSignosConvencionales(absolutePath, {id:'titulo-signos_convencionales',class:'titulo-tabulados'}),                                    
                                     html.div({class:'float-clear'},"")
                                 ]),
@@ -1532,6 +1543,21 @@ class AppSIGBA extends backend.AppBackend{
                 if(p_texto){
                     var textoLey=html.div({id:'texto'},p_texto)
                 }
+                var tipoEncabezadoPrincipal=be.config['client-setup'].tipoEncabezadoPrincipal;
+                //(texto, vacio, grupos)
+                var sectorEncabezadoCentro;
+                if (tipoEncabezadoPrincipal=='texto' && textoLey && p_texto){
+                    var sectorEncabezadoCentro=textoLey;
+                }else if(tipoEncabezadoPrincipal=='grupos'){
+                    var sectorEncabezadoCentro=html.div({class:'contiene-grupos'},grupos.map(function(grupo){
+                        var href=''+absolutePath+'principal#'+grupo.codigo;
+                        var src=skinUrl+'img/'+grupo.codigo+'.png';
+                        return html.a({class:'grupo-a',href:href,title:grupo.denominacion},[html.img({class:'grupo-img',src:src})])
+                    }))
+                }else{
+                    var sectorEncabezadoCentro=null;
+                };
+                
                 var encabezadoCompletoHtml=html.div({id:'id-encabezado'},be.content.idEncabezado || [
                     html.a({class:'encabezado',id:'barra-superior',href:''+absolutePath+'principal'},[
                         html.div({class:'encabezado-interno'},[
@@ -1540,19 +1566,14 @@ class AppSIGBA extends backend.AppBackend{
                         ]),
                     ]),
                     html.div({class:'encabezado',id:'barra-inferior'},
-                        [].concat([
-                            html.a({class:'a-principal',href:''+absolutePath+'principal'},[html.img(
-                                {class:'encabezado',id:'img-logo',src:skinUrl+srcLogoSistema}
-                            )])
-                        ]).concat(be.config['client-setup'].logos.map(function(logoName){
+                        [html.a({class:'a-principal',href:''+absolutePath+'principal'},[html.img(
+                            {class:'encabezado',id:'img-logo',src:skinUrl+srcLogoSistema})])
+                        ].concat(be.config['client-setup'].logos.map(function(logoName){
                                 return html.a({class:'a-principal',href:''+absolutePath+'principal'},[html.img({class:'encabezado',id:'logo-'+logoName,src:skinUrl+'img/img-logo-'+logoName+'.png'})]);
-                        }).concat([be.config['client-setup'].conTextoPrincipal?html.div({class:'encabezado',id:'texto-encabezado-grande'}):null]).concat(
-                              esPrincipal?textoLey?textoLey:(p_texto===null?null:html.div({class:'contiene-grupos'},grupos.map(function(grupo){
-                                    var href=''+absolutePath+'principal#'+grupo.codigo;
-                                var src=skinUrl+'img/'+grupo.codigo+'.png';
-                                return html.a({class:'grupo-a',href:href,title:grupo.denominacion},[html.img({class:'grupo-img',src:src})])
-                            }))):null
-                        ))
+                        //}).concat([be.config['client-setup'].conTextoPrincipal?html.div({class:'encabezado',id:'texto-encabezado-grande'}):null]
+                        })).concat(/* REVISAR*/
+                            esPrincipal? sectorEncabezadoCentro :null
+                        )
                     )
                 ])
                 return encabezadoCompletoHtml;
@@ -1563,8 +1584,9 @@ class AppSIGBA extends backend.AppBackend{
         return html.div({class:'footer',id:'foot'},[
             html.div({class:'footer',id:'foot-div-img'},[html.img({class:'footer',id:'foot-img',src:skinUrl+'img/foot-logo-BA.png'})]),
             html.div({class:'footer',id:'contiene-textos-foot'},[
-                html.div({class:'footer',id:'foot-texto'}),
-                html.div({class:'footer',id:'foot-texto-2'})
+                html.div({class:'footer',id:'foot-texto'}), 
+                html.div({class:'footer',id:'foot-texto-2'}),
+                html.div({class:'footer',id:'foot-contacto'})
             ])
         ])
     }

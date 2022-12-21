@@ -393,11 +393,16 @@ window.addEventListener('load', function () {
     refreshChartsRender();
     var foot = document.getElementById('foot-texto');
     var footOtroRenglon = document.getElementById('foot-texto-2');
+    var footContacto = document.getElementById('foot-contacto');
     if (foot) {
         foot.textContent = 'Dirección General de Estadística y Censos';
     }
     if (footOtroRenglon) {
         footOtroRenglon.textContent = 'Gobierno de la Ciudad de Buenos Aires';
+    }
+    if (footContacto) {
+        //footContacto.textContent = '&#9993; nombreMail@estadisticaciudad.gob.ar';
+        footContacto.innerHTML = 'Contacto &#x2709; cdocumentacion@estadisticaciudad.gob.ar';
     }
     window.addEventListener('scroll', function () {
         ["id-encabezado", "div-encabezado-titulo-tabulado", "foot", "annios-links"].forEach(function (id) {
