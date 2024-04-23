@@ -1561,17 +1561,19 @@ class AppSIGBA extends backend.AppBackend{
                 var encabezadoCompletoHtml=html.div({id:'id-encabezado'},be.content.idEncabezado || [
                     html.a({class:'encabezado',id:'barra-superior',href:''+absolutePath+'principal'},[
                         html.div({class:'encabezado-interno'},[
-                            html.img({class:'encabezado',id:'bs-izq',src:skinUrl+'img/logo-ciudad.png'}),
-                            html.img({class:'encabezado',id:'bs-der',src:skinUrl+'img/logo-BA.png'})
+                            html.img({class:'encabezado',id:'bs-izq',src:skinUrl+'img/img-logo-estadistica.png'}),
+                            html.img({class:'encabezado',id:'bs-der',src:skinUrl+'img/BA2024.png'})
                         ]),
                     ]),
                     html.div({class:'encabezado',id:'barra-inferior'},
                         [html.a({class:'a-principal',href:''+absolutePath+'principal'},[html.img(
                             {class:'encabezado',id:'img-logo',src:skinUrl+srcLogoSistema})])
-                        ].concat(be.config['client-setup'].logos.map(function(logoName){
+                        ]
+                        .concat(be.config['client-setup'].logos.map(function(logoName){
                                 return html.a({class:'a-principal',href:''+absolutePath+'principal'},[html.img({class:'encabezado',id:'logo-'+logoName,src:skinUrl+'img/img-logo-'+logoName+'.png'})]);
                         //}).concat([be.config['client-setup'].conTextoPrincipal?html.div({class:'encabezado',id:'texto-encabezado-grande'}):null]
-                        })).concat(/* REVISAR*/
+                        }))
+                        .concat(/* REVISAR*/
                             esPrincipal? sectorEncabezadoCentro :null
                         )
                     )
