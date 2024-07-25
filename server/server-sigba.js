@@ -1562,7 +1562,7 @@ class AppSIGBA extends backend.AppBackend{
                     html.a({class:'encabezado',id:'barra-superior',href:''+absolutePath+'principal'},[
                         html.div({class:'encabezado-interno'},[
                             html.img({class:'encabezado',id:'bs-izq',src:skinUrl+'img/IDECBA_02.png'}),
-                            html.img({class:'encabezado',id:'logo-sistema-indicador',src:skinUrl+srcLogoSistema}),
+                            html.a({class:'a-principal',href:''+absolutePath+'principal'},[html.img({class:'encabezado',id:'logo-sistema-indicador',src:skinUrl+srcLogoSistema})]),
                             html.img({class:'encabezado',id:'bs-der',src:skinUrl+'img/BA_02.png'})
                         ]),
                     ]),
