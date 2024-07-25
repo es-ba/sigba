@@ -514,7 +514,7 @@ class AppSIGBA extends backend.AppBackend{
     
     anniosCortantes(client,annios,anniosA,indicador){
         var sql = "SELECT distinct valor_corte annio FROM cortes_celdas "+
-            "WHERE variable = 'annio'"+ (indicador?" and indicador = $1": "")+
+            "WHERE variable = 'annio'"+ (indicador?" and indicador = $1 ": "")+
             "ORDER BY annio desc";
         return client.query(sql,indicador?[indicador]:[]).fetchAll().then(function(result){
             result.rows.forEach(function(row,i){
@@ -1567,9 +1567,9 @@ class AppSIGBA extends backend.AppBackend{
                         ]),
                     ]),
                     html.div({class:'encabezado',id:'barra-inferior'},
-                        [html.a({class:'a-principal',href:''+absolutePath+'principal'},[html.img(
+                        [/*html.a({class:'a-principal',href:''+absolutePath+'principal'},[html.img(
                             {class:'encabezado',id:'img-logo',src:skinUrl+srcLogoSistema})])
-                        ]
+                        */]
                         .concat(be.config['client-setup'].logos.map(function(logoName){
                                 return html.a({class:'a-principal',href:''+absolutePath+'principal'},[html.img({class:'encabezado',id:'logo-'+logoName,src:skinUrl+'img/img-logo-'+logoName+'.png'})]);
                         //}).concat([be.config['client-setup'].conTextoPrincipal?html.div({class:'encabezado',id:'texto-encabezado-grande'}):null]
