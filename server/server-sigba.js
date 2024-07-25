@@ -1559,21 +1559,21 @@ class AppSIGBA extends backend.AppBackend{
                 };
                 
                 var encabezadoCompletoHtml=html.div({id:'id-encabezado'},be.content.idEncabezado || [
-                    html.a({class:'encabezado',id:'barra-superior',href:''+absolutePath+'principal'},[
-                        html.div({class:'encabezado-interno'},[
+                    html.div({class:'encabezado',id:'barra-superior'},[
+                        // html.div({class:'encabezado-interno'},[
                             html.img({class:'encabezado',id:'bs-izq',src:skinUrl+'img/IDECBA_02.png'}),
-                            html.a({class:'a-principal',href:''+absolutePath+'principal'},[html.img({class:'encabezado',id:'logo-sistema-indicador',src:skinUrl+srcLogoSistema})]),
+                            html.a({class:'a-principal',href:''+absolutePath+'principal'},[html.img({id:'logo-sistema-indicador',src:skinUrl+srcLogoSistema})]),
                             html.img({class:'encabezado',id:'bs-der',src:skinUrl+'img/BA_02.png'})
-                        ]),
+                        // ]),
                     ]),
                     html.div({class:'encabezado',id:'barra-inferior'},
                         [/*html.a({class:'a-principal',href:''+absolutePath+'principal'},[html.img(
                             {class:'encabezado',id:'img-logo',src:skinUrl+srcLogoSistema})])
                         */]
-                        .concat(be.config['client-setup'].logos.map(function(logoName){
-                                return html.a({class:'a-principal',href:''+absolutePath+'principal'},[html.img({class:'encabezado',id:'logo-'+logoName,src:skinUrl+'img/img-logo-'+logoName+'.png'})]);
-                        //}).concat([be.config['client-setup'].conTextoPrincipal?html.div({class:'encabezado',id:'texto-encabezado-grande'}):null]
-                        }))
+                        // .concat(be.config['client-setup'].logos.map(function(logoName){
+                        //         return html.a({class:'a-principal',href:''+absolutePath+'principal'},[html.img({class:'encabezado',id:'logo-'+logoName,src:skinUrl+'img/img-logo-'+logoName+'.png'})]);
+                        // //}).concat([be.config['client-setup'].conTextoPrincipal?html.div({class:'encabezado',id:'texto-encabezado-grande'}):null]
+                        // }))
                         .concat(/* REVISAR*/
                             esPrincipal? sectorEncabezadoCentro :null
                         )

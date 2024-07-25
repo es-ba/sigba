@@ -61,7 +61,5 @@ client-setup:
   labels:
     agrupacion-principal: Derecho
     agrupacion-secundaria: Dimensión
-  logos:
-  - estadistica
 content: []  
 `;
