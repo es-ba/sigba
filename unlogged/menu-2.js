@@ -395,7 +395,7 @@ window.addEventListener('load', function () {
     var footOtroRenglon = document.getElementById('foot-texto-2');
     var footContacto = document.getElementById('foot-contacto');
     if (foot) {
-        foot.textContent = 'Dirección General de Estadística y Censos';
+        foot.textContent = 'Instituto de Estadística y Censos de la Ciudad Autónoma de Buenos Aires (IDECBA)';
     }
     if (footOtroRenglon) {
         footOtroRenglon.textContent = 'Gobierno de la Ciudad de Buenos Aires';
