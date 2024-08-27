@@ -1,0 +1,12 @@
+
+/*TODO: mover este archivo a source y que webpack lo pase a la carpeta dist*/
+/*############ WARNING don't remove this file ###############*/
+
+.c3-ygrid-line.zeroAxis line{
+    stroke: black;
+    stroke-width: 1px;
+}
+
+.c3-axis.c3-axis-x path{
+    stroke-opacity: 0;
+}
