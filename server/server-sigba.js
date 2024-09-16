@@ -488,7 +488,7 @@ class AppSIGBA extends backend.AppBackend{
                 +"u.denominacion as u_denom,u.um as um,u.nota_pie nota_pie, i.decimales, i.annios_ocultables FROM indicadores i " 
                 +"\n LEFT JOIN fte f ON f.fte=i.fte " 
                 +"\n LEFT JOIN um u ON u.um=i.um "
-                +"\n WHERE indicador=$1",
+                +"\n WHERE indicador=$1 ",
             [indicador]
         ).fetchOneRowIfExists().then(function(result){
             var infoIndicador=result.row;
@@ -549,7 +549,7 @@ class AppSIGBA extends backend.AppBackend{
             return {
                 cortantes:"v.cortantes - 'annio'", 
                 cond_cortantes_posibles:"cortes ->> 'annio' = $2", 
-                cond_annio_en_cortante:" cc_annio.valor_corte=$3",
+                cond_annio_en_cortante:" cc_annio.valor_corte=$3 ",
                 f_param_cortantes_posibles: function(arra){return arra;}
             };
         }else{

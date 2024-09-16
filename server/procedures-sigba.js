@@ -50,7 +50,7 @@ ProceduresExamples = [
             {name:'annioCortante'        ,typeName:'text'},
         ],
         coreFunction:function(context, parameters){
-            var condicion=(parameters.annioCortante!='TRUE')?'cc.valor_corte = $3 ':' $3';
+            var condicion=(parameters.annioCortante!='TRUE')?'cc.valor_corte = $3 ':' $3 ';
             validarParametrosCamposCortantes(parameters.camposCortantes);
             var selectString=
                      "WITH validar AS(  "+
