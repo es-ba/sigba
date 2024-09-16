@@ -1561,7 +1561,7 @@ class AppSIGBA extends backend.AppBackend{
                 var encabezadoCompletoHtml=html.div({id:'id-encabezado'},be.content.idEncabezado || [
                     html.div({class:'encabezado',id:'barra-superior'},[
                         // html.div({class:'encabezado-interno'},[
-                            html.img({class:'encabezado',id:'bs-izq',src:skinUrl+'img/IDECBA_02.png'}),
+                            html.a({class:'a-principal',href:'https://www.estadisticaciudad.gob.ar/eyc/'},[html.img({class:'encabezado',id:'bs-izq',src:skinUrl+'img/IDECBA_02.png'})]),
                             html.a({class:'a-principal',href:''+absolutePath+'principal'},[html.img({id:'logo-sistema-indicador',src:skinUrl+srcLogoSistema})]),
                             html.img({class:'encabezado',id:'bs-der',src:skinUrl+'img/BA_02.png'})
                         // ]),
