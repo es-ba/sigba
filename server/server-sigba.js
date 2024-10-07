@@ -147,6 +147,11 @@ class AppSIGBA extends backend.AppBackend{
                                             html.img({class:'img-info-indicador', src:skinUrl+'img/img-info-indicador.png'})
                                         ]),
                                     ])
+                                    var linkMapa=html.span({id:'mapa_'+registro.indicador,class:'mapa-indicador'},[
+                                        html.a({class:'link-mapa-indicador',href:'https://ideec.estadisticaciudad.gob.ar/visualizador/visor/a/sidnnya_2024/nac_nnya',target:"_blank", title:'Mapa IDEEC'},[
+                                            html.img({class:'img-mapa-indicador', src:skinUrl+'img/img-mapa-indicador.jpg'})
+                                        ]),
+                                    ])
                                 }
                                 if(registro.agrupacion_principal ){
                                     if(registro.descripcion){
@@ -176,6 +181,7 @@ class AppSIGBA extends backend.AppBackend{
                                     html.span({id:id, class:'ancla'},registro.icono?"\u00a0":""),
                                     html.a(htmlA,registro.denominacion_principal?registro.denominacion_principal:registro[nombreCampo]),
                                     registro.indicador?informacionIndicador:null,
+                                    registro.indicador?linkMapa:null,
                                     registro.agrupacion_principal?informacionAgrupacionPrincipal:null
                                 ]);
                             })
