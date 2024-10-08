@@ -16,6 +16,7 @@ module.exports = function(context){
             {name:'universo'                 , label:'Universo'                              , typeName:'text'},
             {name:'def_con'                  , label:'Definición conceptual'                 , typeName:'text'},
             {name:'def_ope'                  , label:'Definición operativa'                  , typeName:'text'},
+            {name:'link_mapa_ideec'          , label:'URL a mapa IDEEC'                      , typeName:'text'},
             {name:'cob'                      , label:'Cobertura'                             , typeName:'text'},
             {name:'desagregaciones'          , label:'Desagregaciones'                       , typeName:'text'},
             {name:'uso_alc_lim'              , label:'Uso - Alcance - Limitaciones'          , typeName:'text'},

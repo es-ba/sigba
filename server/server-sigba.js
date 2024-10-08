@@ -137,7 +137,7 @@ class AppSIGBA extends backend.AppBackend{
                                 if(registro.nuevo){
                                     attributes["nuevo-registro"]='nuevo';
                                 }
-                                if(registro.indicador ){
+                                if(registro.indicador){
                                     attributes.id=id;
                                     if(registro.def_con){
                                         attributes.title=registro.def_con;
@@ -148,8 +148,8 @@ class AppSIGBA extends backend.AppBackend{
                                         ]),
                                     ])
                                     var linkMapa=html.span({id:'mapa_'+registro.indicador,class:'mapa-indicador'},[
-                                        html.a({class:'link-mapa-indicador',href:'https://ideec.estadisticaciudad.gob.ar/visualizador/visor/a/sidnnya_2024/nac_nnya',target:"_blank", title:'Mapa IDEEC'},[
-                                            html.img({class:'img-mapa-indicador', src:skinUrl+'img/img-mapa-indicador.jpg'})
+                                        html.a({class:'link-mapa-indicador',href:registro.link_mapa_ideec,target:"_blank", title:'Mapa IDEEC'},[
+                                            html.img({class:'img-mapa-indicador', src:skinUrl+'img/img-mapa-indicador.png'})
                                         ]),
                                     ])
                                 }
@@ -181,7 +181,7 @@ class AppSIGBA extends backend.AppBackend{
                                     html.span({id:id, class:'ancla'},registro.icono?"\u00a0":""),
                                     html.a(htmlA,registro.denominacion_principal?registro.denominacion_principal:registro[nombreCampo]),
                                     registro.indicador?informacionIndicador:null,
-                                    registro.indicador?linkMapa:null,
+                                    (registro.indicador && registro.link_mapa_ideec)?linkMapa:null,
                                     registro.agrupacion_principal?informacionAgrupacionPrincipal:null
                                 ]);
                             })
