@@ -1540,10 +1540,6 @@ class AppSIGBA extends backend.AppBackend{
     encabezado(skinUrl,esPrincipal,req,client){
         var be = this;
         return be.parametrosSistema(client).then(function(parametros){
-            var srcLogoSistema='img/img-logo.png';
-            if(parametros && parametros.nombre_sistema){
-                srcLogoSistema='img/img-logo'+'-'+parametros.nombre_sistema+'.png'
-            }
             return be.obtenerGruposPrincipales(client).then(function(grupos){
                 var p_texto= parametros.texto_sistema;
                 if(p_texto){
@@ -1563,26 +1559,16 @@ class AppSIGBA extends backend.AppBackend{
                 }else{
                     var sectorEncabezadoCentro=null;
                 };
-                
                 var encabezadoCompletoHtml=html.div({id:'id-encabezado'},be.content.idEncabezado || [
                     html.div({class:'encabezado',id:'barra-superior'},[
-                        // html.div({class:'encabezado-interno'},[
-                            html.a({class:'a-principal',href:'https://www.estadisticaciudad.gob.ar/eyc/'},[html.img({class:'encabezado',id:'bs-izq',src:skinUrl+'img/IDECBA_02.png'})]),
-                            html.a({class:'a-principal',href:''+absolutePath+'principal'},[html.img({id:'logo-sistema-indicador',src:skinUrl+srcLogoSistema})]),
-                            html.img({class:'encabezado',id:'bs-der',src:skinUrl+'img/BA_02.png'})
-                        // ]),
+                        html.a({class:'a-principal',href:'https://www.estadisticaciudad.gob.ar/eyc/'},[html.img({class:'encabezado',id:'bs-izq',src:skinUrl+'img/IDECBA_02.png'})]),
+                        ...be.config['client-setup'].logos.map(logoName =>
+                            html.a({class:'a-principal',href:''+absolutePath+'principal'},[html.img({id:'logo-'+logoName,src:skinUrl+'img/img-logo-'+logoName+'-'+parametros.nombre_sistema+'.png'})]),
+                        ),
+                        html.img({class:'encabezado',id:'bs-der',src:skinUrl+'img/BA_02.png'})
                     ]),
                     html.div({class:'encabezado',id:'barra-inferior'},
-                        [/*html.a({class:'a-principal',href:''+absolutePath+'principal'},[html.img(
-                            {class:'encabezado',id:'img-logo',src:skinUrl+srcLogoSistema})])
-                        */]
-                        // .concat(be.config['client-setup'].logos.map(function(logoName){
-                        //         return html.a({class:'a-principal',href:''+absolutePath+'principal'},[html.img({class:'encabezado',id:'logo-'+logoName,src:skinUrl+'img/img-logo-'+logoName+'.png'})]);
-                        // //}).concat([be.config['client-setup'].conTextoPrincipal?html.div({class:'encabezado',id:'texto-encabezado-grande'}):null]
-                        // }))
-                        .concat(/* REVISAR*/
-                            esPrincipal? sectorEncabezadoCentro :null
-                        )
+                        [esPrincipal? sectorEncabezadoCentro :null]                       
                     )
                 ])
                 return encabezadoCompletoHtml;
