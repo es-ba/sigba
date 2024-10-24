@@ -167,9 +167,10 @@ class AppSIGBA extends backend.AppBackend{
                                     }
                                 }
                                 var sufijoTab=defTables[0].tabla||'';
+                                var txtTooltipOds= registro.metas?registro.metas:'El indicador contribuye a un Objetivo de desarrollo sostenible';
                                 var htmlIcono= html.span(
                                     {class:'span-img-icono'+sufijoTab},
-                                    registro.icono?html.img({class:'img-icono-'+sufijoTab,src:skinUrl+'img/'+registro.icono}):null
+                                    registro.icono?html.img({class:'img-icono-'+sufijoTab,src:skinUrl+'img/'+registro.icono, title:txtTooltipOds}):null
                                 );
                                 var htmlA={class:'es-link'};
                                 if(registro.indicador){
