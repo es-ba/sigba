@@ -773,11 +773,11 @@ class AppSIGBA extends backend.AppBackend{
     }
     linkSignosConvencionales(absolutePath, attrs){
         var be = this;
-        return html.div(attrs ?? {id:'link-signos-convencionales'},[
+        return html.div(attrs ?? {id:'link-signos_convencionales'},[
             html.a({
                 id:'signos_convencionales-link',
-                href:''+absolutePath+(be.config.content?.["marco-conceptual"]?.path ?? 'principal-signos_convencionales')
-            },be.config.content?.["marco-conceptual"]?.name ?? 'Signos convencionales')
+                href:''+absolutePath+(be.config.content?.["marco-conceptual"]?.path ?? 'principal-referencias')
+            },be.config.content?.["marco-conceptual"]?.name ?? 'Referencias')
         ])
     }
     linkContacto(absolutePath, attrs){
@@ -1468,7 +1468,7 @@ class AppSIGBA extends backend.AppBackend{
                 }).catch(MiniTools.serveErr(req,res)).then(function(){client.done()});
             })
         });
-        mainApp.get(baseUrl+'/principal-signos_convencionales',function(req,res){
+        mainApp.get(baseUrl+'/principal-referencias',function(req,res){
             return be.inDbClient(req,function(client){
                 var skin=be.config['client-setup'].skin;
                 var skinUrl=(skin?skin+'/':'');
@@ -1476,19 +1476,19 @@ class AppSIGBA extends backend.AppBackend{
                     var filasSignos=result.rows;
                     return be.encabezado(skinUrl,false,req,client).then(function(encabezadoHtml){
                         var pantalla=html.html([
-                            be.headSigba(false,req,'Signos convencionales'),
+                            be.headSigba(false,req,'Referencias'),
                             html.body({"que-pantalla": 'signos'},[
                                 encabezadoHtml,
                                 html.div({id:'total-layout','menu-type':'hidden'},[
-                                    html.table({id:'tabla-signos_convencionales',class:'signos-convencionales-encabezado'},[
-                                        html.caption({id:'caption-signos_convencionales',class:'signos-convencionales-encabezado'},'SIGNOS CONVENCIONALES'),
-                                        html.thead({id:'thead-signos_convencionales',class:'signos-convencionales-encabezado'},[
-                                            html.tr({id:'thead-tr-signos_convencionales',class:'signos-convencionales-encabezado'},[
+                                    html.table({id:'tabla-signos_convencionales',class:'signos_convencionales-encabezado'},[
+                                        html.caption({id:'caption-signos_convencionales',class:'signos_convencionales-encabezado'},'SIGNOS CONVENCIONALES'),
+                                        html.thead({id:'thead-signos_convencionales',class:'signos_convencionales-encabezado'},[
+                                            html.tr({id:'thead-tr-signos_convencionales',class:'signos_convencionales-encabezado'},[
                                                 html.th({id:'th-signo',class:'signos_convencionales-encabezado'},'Signo'),
                                                 html.th({id:'th-dnominacion',class:'signos_convencionales-encabezado'},'Descripción')
                                             ])
                                         ]),
-                                        html.tbody({id:'tbody-signos-convencionales'},
+                                        html.tbody({id:'tbody-signos_convencionales'},
                                             filasSignos.map(function(filaSigno){
                                                 return html.tr({class:'fila-signos_convencionales'},[
                                                     html.td({class:'td-signos_convencionales'},[filaSigno.signo]),
