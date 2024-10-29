@@ -1474,25 +1474,49 @@ class AppSIGBA extends backend.AppBackend{
                 var skinUrl=(skin?skin+'/':'');
                 return client.query(`SELECT signo,denominacion,orden FROM signos_convencionales ORDER BY orden`).fetchAll().then(function(result){
                     var filasSignos=result.rows;
+                    const filasIconografia=[
+                        {signo: 'img-ley-agrupacion_principal', denominacion: 'Acceso a Leyes vinculadas al indicador.'},
+                        {signo: 'img-info-indicador', denominacion: 'Acceso a Ficha técnica del indicador (definiciones, fuentes y metadata complementaria)'},
+                        {signo: 'img-mapa-indicador', denominacion: 'Acceso a mapa'},
+                        {signo: 'sigba_nuevo', denominacion: 'La presencia de la estrella en la esquina superior derecha de un indicador, muestra que fue recientemente actualizado'},
+                        {signo: 'ods4', denominacion: 'Objetivo de Desarrollo Sostenible (Agenda 2030) Muestra los indicadores que forman parte del programa.'},
+                    ]
                     return be.encabezado(skinUrl,false,req,client).then(function(encabezadoHtml){
                         var pantalla=html.html([
                             be.headSigba(false,req,'Referencias'),
                             html.body({"que-pantalla": 'signos'},[
                                 encabezadoHtml,
                                 html.div({id:'total-layout','menu-type':'hidden'},[
-                                    html.table({id:'tabla-signos_convencionales',class:'signos_convencionales-encabezado'},[
-                                        html.caption({id:'caption-signos_convencionales',class:'signos_convencionales-encabezado'},'SIGNOS CONVENCIONALES'),
-                                        html.thead({id:'thead-signos_convencionales',class:'signos_convencionales-encabezado'},[
-                                            html.tr({id:'thead-tr-signos_convencionales',class:'signos_convencionales-encabezado'},[
-                                                html.th({id:'th-signo',class:'signos_convencionales-encabezado'},'Signo'),
-                                                html.th({id:'th-dnominacion',class:'signos_convencionales-encabezado'},'Descripción')
+                                    html.table({id:'tabla-signos_convencionales',class:'referencias_table-encabezado'},[
+                                        html.caption({id:'caption-signos_convencionales',class:'referencias_table-encabezado'},'SIGNOS CONVENCIONALES'),
+                                        html.thead({id:'thead-signos_convencionales',class:'referencias_table-encabezado'},[
+                                            html.tr({id:'thead-tr-signos_convencionales',class:'referencias_table-encabezado'},[
+                                                html.th({id:'th-signo',class:'referencias_table-encabezado'},'Signo'),
+                                                html.th({id:'th-dnominacion',class:'referencias_table-encabezado'},'Descripción')
                                             ])
                                         ]),
                                         html.tbody({id:'tbody-signos_convencionales'},
                                             filasSignos.map(function(filaSigno){
-                                                return html.tr({class:'fila-signos_convencionales'},[
-                                                    html.td({class:'td-signos_convencionales'},[filaSigno.signo]),
-                                                    html.td({class:'td-signos_convencionales'},[filaSigno.denominacion]),
+                                                return html.tr({class:'fila-referencias_table'},[
+                                                    html.td({class:'td-referencias_table'},[filaSigno.signo]),
+                                                    html.td({class:'td-referencias_table'},[filaSigno.denominacion]),
+                                                ])
+                                            })
+                                        )
+                                    ]),
+                                    html.table({id:'tabla-iconografia',class:'referencias_table-encabezado'},[
+                                        html.caption({id:'caption-iconografia',class:'referencias_table-encabezado'},'Iconografía y funcionalidades'),
+                                        html.thead({id:'thead-iconografia',class:'referencias_table-encabezado'},[
+                                            html.tr({id:'thead-tr-iconografia',class:'referencias_table-encabezado'},[
+                                                html.th({id:'th-signo',class:'referencias_table-encabezado'},'Signo'),
+                                                html.th({id:'th-dnominacion',class:'referencias_table-encabezado'},'Descripción')
+                                            ])
+                                        ]),
+                                        html.tbody({id:'tbody-iconografia'},
+                                            filasIconografia.map(function(filaIco){
+                                                return html.tr({class:'fila-referencias_table'},[
+                                                    html.td({class:'td-referencias_table'},[html.img({class:filaIco.signo, src:skinUrl+'img/'+filaIco.signo+'.png'})]),
+                                                    html.td({class:'td-referencias_table'},[filaIco.denominacion]),
                                                 ])
                                             })
                                         )
