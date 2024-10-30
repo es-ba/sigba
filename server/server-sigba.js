@@ -144,12 +144,12 @@ class AppSIGBA extends backend.AppBackend{
                                     }
                                     var informacionIndicador=html.span({id:'ficha_'+registro.indicador,class:'info-indicador','ficha-indicador':JSON.stringify(registro.ficha)},[
                                         html.a({class:'link-info-indicador',href:''+absolutePath+''+urlYClasesTabulados+'-info-indicador?indicador='+registro.indicador,title:'Ficha técnica'},[
-                                            html.img({class:'img-info-indicador', src:skinUrl+'img/img-info-indicador.png'})
+                                            html.img({class:'img-info-indicador', src:skinUrl+'img/ficha-tecnica-gris.svg'})
                                         ]),
                                     ])
                                     var linkMapa=html.span({id:'mapa_'+registro.indicador,class:'mapa-indicador'},[
                                         html.a({class:'link-mapa-indicador',href:registro.link_mapa_ideec,target:"_blank", title:'Mapa IDEEC'},[
-                                            html.img({class:'img-mapa-indicador', src:skinUrl+'img/img-mapa-indicador.png'})
+                                            html.img({class:'img-mapa-indicador', src:skinUrl+'img/mapas-gris.svg'})
                                         ]),
                                     ])
                                 }
@@ -161,7 +161,7 @@ class AppSIGBA extends backend.AppBackend{
                                     if(ley){
                                         var informacionAgrupacionPrincipal=html.span({id:'ley_'+registro.agrupacion_principal,class:'ley-agrupacion_principal'},[
                                             html.a({class:'link-ley-agrupacion_principal',href:''+absolutePath+''+urlYClasesTabulados+'-ley-agrupacion_principal?agrupacion_principal='+registro.agrupacion_principal,title:'Leyes'},[
-                                                html.img({class:'img-ley-agrupacion_principal', src:skinUrl+'img/img-ley-agrupacion_principal.png'})
+                                                html.img({class:'img-ley-agrupacion_principal', src:skinUrl+'img/leyes-blco.svg'})
                                             ])
                                         ]);
                                     }
@@ -1475,11 +1475,11 @@ class AppSIGBA extends backend.AppBackend{
                 return client.query(`SELECT signo,denominacion,orden FROM signos_convencionales ORDER BY orden`).fetchAll().then(function(result){
                     var filasSignos=result.rows;
                     const filasIconografia=[
-                        {signo: 'img-ley-agrupacion_principal', denominacion: 'Acceso a Leyes vinculadas al indicador.'},
-                        {signo: 'img-info-indicador', denominacion: 'Acceso a Ficha técnica del indicador (definiciones, fuentes y metadata complementaria)'},
-                        {signo: 'img-mapa-indicador', denominacion: 'Acceso a mapa'},
-                        {signo: 'sigba_nuevo', denominacion: 'La presencia de la estrella en la esquina superior derecha de un indicador, muestra que fue recientemente actualizado'},
-                        {signo: 'ods4', denominacion: 'Objetivo de Desarrollo Sostenible (Agenda 2030) Muestra los indicadores que forman parte del programa.'},
+                        {signo: 'leyes-gris', ext:'svg', denominacion: 'Acceso a Leyes vinculadas al indicador.'},
+                        {signo: 'ficha-tecnica-gris', ext:'svg', denominacion: 'Acceso a Ficha técnica del indicador (definiciones, fuentes y metadata complementaria)'},
+                        {signo: 'mapas-gris', ext:'svg', denominacion: 'Acceso a mapa'},
+                        {signo: 'estrella', ext:'svg', denominacion: 'La presencia de la estrella en la esquina superior derecha de un indicador, muestra que fue recientemente actualizado'},
+                        {signo: 'ods4', ext:'png', denominacion: 'Objetivo de Desarrollo Sostenible (Agenda 2030) Muestra los indicadores que forman parte del programa.'},
                     ]
                     return be.encabezado(skinUrl,false,req,client).then(function(encabezadoHtml){
                         var pantalla=html.html([
@@ -1487,36 +1487,36 @@ class AppSIGBA extends backend.AppBackend{
                             html.body({"que-pantalla": 'signos'},[
                                 encabezadoHtml,
                                 html.div({id:'total-layout','menu-type':'hidden'},[
-                                    html.table({id:'tabla-signos_convencionales',class:'referencias_table-encabezado'},[
-                                        html.caption({id:'caption-signos_convencionales',class:'referencias_table-encabezado'},'SIGNOS CONVENCIONALES'),
+                                    html.table({id:'tabla-iconografia',class:['referencias_table-encabezado', 'referencias_table']},[
+                                        html.caption({class:['referencias_table-encabezado','caption-referencias_table']},'Iconografía y funcionalidades'),
+                                        html.thead({id:'thead-iconografia',class:'referencias_table-encabezado'},[
+                                            // html.tr({id:'thead-tr-iconografia',class:'referencias_table-encabezado'},[
+                                            //     html.th({id:'th-signo',class:'referencias_table-encabezado'},'Signo'),
+                                            //     html.th({id:'th-dnominacion',class:'referencias_table-encabezado'},'Descripción')
+                                            // ])
+                                        ]),
+                                        html.tbody({id:'tbody-iconografia'},
+                                            filasIconografia.map(function(filaIco){
+                                                return html.tr({class:'fila-referencias_table'},[
+                                                    html.td({class:'td-referencias_table'},[html.img({class:filaIco.signo, src:skinUrl+'img/'+filaIco.signo+'.'+filaIco.ext})]),
+                                                    html.td({class:'td-referencias_table'},[filaIco.denominacion]),
+                                                ])
+                                            })
+                                        )
+                                    ]),
+                                    html.table({id:'tabla-signos_convencionales',class:['referencias_table-encabezado', 'referencias_table']},[
+                                        html.caption({class:['referencias_table-encabezado','caption-referencias_table']},'SIGNOS CONVENCIONALES'),
                                         html.thead({id:'thead-signos_convencionales',class:'referencias_table-encabezado'},[
-                                            html.tr({id:'thead-tr-signos_convencionales',class:'referencias_table-encabezado'},[
-                                                html.th({id:'th-signo',class:'referencias_table-encabezado'},'Signo'),
-                                                html.th({id:'th-dnominacion',class:'referencias_table-encabezado'},'Descripción')
-                                            ])
+                                            // html.tr({id:'thead-tr-signos_convencionales',class:'referencias_table-encabezado'},[
+                                            //     html.th({id:'th-signo',class:'referencias_table-encabezado'},'Signo'),
+                                            //     html.th({id:'th-dnominacion',class:'referencias_table-encabezado'},'Descripción')
+                                            // ])
                                         ]),
                                         html.tbody({id:'tbody-signos_convencionales'},
                                             filasSignos.map(function(filaSigno){
                                                 return html.tr({class:'fila-referencias_table'},[
                                                     html.td({class:'td-referencias_table'},[filaSigno.signo]),
                                                     html.td({class:'td-referencias_table'},[filaSigno.denominacion]),
-                                                ])
-                                            })
-                                        )
-                                    ]),
-                                    html.table({id:'tabla-iconografia',class:'referencias_table-encabezado'},[
-                                        html.caption({id:'caption-iconografia',class:'referencias_table-encabezado'},'Iconografía y funcionalidades'),
-                                        html.thead({id:'thead-iconografia',class:'referencias_table-encabezado'},[
-                                            html.tr({id:'thead-tr-iconografia',class:'referencias_table-encabezado'},[
-                                                html.th({id:'th-signo',class:'referencias_table-encabezado'},'Signo'),
-                                                html.th({id:'th-dnominacion',class:'referencias_table-encabezado'},'Descripción')
-                                            ])
-                                        ]),
-                                        html.tbody({id:'tbody-iconografia'},
-                                            filasIconografia.map(function(filaIco){
-                                                return html.tr({class:'fila-referencias_table'},[
-                                                    html.td({class:'td-referencias_table'},[html.img({class:filaIco.signo, src:skinUrl+'img/'+filaIco.signo+'.png'})]),
-                                                    html.td({class:'td-referencias_table'},[filaIco.denominacion]),
                                                 ])
                                             })
                                         )
