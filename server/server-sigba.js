@@ -142,7 +142,7 @@ class AppSIGBA extends backend.AppBackend{
                                     if(registro.def_con){
                                         attributes.title=registro.def_con;
                                     }
-                                    var informacionIndicador=html.span({id:'ficha_'+registro.indicador,class:'info-indicador','ficha-indicador':JSON.stringify(registro.ficha)},[
+                                    var informacionIndicador=html.span({id:'ficha_'+registro.indicador,class:'info-indicador'},[
                                         html.a({class:'link-info-indicador',href:''+absolutePath+''+urlYClasesTabulados+'-info-indicador?indicador='+registro.indicador,title:'Ficha técnica'},[
                                             html.img({class:'img-info-indicador', src:skinUrl+'img/ficha-tecnica-gris.svg'})
                                         ]),
@@ -492,7 +492,7 @@ class AppSIGBA extends backend.AppBackend{
         return client.query(
             "SELECT i.denominacion as i_denom ,i.con_nota_pie con_nota,f.fte as fte, f.denominacion as f_denom,f.graf_ult_annios as graf_ult_annios, "
                 +"f.graf_cada_cinco as graf_cada_cinco, "
-                +"u.denominacion as u_denom,u.um as um,u.nota_pie nota_pie, i.decimales, i.annios_ocultables FROM indicadores i " 
+                +"u.denominacion as u_denom,u.um as um,u.nota_pie nota_pie, i.decimales, i.annios_ocultables, i.link_mapa_ideec FROM indicadores i " 
                 +"\n LEFT JOIN fte f ON f.fte=i.fte " 
                 +"\n LEFT JOIN um u ON u.um=i.um "
                 +"\n WHERE indicador=$1 ",
@@ -512,12 +512,10 @@ class AppSIGBA extends backend.AppBackend{
                 graf_ult_annios:infoIndicador.graf_ult_annios,
                 graf_cada_cinco:infoIndicador.graf_cada_cinco,
                 annios_ocultables:infoIndicador.annios_ocultables,
+                link_mapa_ideec:infoIndicador.link_mapa_ideec,
             }
         })
     }
-    
-    
-    
     
     anniosCortantes(client,annios,anniosA,indicador){
         var sql = "SELECT distinct valor_corte annio FROM cortes_celdas "+
@@ -771,6 +769,20 @@ class AppSIGBA extends backend.AppBackend{
             })
         })
     }
+    linksIconosMapaEInfo(absolutePath, infoIndicador, nombre_principal,skinUrl){
+        return html.span({id:'link-iconos_mapa_info'},[
+            html.span({id:'ficha_'+infoIndicador.indicador,class:'info-indicador'},[
+                html.a({class:'link-info-indicador',href:''+absolutePath+''+nombre_principal+'-info-indicador?indicador='+infoIndicador.indicador,title:'Ficha técnica'},[
+                    html.img({class:'img-info-indicador', src:skinUrl+'img/ficha-tecnica-blco.svg'})
+                ]),
+            ]),
+            infoIndicador.link_mapa_ideec? html.span({id:'mapa_'+infoIndicador.indicador,class:'mapa-indicador'},[
+                html.a({class:'link-mapa-indicador',href:infoIndicador.link_mapa_ideec,target:"_blank", title:'Mapa IDEEC'},[
+                    html.img({class:'img-mapa-indicador', src:skinUrl+'img/mapa-blco.svg'})
+                ]),
+            ]) : ''
+        ]);
+    }
     linkSignosConvencionales(absolutePath, attrs){
         var be = this;
         return html.div(attrs ?? {id:'link-signos_convencionales'},[
@@ -896,6 +908,7 @@ class AppSIGBA extends backend.AppBackend{
                             graf_ult_annios:infoParaTabulado.graf_ult_annios,
                             graf_cada_cinco:infoParaTabulado.graf_cada_cinco,
                             annios_ocultables:infoParaTabulado.annios_ocultables,
+                            link_mapa_ideec:infoParaTabulado.link_mapa_ideec,
                         };
                         matrices.matrixTab.caption=infoParaTabulado.i_denom;
                         matrices.matrixGraf.caption=infoParaTabulado.i_denom;
@@ -967,14 +980,19 @@ class AppSIGBA extends backend.AppBackend{
                                 html.a({class:'annio-cortante-posible',href:''+absolutePath+''+urlYClasesTabulados+'-indicador?indicador='+indicador+"&cortante="+cortante,'menu-item-selected':annio?false:true},'Serie')
                             ])
                         );
-                    }).then(function(){
+                    }).
+                    then(function(){
+                        return be.parametrosSistema(client).then(function(parametros){
+                           return parametros.nombre_principal;
+                        })}).  
+                    then(function(nombre_principal){
                         var skin=be.config['client-setup'].skin;
                         var skinUrl=(skin?skin+'/':'');
                         return be.encabezado(skinUrl,false,req,client).then(function(encabezadoHtml){
                             var pantalla=html.div({id:'total-layout','menu-type':'hidden'},[
                                 encabezadoHtml,
                                 html.div({class:'annios-links-container',id:'annios-links'},[
-                                    html.div({id:'barra-annios'},anniosLinks),
+                                    html.div({id:'barra-annios'},[...anniosLinks, be.linksIconosMapaEInfo(absolutePath,tabuladoDescripcionMatriz.descripcionTabulado,nombre_principal, skinUrl)]),
                                     be.linkContacto(absolutePath),
                                     be.linkSignosConvencionales(absolutePath),
                                     html.div({class:'float-clear'})
