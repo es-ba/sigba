@@ -1481,61 +1481,50 @@ class AppSIGBA extends backend.AppBackend{
             return be.inDbClient(req,function(client){
                 var skin=be.config['client-setup'].skin;
                 var skinUrl=(skin?skin+'/':'');
-                return client.query(`SELECT signo,denominacion,orden FROM signos_convencionales ORDER BY orden`).fetchAll().then(function(result){
-                    var filasSignos=result.rows;
-                    const filasIconografia=[
-                        {signo: 'leyes-gris', ext:'svg', denominacion: 'Acceso a Leyes vinculadas al indicador.'},
-                        {signo: 'ficha-tecnica-gris', ext:'svg', denominacion: 'Acceso a Ficha técnica del indicador (definiciones, fuentes y metadata complementaria)'},
-                        {signo: 'mapa-gris', ext:'svg', denominacion: 'Acceso a mapa'},
-                        {signo: 'estrella', ext:'svg', denominacion: 'La presencia de la estrella en la esquina superior derecha de un indicador, muestra que fue recientemente actualizado'},
-                        {signo: 'ods4', ext:'png', denominacion: 'Objetivo de Desarrollo Sostenible (Agenda 2030) Muestra los indicadores que forman parte del programa.'},
-                    ]
-                    return be.encabezado(skinUrl,false,req,client).then(function(encabezadoHtml){
-                        var pantalla=html.html([
-                            be.headSigba(false,req,'Referencias'),
-                            html.body({"que-pantalla": 'signos'},[
-                                encabezadoHtml,
-                                html.div({id:'total-layout','menu-type':'hidden'},[
-                                    html.table({id:'tabla-iconografia',class:['referencias_table-encabezado', 'referencias_table']},[
-                                        html.caption({class:['referencias_table-encabezado','caption-referencias_table']},'Iconografía y funcionalidades'),
-                                        html.thead({id:'thead-iconografia',class:'referencias_table-encabezado'},[
-                                            // html.tr({id:'thead-tr-iconografia',class:'referencias_table-encabezado'},[
-                                            //     html.th({id:'th-signo',class:'referencias_table-encabezado'},'Signo'),
-                                            //     html.th({id:'th-dnominacion',class:'referencias_table-encabezado'},'Descripción')
-                                            // ])
+                return client.query(`SELECT signo,denominacion,orden FROM signos_convencionales ORDER BY orden`).fetchAll().then(function(signosResult){
+                    return client.query(`SELECT icono,extension,descripcion,orden FROM iconografia ORDER BY orden`).fetchAll().then(function(iconoGrafiaResult){
+                        return be.encabezado(skinUrl,false,req,client).then(function(encabezadoHtml){
+                            var pantalla=html.html([
+                                be.headSigba(false,req,'Referencias'),
+                                html.body({"que-pantalla": 'signos'},[
+                                    encabezadoHtml,
+                                    html.div({id:'total-layout','menu-type':'hidden'},[
+                                        html.table({id:'tabla-iconografia',class:['referencias_table-encabezado', 'referencias_table']},[
+                                            html.caption({class:['referencias_table-encabezado','caption-referencias_table']},'Iconografía y funcionalidades'),
+                                            html.thead({id:'thead-iconografia',class:'referencias_table-encabezado'},[]),
+                                            html.tbody({id:'tbody-iconografia'},
+                                                iconoGrafiaResult.rows.map(function(filaIco){
+                                                    return html.tr({class:'fila-referencias_table'},[
+                                                        html.td({class:'td-referencias_table'},[html.img({class:filaIco.icono, src:skinUrl+'img/'+filaIco.icono+'.'+filaIco.extension})]),
+                                                        html.td({class:'td-referencias_table'},[filaIco.descripcion]),
+                                                    ])
+                                                })
+                                            )
                                         ]),
-                                        html.tbody({id:'tbody-iconografia'},
-                                            filasIconografia.map(function(filaIco){
-                                                return html.tr({class:'fila-referencias_table'},[
-                                                    html.td({class:'td-referencias_table'},[html.img({class:filaIco.signo, src:skinUrl+'img/'+filaIco.signo+'.'+filaIco.ext})]),
-                                                    html.td({class:'td-referencias_table'},[filaIco.denominacion]),
-                                                ])
-                                            })
-                                        )
-                                    ]),
-                                    html.table({id:'tabla-signos_convencionales',class:['referencias_table-encabezado', 'referencias_table']},[
-                                        html.caption({class:['referencias_table-encabezado','caption-referencias_table']},'SIGNOS CONVENCIONALES'),
-                                        html.thead({id:'thead-signos_convencionales',class:'referencias_table-encabezado'},[
-                                            // html.tr({id:'thead-tr-signos_convencionales',class:'referencias_table-encabezado'},[
-                                            //     html.th({id:'th-signo',class:'referencias_table-encabezado'},'Signo'),
-                                            //     html.th({id:'th-dnominacion',class:'referencias_table-encabezado'},'Descripción')
-                                            // ])
+                                        html.table({id:'tabla-signos_convencionales',class:['referencias_table-encabezado', 'referencias_table']},[
+                                            html.caption({class:['referencias_table-encabezado','caption-referencias_table']},'SIGNOS CONVENCIONALES'),
+                                            html.thead({id:'thead-signos_convencionales',class:'referencias_table-encabezado'},[
+                                                // html.tr({id:'thead-tr-signos_convencionales',class:'referencias_table-encabezado'},[
+                                                //     html.th({id:'th-signo',class:'referencias_table-encabezado'},'Signo'),
+                                                //     html.th({id:'th-dnominacion',class:'referencias_table-encabezado'},'Descripción')
+                                                // ])
+                                            ]),
+                                            html.tbody({id:'tbody-signos_convencionales'},
+                                                signosResult.rows.map(function(filaSigno){
+                                                    return html.tr({class:'fila-referencias_table'},[
+                                                        html.td({class:'td-referencias_table'},[filaSigno.signo]),
+                                                        html.td({class:'td-referencias_table'},[filaSigno.denominacion]),
+                                                    ])
+                                                })
+                                            )
                                         ]),
-                                        html.tbody({id:'tbody-signos_convencionales'},
-                                            filasSignos.map(function(filaSigno){
-                                                return html.tr({class:'fila-referencias_table'},[
-                                                    html.td({class:'td-referencias_table'},[filaSigno.signo]),
-                                                    html.td({class:'td-referencias_table'},[filaSigno.denominacion]),
-                                                ])
-                                            })
-                                        )
-                                    ]),
-                                    be.foot(skinUrl)
+                                        be.foot(skinUrl)
+                                    ])
                                 ])
                             ])
-                        ])
-                        res.send(pantalla.toHtmlText({pretty:true}));
-                        res.end();
+                            res.send(pantalla.toHtmlText({pretty:true}));
+                            res.end();
+                        })
                     })
                 })
             })
@@ -1630,12 +1619,13 @@ class AppSIGBA extends backend.AppBackend{
                     {menuType:'table', name:'indicadores' },
                 ]},
                 {menuType:'menu', name:'atributos', label:'atributos de indicadores', menuContent:[
-                    {menuType:'table', name:'fte'             , label:'fuente de datos '                          },
-                    {menuType:'table', name:'um'              , label:'unidad de medida'                          },
-                    {menuType:'table', name:'cv'              , label:'coeficientes de variación'                 },
-                    {menuType:'table', name:'indicador_annio' , label:'cobertura'                                 },
-                    {menuType:'table'    , name:'signos_convencionales', label:'signos convencionales'            },
-                    {menuType:'table'    , name:'variables_principales', label:'variables principales del sistema'},
+                    {menuType:'table', name:'fte'             , label:'fuente de datos '                             },
+                    {menuType:'table', name:'um'              , label:'unidad de medida'                             },
+                    {menuType:'table', name:'cv'              , label:'coeficientes de variación'                    },
+                    {menuType:'table', name:'indicador_annio' , label:'cobertura'                                    },
+                    {menuType:'table'    , name:'signos_convencionales', label:'signos convencionales'               },
+                    {menuType:'table'    , name:'iconografia', label:'iconografia' },
+                    {menuType:'table'    , name:'variables_principales', label:'variables principales del sistema'   },
                 ]},
                 {menuType:'menu'    , name:'variables' , menuContent:[
                     {menuType:'table', name:'variables'                                              },
@@ -1682,6 +1672,7 @@ class AppSIGBA extends backend.AppBackend{
             'tabulados_variables',
             'diferencia_totales',
             'signos_convencionales',
+            'iconografia',
             'totales_calculados'
         ]);
     }
