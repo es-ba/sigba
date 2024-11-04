@@ -142,16 +142,7 @@ class AppSIGBA extends backend.AppBackend{
                                     if(registro.def_con){
                                         attributes.title=registro.def_con;
                                     }
-                                    var informacionIndicador=html.span({id:'ficha_'+registro.indicador,class:'info-indicador'},[
-                                        html.a({class:'link-info-indicador',href:''+absolutePath+''+urlYClasesTabulados+'-info-indicador?indicador='+registro.indicador,title:'Ficha técnica'},[
-                                            html.img({class:'img-info-indicador', src:skinUrl+'img/ficha-tecnica-gris.svg'})
-                                        ]),
-                                    ])
-                                    var linkMapa=html.span({id:'mapa_'+registro.indicador,class:'mapa-indicador'},[
-                                        html.a({class:'link-mapa-indicador',href:registro.link_mapa_ideec,target:"_blank", title:'Mapa IDEEC'},[
-                                            html.img({class:'img-mapa-indicador', src:skinUrl+'img/mapas-gris.svg'})
-                                        ]),
-                                    ])
+                                    var informacionIndicador = be.linksIconosMapaEInfo(absolutePath,registro,urlYClasesTabulados, skinUrl, true)
                                 }
                                 if(registro.agrupacion_principal ){
                                     if(registro.descripcion){
@@ -182,7 +173,6 @@ class AppSIGBA extends backend.AppBackend{
                                     html.span({id:id, class:'ancla'},registro.icono?"\u00a0":""),
                                     html.a(htmlA,registro.denominacion_principal?registro.denominacion_principal:registro[nombreCampo]),
                                     registro.indicador?informacionIndicador:null,
-                                    (registro.indicador && registro.link_mapa_ideec)?linkMapa:null,
                                     registro.agrupacion_principal?informacionAgrupacionPrincipal:null
                                 ]);
                             })
@@ -769,16 +759,17 @@ class AppSIGBA extends backend.AppBackend{
             })
         })
     }
-    linksIconosMapaEInfo(absolutePath, infoIndicador, nombre_principal,skinUrl){
+    linksIconosMapaEInfo(absolutePath, infoIndicador, nombre_principal,skinUrl, grisIcon=false){
+        const iconColor = grisIcon?'gris':'blco';
         return html.span({id:'link-iconos_mapa_info'},[
             html.span({id:'ficha_'+infoIndicador.indicador,class:'info-indicador'},[
                 html.a({class:'link-info-indicador',href:''+absolutePath+''+nombre_principal+'-info-indicador?indicador='+infoIndicador.indicador,title:'Ficha técnica'},[
-                    html.img({class:'img-info-indicador', src:skinUrl+'img/ficha-tecnica-blco.svg'})
+                    html.img({class:'img-info-indicador', src:skinUrl+'img/ficha-tecnica-'+iconColor+'.svg'})
                 ]),
             ]),
             infoIndicador.link_mapa_ideec? html.span({id:'mapa_'+infoIndicador.indicador,class:'mapa-indicador'},[
                 html.a({class:'link-mapa-indicador',href:infoIndicador.link_mapa_ideec,target:"_blank", title:'Mapa IDEEC'},[
-                    html.img({class:'img-mapa-indicador', src:skinUrl+'img/mapa-blco.svg'})
+                    html.img({class:'img-mapa-indicador', src:skinUrl+'img/mapa-'+iconColor+'.svg'})
                 ]),
             ]) : ''
         ]);
@@ -1495,7 +1486,7 @@ class AppSIGBA extends backend.AppBackend{
                     const filasIconografia=[
                         {signo: 'leyes-gris', ext:'svg', denominacion: 'Acceso a Leyes vinculadas al indicador.'},
                         {signo: 'ficha-tecnica-gris', ext:'svg', denominacion: 'Acceso a Ficha técnica del indicador (definiciones, fuentes y metadata complementaria)'},
-                        {signo: 'mapas-gris', ext:'svg', denominacion: 'Acceso a mapa'},
+                        {signo: 'mapa-gris', ext:'svg', denominacion: 'Acceso a mapa'},
                         {signo: 'estrella', ext:'svg', denominacion: 'La presencia de la estrella en la esquina superior derecha de un indicador, muestra que fue recientemente actualizado'},
                         {signo: 'ods4', ext:'png', denominacion: 'Objetivo de Desarrollo Sostenible (Agenda 2030) Muestra los indicadores que forman parte del programa.'},
                     ]
