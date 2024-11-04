@@ -6,10 +6,10 @@ module.exports = function(context){
         name:'iconografia',
         editable: puedeEditar,
         fields: [
-            {name: 'icono'       ,typeName:'text'          ,nullable:false      ,title:'Signo'   },
-            {name: 'extension'   ,typeName:'text'          ,nullable:false      ,title:'Signo'   },
-            {name: 'descripcion' ,typeName:'text'                               ,title:'Denominación'   },
-            {name: 'orden'       ,typeName:'integer'                               },
+            {name: 'icono'       ,typeName:'text'    ,nullable:false },
+            {name: 'extension'   ,typeName:'text'    ,nullable:false },
+            {name: 'descripcion' ,typeName:'text'                    },
+            {name: 'orden'       ,typeName:'integer'                 },
         ],
         primaryKey:['icono']
     },context);
