@@ -1,4 +1,7 @@
 set search_path=nnya;
+set role to nnya_owner;
+
+DROP TABLE IF EXISTS nnya.iconografia;
 
 create table "iconografia" (
   "icono" text NOT NULL, 
@@ -8,7 +11,6 @@ create table "iconografia" (
 primary key ("icono")
 );
 grant select, insert, update, delete on "iconografia" to "nnya_user";
-
 
 insert into iconografia (icono, extension, descripcion, orden)
 values

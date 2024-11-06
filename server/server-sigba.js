@@ -1502,7 +1502,7 @@ class AppSIGBA extends backend.AppBackend{
                                             )
                                         ]),
                                         html.table({id:'tabla-signos_convencionales',class:['referencias_table', 'referencias_table-encabezado']},[
-                                            html.caption({class:['referencias_table-encabezado','caption-referencias_table']},'SIGNOS CONVENCIONALES'),
+                                            html.caption({class:['referencias_table-encabezado','caption-referencias_table']},'Signos convencionales'),
                                             html.thead({id:'thead-signos_convencionales',class:'referencias_table-encabezado'},[
                                                 // html.tr({id:'thead-tr-signos_convencionales',class:'referencias_table-encabezado'},[
                                                 //     html.th({id:'th-signo',class:'referencias_table-encabezado'},'Signo'),
