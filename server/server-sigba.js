@@ -142,7 +142,7 @@ class AppSIGBA extends backend.AppBackend{
                                     if(registro.def_con){
                                         attributes.title=registro.def_con;
                                     }
-                                    var informacionIndicador = be.linksIconosMapaEInfo(absolutePath,registro,urlYClasesTabulados, skinUrl, true)
+                                    var informacionIndicador = be.linksIconosMapaEInfo(absolutePath,registro,urlYClasesTabulados, skinUrl, true, html.div)
                                 }
                                 if(registro.agrupacion_principal ){
                                     if(registro.descripcion){
@@ -759,9 +759,9 @@ class AppSIGBA extends backend.AppBackend{
             })
         })
     }
-    linksIconosMapaEInfo(absolutePath, infoIndicador, nombre_principal,skinUrl, grisIcon=false){
+    linksIconosMapaEInfo(absolutePath, infoIndicador, nombre_principal,skinUrl, grisIcon=false, containerTag=html.span){
         const iconColor = grisIcon?'gris':'blco';
-        return html.span({id:'link-iconos_mapa_info'},[
+        return containerTag({id:'link-iconos_mapa_info'},[
             html.span({id:'ficha_'+infoIndicador.indicador,class:'info-indicador'},[
                 html.a({class:'link-info-indicador',href:''+absolutePath+''+nombre_principal+'-info-indicador?indicador='+infoIndicador.indicador,title:'Ficha técnica'},[
                     html.img({class:'img-info-indicador', src:skinUrl+'img/ficha-tecnica-'+iconColor+'.svg'})
