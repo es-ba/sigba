@@ -1488,8 +1488,8 @@ class AppSIGBA extends backend.AppBackend{
                                 be.headSigba(false,req,'Referencias'),
                                 html.body({"que-pantalla": 'signos'},[
                                     encabezadoHtml,
-                                    html.div({id:'total-layout','menu-type':'hidden'},[
-                                        html.table({id:'tabla-iconografia',class:['referencias_table-encabezado', 'referencias_table']},[
+                                    html.div({id:'total-layout','menu-type':'hidden', class:'tablas_referencias'},[
+                                        html.table({id:'tabla-iconografia',class:['referencias_table', 'referencias_table-encabezado']},[
                                             html.caption({class:['referencias_table-encabezado','caption-referencias_table']},'Iconografía y funcionalidades'),
                                             html.thead({id:'thead-iconografia',class:'referencias_table-encabezado'},[]),
                                             html.tbody({id:'tbody-iconografia'},
@@ -1501,7 +1501,7 @@ class AppSIGBA extends backend.AppBackend{
                                                 })
                                             )
                                         ]),
-                                        html.table({id:'tabla-signos_convencionales',class:['referencias_table-encabezado', 'referencias_table']},[
+                                        html.table({id:'tabla-signos_convencionales',class:['referencias_table', 'referencias_table-encabezado']},[
                                             html.caption({class:['referencias_table-encabezado','caption-referencias_table']},'SIGNOS CONVENCIONALES'),
                                             html.thead({id:'thead-signos_convencionales',class:'referencias_table-encabezado'},[
                                                 // html.tr({id:'thead-tr-signos_convencionales',class:'referencias_table-encabezado'},[
