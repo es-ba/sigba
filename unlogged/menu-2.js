@@ -82,7 +82,10 @@ function generateChart(elementWithMatrix, svgWidth) {
                     y: {
                         //siempre la misma escala para distintos graficos de variable z
                         min: minZYValue,
-                        max: maxZYValue 
+                        max: maxZYValue,
+                        tick:{
+                            format: (d) => isNaN(d) ? d : parseFloat(d.toFixed(tabuladoInfo.decimales))
+                        } 
                     },
                 }
             }
