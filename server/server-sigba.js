@@ -1631,7 +1631,7 @@ class AppSIGBA extends backend.AppBackend{
                     {menuType:'table', name:'variables'                                              },
                     {menuType:'table', name:'cortes'                                                 },
                     {menuType:'table', name:'indicadores-variables'   , table:'indicadores_variables'},
-                    {menuType:'proc' , name:'generar'                 , label:'generar-variables' , proc:'variables/generar'},
+                    {menuType:'proc' , name:'generar'                 , label:'agregar/quitar variables', proc:'variables/generar'},
                     {menuType:'table', name:'tabulados-variables'     , table:'tabulados_variables'  },
                 ]},
                 {menuType:'menu', name:'tabulados', menuContent:[

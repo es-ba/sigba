@@ -14,7 +14,7 @@ module.exports = function(context){
         primaryKey:['indicador','cortes', 'variable'], // poner acá el autonumérico
         foreignKeys:[
             {references:'celdas'                  , fields:['indicador', 'cortes'], onDelete:'cascade'},
-            {references:'cortes'                  , fields:['variable', 'valor_corte']},
+            {references:'cortes'                  , fields:['variable', 'valor_corte'], onDelete:'cascade'},
             {references:'indicadores_variables'   , fields:['indicador','variable' ], onDelete:'cascade'}
         ]
     },context);
